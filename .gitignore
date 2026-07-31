@@ -1,0 +1,25 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Local SQLite databases and SQLite transient files
+database/*.sqlite
+database/*.sqlite-*
+database/*.db
+database/*.db-*
+!database/easy.db
+!database/medium.db
+!database/expert.db
+
+# Tooling and OS files
+.vite/
+.DS_Store
+Thumbs.db
+*.log
+*.tsbuildinfo

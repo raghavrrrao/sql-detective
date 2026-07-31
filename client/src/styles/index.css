@@ -1,0 +1,161 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-size: 16px;
+    background: #08070a;
+    /* Investigation board texture, shared by every screen. */
+    --board-grid: rgba(255, 255, 255, 0.035);
+    --board-line: rgba(196, 19, 46, 0.5);
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    background: #08070a;
+    color: #f3f2ee;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: Oswald, Impact, ui-sans-serif, sans-serif;
+    letter-spacing: 0.01em;
+  }
+
+  /* Readability floor: body copy is never cramped. */
+  p,
+  li,
+  dd {
+    line-height: 1.75;
+  }
+
+  ::selection {
+    background: rgba(196, 19, 46, 0.4);
+    color: #fff;
+  }
+
+  *:focus-visible {
+    outline: 2px solid #e8c766;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0c0c10;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2c2c36;
+    border: 2px solid #0c0c10;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #46464f;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* ---- Background texture layers ---- */
+  .board-grid {
+    background-image: linear-gradient(var(--board-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--board-grid) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .board-grid-fine {
+    background-image: linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  .film-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
+  }
+
+  .paper-texture {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.6' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)' opacity='.4'/%3E%3C/svg%3E");
+    background-size: 120px 120px;
+  }
+
+  .vignette {
+    background: radial-gradient(120% 90% at 50% 40%, transparent 30%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.9) 100%);
+  }
+
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.028) 0px,
+      rgba(255, 255, 255, 0.028) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+
+  /* ---- Aggressive geometry ---- */
+  .clip-corner {
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  }
+
+  .clip-corner-sm {
+    clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  }
+
+  .clip-notch-tr {
+    clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+  }
+
+  .clip-tag {
+    clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
+  }
+
+  /* ---- Surfaces ---- */
+  .panel-surface {
+    background: linear-gradient(160deg, rgba(27, 27, 33, 0.92) 0%, rgba(12, 12, 16, 0.94) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .panel-surface-raised {
+    background: linear-gradient(160deg, rgba(34, 34, 41, 0.95) 0%, rgba(16, 16, 21, 0.96) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dossier-surface {
+    background: linear-gradient(150deg, rgba(30, 27, 24, 0.94) 0%, rgba(14, 13, 12, 0.96) 100%);
+    border: 1px solid rgba(201, 162, 39, 0.16);
+  }
+
+  .hairline-top {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* Red string that connects pins on a detective board. */
+  .evidence-thread {
+    background: linear-gradient(90deg, transparent, var(--board-line) 18%, var(--board-line) 82%, transparent);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

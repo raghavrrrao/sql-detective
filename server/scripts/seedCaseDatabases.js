@@ -1,0 +1,12 @@
+import fs from 'node:fs';
+import { databaseDirectory } from './seedHelpers.js';
+import { seedEasyDatabase } from './seedEasyDatabase.js';
+import { seedMediumDatabase } from './seedMediumDatabase.js';
+import { seedExpertDatabase } from './seedExpertDatabase.js';
+
+// Every case is hand-authored. There is no generated data left in the project.
+fs.mkdirSync(databaseDirectory, { recursive: true });
+
+await seedEasyDatabase();
+await seedMediumDatabase();
+await seedExpertDatabase();
