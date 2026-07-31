@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, FlaskConical, FileText, Fingerprint, HardDrive, KeyRound, Package, Pill, Swords } from 'lucide-react';
 
@@ -28,8 +28,18 @@ function formatStamp(value) {
   return time ? time.slice(0, 5) : value;
 }
 
-export function EvidenceCard({ item, index }) {
-  const [isOpen, setIsOpen] = useState(false);
+/**
+ * Expansion is uncontrolled by default, but the case board hands in `isOpen`
+ * and `onToggle` so an opened exhibit is still open after a refresh.
+ */
+function EvidenceCardComponent({ item, index, isOpen: controlledOpen, onToggle }) {
+  const [localOpen, setLocalOpen] = useState(false);
+  const isOpen = controlledOpen ?? localOpen;
+  const toggle = useCallback(() => {
+    if (onToggle) onToggle(item.id);
+    else setLocalOpen((open) => !open);
+  }, [onToggle, item.id]);
+
   const style = categoryStyles[item.category] ?? fallback;
   const Icon = style.icon;
   const importance = importanceOf(item.category);
@@ -44,7 +54,7 @@ export function EvidenceCard({ item, index }) {
     >
       <button
         type="button"
-        onClick={() => setIsOpen((open) => !open)}
+        onClick={toggle}
         aria-expanded={isOpen}
         className="flex w-full items-start gap-3.5 p-4 text-left"
       >
@@ -65,7 +75,7 @@ export function EvidenceCard({ item, index }) {
           </span>
         </span>
 
-        <ChevronDown size={17} className={`mt-1 shrink-0 text-bone-dim transition-transform duration-200 ${isOpen ? 'rotate-180 text-gold-bright' : ''}`} />
+        <ChevronDown aria-hidden="true" size={17} className={`mt-1 shrink-0 text-bone-dim transition-transform duration-200 ${isOpen ? 'rotate-180 text-gold-bright' : ''}`} />
       </button>
 
       <AnimatePresence initial={false}>
@@ -84,3 +94,5 @@ export function EvidenceCard({ item, index }) {
     </motion.article>
   );
 }
+
+export const EvidenceCard = memo(EvidenceCardComponent);

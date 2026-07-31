@@ -1,105 +1,136 @@
-import { useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Bookmark, BookOpen, Check, Search } from 'lucide-react';
+import { useCallback, useEffect, useRef } from 'react';
+import { BookOpen, ClipboardCheck, FileText, History, NotebookPen, ScrollText, Target } from 'lucide-react';
 import { ReusableModal } from './ReusableModal';
+import { NotebookEvidenceNotes } from './notebook/NotebookEvidenceNotes';
+import { NotebookObjectives } from './notebook/NotebookObjectives';
+import { NotebookOverview } from './notebook/NotebookOverview';
+import { NotebookPersonalNotes } from './notebook/NotebookPersonalNotes';
+import { NotebookPrimeSuspect } from './notebook/NotebookPrimeSuspect';
+import { NotebookQueryHistory } from './notebook/NotebookQueryHistory';
+import { useInvestigationSession } from '../state/investigationSession';
+
+const sections = [
+  { id: 'overview', label: 'Overview', icon: ScrollText },
+  { id: 'objectives', label: 'Objectives', icon: ClipboardCheck },
+  { id: 'evidence', label: 'Evidence', icon: FileText },
+  { id: 'history', label: 'History', icon: History },
+  { id: 'suspect', label: 'Prime suspect', icon: Target },
+  { id: 'notes', label: 'Notes', icon: NotebookPen },
+];
 
 /**
- * The detective notebook. Leads from the case briefing become tickable
- * objectives with a progress bar; everything is local UI state so the
- * investigation itself is untouched.
+ * The detective notebook: the player's companion across the whole case. Which
+ * section is open, how far each one was scrolled, which panels were expanded
+ * and everything typed into it all survive a refresh.
  */
-export function NotebookModal({ isOpen, onClose, leads = [] }) {
-  const [notes, setNotes] = useState('');
-  const [done, setDone] = useState(() => new Set());
-  const [bookmarked, setBookmarked] = useState(() => new Set());
-  const [search, setSearch] = useState('');
+export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, leads = [] }) {
+  const { notebookSection, setNotebookSection, scrollPositions, rememberScroll, tally } = useInvestigationSession();
 
-  const toggle = (setter) => (value) =>
-    setter((current) => {
-      const next = new Set(current);
-      if (next.has(value)) next.delete(value);
-      else next.add(value);
-      return next;
+  const bodyRef = useRef(null);
+  // Scroll offset is tracked in a ref and only committed when the section
+  // changes or the notebook closes — dispatching per scroll frame would
+  // re-render every section on the way past.
+  const offsetRef = useRef(0);
+  const sectionRef = useRef(notebookSection);
+  sectionRef.current = notebookSection;
+
+  const active = sections.find((section) => section.id === notebookSection) ?? sections[0];
+
+  const commitScroll = useCallback(() => {
+    rememberScroll(sectionRef.current, offsetRef.current);
+  }, [rememberScroll]);
+
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const node = bodyRef.current;
+    if (!node) return undefined;
+    const onScroll = () => { offsetRef.current = node.scrollTop; };
+    node.addEventListener('scroll', onScroll, { passive: true });
+    return () => node.removeEventListener('scroll', onScroll);
+  }, [isOpen]);
+
+  // Restore where this section was left, once the panel has rendered.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      const node = bodyRef.current;
+      if (!node) return;
+      const offset = scrollPositions[active.id] ?? 0;
+      node.scrollTop = offset;
+      offsetRef.current = offset;
     });
+    return () => window.cancelAnimationFrame(frame);
+    // scrollPositions is intentionally excluded: it is a restore source, not a trigger.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, active.id]);
 
-  const visible = useMemo(
-    () => leads.filter((lead) => lead.toLowerCase().includes(search.toLowerCase())),
-    [leads, search],
-  );
+  const selectSection = useCallback((id) => {
+    commitScroll();
+    setNotebookSection(id);
+  }, [commitScroll, setNotebookSection]);
 
-  const progress = leads.length ? Math.round((done.size / leads.length) * 100) : 0;
+  const handleClose = useCallback(() => {
+    commitScroll();
+    onClose();
+  }, [commitScroll, onClose]);
+
+  // Arrow keys move along the tab strip, as a tablist should.
+  const handleTabKeys = useCallback((event) => {
+    const offsets = { ArrowRight: 1, ArrowLeft: -1, Home: 'first', End: 'last' };
+    const move = offsets[event.key];
+    if (move === undefined) return;
+    event.preventDefault();
+    const index = sections.findIndex((section) => section.id === sectionRef.current);
+    const nextIndex = move === 'first' ? 0
+      : move === 'last' ? sections.length - 1
+        : (index + move + sections.length) % sections.length;
+    selectSection(sections[nextIndex].id);
+    event.currentTarget.querySelector(`#notebook-tab-${sections[nextIndex].id}`)?.focus();
+  }, [selectSection]);
 
   return (
-    <ReusableModal isOpen={isOpen} onClose={onClose} title="Detective notebook" icon={BookOpen} size="lg">
-      {/* Objective progress */}
-      <div className="clip-corner-sm panel-surface-raised p-4">
-        <div className="flex items-center justify-between gap-3">
-          <p className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Leads followed</p>
-          <p className="font-mono text-sm text-gold-bright">{done.size} / {leads.length}</p>
-        </div>
-        <div className="mt-3 h-1.5 overflow-hidden bg-white/10">
-          <motion.span
-            className="block h-full bg-gradient-to-r from-crimson to-gold"
-            initial={false}
-            animate={{ width: `${progress}%` }}
-            transition={{ duration: 0.4, ease: 'easeOut' }}
-          />
-        </div>
-      </div>
-
-      <label className="relative mt-5 block">
-        <span className="sr-only">Search leads</span>
-        <Search size={16} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-bone-dim" />
-        <input
-          value={search}
-          onChange={(event) => setSearch(event.target.value)}
-          placeholder="Search leads..."
-          className="clip-corner-sm w-full border border-white/10 bg-black/40 py-3 pl-10 pr-4 text-base text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
-        />
-      </label>
-
-      <ul className="mt-4 space-y-2.5">
-        {visible.map((lead) => {
-          const isDone = done.has(lead);
-          const isSaved = bookmarked.has(lead);
+    <ReusableModal isOpen={isOpen} onClose={handleClose} title="Detective notebook" icon={BookOpen} size="lg" bodyRef={bodyRef}>
+      <div
+        role="tablist"
+        aria-label="Notebook sections"
+        onKeyDown={handleTabKeys}
+        className="-mt-1 mb-6 flex flex-wrap gap-1.5"
+      >
+        {sections.map((section) => {
+          const Icon = section.icon;
+          const isActive = section.id === active.id;
           return (
-            <li key={lead} className="clip-corner-sm flex items-start gap-3 border border-white/10 bg-white/[0.035] p-3.5">
-              <button
-                type="button"
-                onClick={() => toggle(setDone)(lead)}
-                aria-pressed={isDone}
-                aria-label={isDone ? `Mark "${lead}" as not followed` : `Mark "${lead}" as followed`}
-                className={`clip-corner-sm mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border transition-colors ${
-                  isDone ? 'border-verdict-clear bg-verdict-clear/20 text-verdict-clear' : 'border-white/25 text-transparent hover:border-gold/60'
-                }`}
-              >
-                <Check size={13} strokeWidth={3} />
-              </button>
-              <p className={`flex-1 text-base leading-7 ${isDone ? 'text-bone-dim line-through' : 'text-bone-muted'}`}>{lead}</p>
-              <button
-                type="button"
-                onClick={() => toggle(setBookmarked)(lead)}
-                aria-pressed={isSaved}
-                aria-label={isSaved ? `Remove bookmark from "${lead}"` : `Bookmark "${lead}"`}
-                className={`shrink-0 p-1 transition-colors ${isSaved ? 'text-gold-bright' : 'text-bone-dim hover:text-gold-bright'}`}
-              >
-                <Bookmark size={16} strokeWidth={2.2} fill={isSaved ? 'currentColor' : 'none'} />
-              </button>
-            </li>
+            <button
+              key={section.id}
+              id={`notebook-tab-${section.id}`}
+              type="button"
+              role="tab"
+              aria-selected={isActive}
+              aria-controls={`notebook-panel-${section.id}`}
+              tabIndex={isActive ? 0 : -1}
+              onClick={() => selectSection(section.id)}
+              className={`clip-corner-sm inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+                isActive
+                  ? 'border-gold/55 bg-gold/12 text-gold-bright'
+                  : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'
+              }`}
+            >
+              <Icon size={13} strokeWidth={2.2} aria-hidden="true" /> {section.label}
+              {section.id === 'objectives' && (
+                <span className="font-mono text-xs text-bone-muted">{tally.done}/{tally.total}</span>
+              )}
+            </button>
           );
         })}
-        {visible.length === 0 && <li className="py-4 text-base text-bone-dim">No leads match that search.</li>}
-      </ul>
+      </div>
 
-      <div className="mt-6">
-        <p className="mb-2.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Working theory</p>
-        <textarea
-          value={notes}
-          onChange={(event) => setNotes(event.target.value)}
-          placeholder="Who cannot account for themselves, and what proves it?"
-          className="clip-corner-sm min-h-40 w-full resize-y border border-white/10 bg-black/40 p-4 text-base leading-7 text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
-        />
-        <p className="mt-2 text-sm text-bone-dim">Notes stay in this browser session only.</p>
+      <div id={`notebook-panel-${active.id}`} role="tabpanel" aria-labelledby={`notebook-tab-${active.id}`} tabIndex={-1} className="outline-none">
+        {active.id === 'overview' && <NotebookOverview caseData={caseData} caseFacts={caseFacts} />}
+        {active.id === 'objectives' && <NotebookObjectives leads={leads} />}
+        {active.id === 'evidence' && <NotebookEvidenceNotes evidence={briefing.evidence} />}
+        {active.id === 'history' && <NotebookQueryHistory onClose={handleClose} />}
+        {active.id === 'suspect' && <NotebookPrimeSuspect suspects={briefing.suspects} />}
+        {active.id === 'notes' && <NotebookPersonalNotes />}
       </div>
     </ReusableModal>
   );

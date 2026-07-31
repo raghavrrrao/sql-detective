@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { AnimatedBackground } from './AnimatedBackground';
@@ -7,51 +7,94 @@ import { InventoryPanel } from './InventoryPanel';
 import { NotebookModal } from './NotebookModal';
 import { QueryResultsTable } from './QueryResultsTable';
 import { Sidebar } from './Sidebar';
-import { SQLEditor, defaultQuery } from './SQLEditor';
+import { SQLEditor, starterQueryFor } from './SQLEditor';
 import { SuspectPanel } from './SuspectPanel';
-import { executeCaseQuery } from '../services/caseService';
-import { recordQueryRun } from '../utils/caseProgress';
+import {
+  InvestigationSessionProvider,
+  useInvestigationActions,
+  useInvestigationSession,
+  useSqlDraft,
+} from '../state/investigationSession';
+import { getCase } from '../utils/cases';
 
-const emptyQueryState = { columns: [], rows: [], executionTime: null, rowCount: 0, isLoading: false, error: null };
+/**
+ * The terminal is deliberately its own component: it subscribes to the editor
+ * text, which changes on every keystroke, so nothing else on the board has to.
+ */
+function TerminalPanel({ onEditorReady }) {
+  const { sql, isDirty } = useSqlDraft();
+  const { setSql, resetSql, clearSql, runQuery } = useInvestigationActions();
+  const { result } = useInvestigationSession();
 
-export function InvestigationLayout({ caseData, briefing, difficulty }) {
+  return (
+    <SQLEditor
+      sql={sql}
+      onSqlChange={setSql}
+      onRun={runQuery}
+      onReset={resetSql}
+      onClear={clearSql}
+      canReset={isDirty}
+      isRunning={result.isLoading}
+      onEditorReady={onEditorReady}
+    />
+  );
+}
+
+function ResultsPanel() {
+  const { result } = useInvestigationSession();
+  return <QueryResultsTable {...result} />;
+}
+
+function InvestigationBoard({ caseData, briefing, difficulty }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
-  const [activeFolder, setActiveFolder] = useState(briefing.notebook[0]?.id ?? 'evidence');
-  const [sql, setSql] = useState(defaultQuery);
-  const [queryState, setQueryState] = useState(emptyQueryState);
+  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql } = useInvestigationSession();
+
   const editorRef = useRef(null);
-  // Monaco captures its command callback once, so route through a ref to
-  // avoid running a stale copy of the query.
-  const runQueryRef = useRef(null);
+  const handleEditorReady = useCallback((editor) => { editorRef.current = editor; }, []);
 
   const leads = briefing.notebook.find((section) => section.id === 'notes')?.entries ?? [];
+  const caseFacts = getCase(difficulty);
 
-  const runQuery = useCallback(async () => {
-    setQueryState((current) => ({ ...current, isLoading: true, error: null }));
-    try {
-      const result = await executeCaseQuery(difficulty, sql);
-      setQueryState({ ...result, isLoading: false, error: null });
-      recordQueryRun(difficulty);
-    } catch (error) {
-      setQueryState((current) => ({ ...current, isLoading: false, error: error.message }));
-    }
-  }, [difficulty, sql]);
-
-  runQueryRef.current = runQuery;
+  const closeSidebar = useCallback(() => setIsSidebarOpen(false), []);
+  const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
+  const openNotebook = useCallback(() => setIsNotebookOpen(true), []);
+  const closeNotebook = useCallback(() => setIsNotebookOpen(false), []);
 
   // Loads a starter query for a suspect instead of revealing their file for free.
   const inspectSuspect = useCallback((suspect) => {
-    const statement = `SELECT * FROM suspects WHERE name = '${suspect.name.replace(/'/g, "''")}';`;
-    setSql(statement);
+    setSql(`SELECT * FROM suspects WHERE name = '${suspect.name.replace(/'/g, "''")}';`);
     editorRef.current?.focus();
-  }, []);
+  }, [setSql]);
 
-  const handleEditorMount = useCallback((editor, monaco) => {
-    editorRef.current = editor;
-    // Ctrl/Cmd + Enter runs the query, as a terminal should.
-    editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter, () => runQueryRef.current?.());
-  }, []);
+  // Board-level shortcuts. Monaco marks its own keybindings as handled, so the
+  // editor's copies of these win whenever the caret is inside it.
+  useEffect(() => {
+    const onKeyDown = (event) => {
+      if (event.defaultPrevented) return;
+      if (event.key === 'Escape') {
+        setIsSidebarOpen(false);
+        return;
+      }
+      // While a dialog is open it owns the keyboard, and a text field always
+      // keeps its own keystrokes — neither should reach the terminal.
+      if (document.querySelector('[role="dialog"]')) return;
+      if (event.target?.closest?.('input, textarea')) return;
+
+      const modifier = event.ctrlKey || event.metaKey;
+      if (!modifier) return;
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        runQuery();
+      } else if (event.key === 'l' || event.key === 'L') {
+        event.preventDefault();
+        clearSql();
+        editorRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [runQuery, clearSql]);
 
   return (
     <div className="relative min-h-screen overflow-hidden text-bone">
@@ -61,25 +104,25 @@ export function InvestigationLayout({ caseData, briefing, difficulty }) {
         <HeaderBar
           caseData={caseData}
           difficulty={difficulty}
-          onOpenSidebar={() => setIsSidebarOpen(true)}
-          onOpenNotebook={() => setIsNotebookOpen(true)}
+          onOpenSidebar={openSidebar}
+          onOpenNotebook={openNotebook}
         />
 
         <div className="relative flex min-h-0 flex-1">
           <Sidebar
             sections={briefing.notebook}
             evidence={briefing.evidence}
-            activeFolder={activeFolder}
-            onSelectFolder={setActiveFolder}
+            activeFolder={boardFolder}
+            onSelectFolder={setBoardFolder}
             isDrawerOpen={isSidebarOpen}
-            onClose={() => setIsSidebarOpen(false)}
+            onClose={closeSidebar}
           />
 
           {isSidebarOpen && (
             <button
               type="button"
               aria-label="Close case board"
-              onClick={() => setIsSidebarOpen(false)}
+              onClick={closeSidebar}
               className="fixed inset-0 z-30 bg-black/70 backdrop-blur-sm xl:hidden"
             />
           )}
@@ -91,17 +134,8 @@ export function InvestigationLayout({ caseData, briefing, difficulty }) {
               transition={{ duration: 0.45 }}
               className="grid min-w-0 content-start gap-5"
             >
-              <SQLEditor
-                sql={sql}
-                onSqlChange={setSql}
-                onRun={runQuery}
-                onReset={() => setSql(defaultQuery)}
-                onClear={() => setSql('')}
-                canReset={sql !== defaultQuery}
-                isRunning={queryState.isLoading}
-                onEditorMount={handleEditorMount}
-              />
-              <QueryResultsTable {...queryState} />
+              <TerminalPanel onEditorReady={handleEditorReady} />
+              <ResultsPanel />
             </motion.div>
 
             <motion.aside
@@ -119,13 +153,33 @@ export function InvestigationLayout({ caseData, briefing, difficulty }) {
 
       <button
         type="button"
-        onClick={() => setIsNotebookOpen(true)}
+        onClick={openNotebook}
         className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5"
       >
-        <BookOpen size={17} strokeWidth={2.2} /> Notebook
+        <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" /> Notebook
       </button>
 
-      <NotebookModal isOpen={isNotebookOpen} onClose={() => setIsNotebookOpen(false)} leads={leads} />
+      <NotebookModal
+        isOpen={isNotebookOpen}
+        onClose={closeNotebook}
+        caseData={caseData}
+        caseFacts={caseFacts}
+        briefing={briefing}
+        leads={leads}
+      />
     </div>
+  );
+}
+
+export function InvestigationLayout({ caseData, briefing, difficulty }) {
+  return (
+    <InvestigationSessionProvider
+      key={difficulty}
+      difficulty={difficulty}
+      briefing={briefing}
+      starterSql={starterQueryFor(difficulty)}
+    >
+      <InvestigationBoard caseData={caseData} briefing={briefing} difficulty={difficulty} />
+    </InvestigationSessionProvider>
   );
 }

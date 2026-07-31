@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 
@@ -10,7 +11,7 @@ function splitEntry(entry) {
   return { stamp: time ? time.slice(0, 5) : stamp, text: entry.slice(separator + 2) };
 }
 
-export function TimelineBoard({ entries }) {
+function TimelineBoardComponent({ entries }) {
   if (entries.length === 0) return <p className="px-4 py-6 text-sm text-bone-dim">No chronology recorded.</p>;
 
   return (
@@ -39,3 +40,5 @@ export function TimelineBoard({ entries }) {
     </ol>
   );
 }
+
+export const TimelineBoard = memo(TimelineBoardComponent);

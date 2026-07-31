@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ClipboardList, FolderOpen, MapPinned, MessagesSquare, Search, StickyNote, X } from 'lucide-react';
 import { EvidenceCard } from './EvidenceCard';
 import { TimelineBoard } from './TimelineBoard';
 import { WitnessReport } from './WitnessReport';
+import { useInvestigationSession } from '../state/investigationSession';
 
 const folderMeta = {
   evidence: { label: 'Evidence', icon: FolderOpen },
@@ -14,19 +15,48 @@ const folderMeta = {
 };
 
 function matches(value, term) {
-  return !term || value.toLowerCase().includes(term.toLowerCase());
+  return term === '' || value.toLowerCase().includes(term);
 }
 
 /**
  * The case board. Notebook sections become classified folders; the structured
  * evidence array renders as investigation cards inside the Evidence folder.
+ * The open folder and any expanded exhibit survive a refresh.
  */
 export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDrawerOpen, onClose }) {
+  const { expanded, toggleExpanded } = useInvestigationSession();
   const [search, setSearch] = useState('');
-  const section = sections.find((entry) => entry.id === activeFolder) ?? sections[0];
 
-  const filteredEvidence = evidence.filter((item) => matches(`${item.title} ${item.category} ${item.description}`, search));
-  const filteredEntries = (section?.entries ?? []).filter((entry) => matches(entry, search));
+  const section = sections.find((entry) => entry.id === activeFolder) ?? sections[0];
+  const sectionId = section?.id;
+
+  // A search term belongs to the folder it was typed in.
+  useEffect(() => { setSearch(''); }, [sectionId]);
+
+  const term = search.trim().toLowerCase();
+
+  const filteredEvidence = useMemo(
+    () => evidence.filter((item) => matches(`${item.title} ${item.category} ${item.description}`, term)),
+    [evidence, term],
+  );
+
+  const filteredEntries = useMemo(
+    () => (section?.entries ?? []).filter((entry) => matches(entry, term)),
+    [section, term],
+  );
+
+  const toggleExhibit = useCallback((id) => toggleExpanded(`board:evidence:${id}`), [toggleExpanded]);
+
+  // Arrow keys walk the folder tabs.
+  const handleTabKeys = useCallback((event) => {
+    const step = event.key === 'ArrowRight' ? 1 : event.key === 'ArrowLeft' ? -1 : 0;
+    if (step === 0) return;
+    event.preventDefault();
+    const index = sections.findIndex((entry) => entry.id === sectionId);
+    const next = sections[(index + step + sections.length) % sections.length];
+    onSelectFolder(next.id);
+    event.currentTarget.querySelector(`#board-tab-${next.id}`)?.focus();
+  }, [sections, sectionId, onSelectFolder]);
 
   return (
     <aside
@@ -34,7 +64,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
     >
       <div className="clip-corner flex min-h-0 flex-1 flex-col panel-surface xl:shadow-panel">
         <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-4">
-          <FolderOpen size={18} className="text-crimson-glow" strokeWidth={2} />
+          <FolderOpen size={18} className="text-crimson-glow" strokeWidth={2} aria-hidden="true" />
           <h2 className="font-display text-base font-semibold uppercase tracking-[0.18em] text-bone">Case board</h2>
           <button
             type="button"
@@ -42,29 +72,33 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
             aria-label="Close case board"
             className="ml-auto p-1.5 text-bone-dim transition-colors hover:text-bone xl:hidden"
           >
-            <X size={19} />
+            <X size={19} aria-hidden="true" />
           </button>
         </header>
 
         {/* Folder tabs */}
-        <div className="flex flex-wrap gap-1.5 border-b border-white/10 p-3">
+        <div role="tablist" aria-label="Case board folders" onKeyDown={handleTabKeys} className="flex flex-wrap gap-1.5 border-b border-white/10 p-3">
           {sections.map((entry) => {
             const meta = folderMeta[entry.id] ?? { label: entry.title, icon: FolderOpen };
             const Icon = meta.icon;
-            const isActive = entry.id === section?.id;
+            const isActive = entry.id === sectionId;
             return (
               <button
                 key={entry.id}
+                id={`board-tab-${entry.id}`}
                 type="button"
+                role="tab"
+                aria-selected={isActive}
+                aria-controls="board-panel"
+                tabIndex={isActive ? 0 : -1}
                 onClick={() => onSelectFolder(entry.id)}
-                aria-pressed={isActive}
                 className={`clip-corner-sm inline-flex items-center gap-1.5 border px-2.5 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
                   isActive
                     ? 'border-gold/55 bg-gold/12 text-gold-bright'
                     : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'
                 }`}
               >
-                <Icon size={13} strokeWidth={2.2} /> {meta.label}
+                <Icon size={13} strokeWidth={2.2} aria-hidden="true" /> {meta.label}
               </button>
             );
           })}
@@ -74,8 +108,9 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
         <div className="border-b border-white/10 p-3">
           <label className="relative block">
             <span className="sr-only">Search the case board</span>
-            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" />
+            <Search size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-bone-dim" aria-hidden="true" />
             <input
+              type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
               placeholder="Search this folder..."
@@ -84,26 +119,34 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
           </label>
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto p-3">
+        <div id="board-panel" role="tabpanel" className="min-h-0 flex-1 overflow-y-auto p-3">
           <AnimatePresence mode="wait">
             <motion.div
-              key={section?.id ?? 'empty'}
+              key={sectionId ?? 'empty'}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
             >
-              {section?.id === 'evidence' && (
+              {sectionId === 'evidence' && (
                 <div className="space-y-3">
-                  {filteredEvidence.map((item, index) => <EvidenceCard key={item.id} item={item} index={index} />)}
+                  {filteredEvidence.map((item, index) => (
+                    <EvidenceCard
+                      key={item.id}
+                      item={item}
+                      index={index}
+                      isOpen={Boolean(expanded[`board:evidence:${item.id}`])}
+                      onToggle={toggleExhibit}
+                    />
+                  ))}
                   {filteredEvidence.length === 0 && <p className="px-1 py-6 text-sm text-bone-dim">No evidence matches that search.</p>}
                 </div>
               )}
 
-              {section?.id === 'witnesses' && <WitnessReport entries={filteredEntries} />}
-              {section?.id === 'timeline' && <TimelineBoard entries={filteredEntries} />}
+              {sectionId === 'witnesses' && <WitnessReport entries={filteredEntries} />}
+              {sectionId === 'timeline' && <TimelineBoard entries={filteredEntries} />}
 
-              {(section?.id === 'crime-scene' || section?.id === 'notes') && (
+              {(sectionId === 'crime-scene' || sectionId === 'notes') && (
                 <ul className="space-y-3">
                   {filteredEntries.map((entry) => (
                     <li key={entry} className="clip-corner-sm panel-surface-raised p-4 text-[0.9rem] leading-7 text-bone-muted">

@@ -1,4 +1,6 @@
-const STORAGE_KEY = 'sql-detective:progress';
+import { readJson, writeJson } from './storage';
+
+const STORAGE_KEY = 'progress';
 
 /** Case order drives the soft progression gate on the selection screen. */
 export const caseOrder = ['easy', 'medium', 'expert'];
@@ -10,22 +12,7 @@ export const caseOrder = ['easy', 'medium', 'expert'];
  */
 export const ENFORCE_PROGRESSION = true;
 
-function readStore() {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  } catch {
-    return {};
-  }
-}
-
-function writeStore(store) {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
-  } catch {
-    /* Private browsing — progression simply resets each session. */
-  }
-}
+const readStore = () => readJson(STORAGE_KEY, {}) ?? {};
 
 export function getProgress() {
   const store = readStore();
@@ -38,13 +25,13 @@ export function getProgress() {
 export function markCaseOpened(caseKey) {
   const store = readStore();
   const entry = store[caseKey] ?? { opened: false, queries: 0 };
-  writeStore({ ...store, [caseKey]: { ...entry, opened: true } });
+  writeJson(STORAGE_KEY, { ...store, [caseKey]: { ...entry, opened: true } });
 }
 
 export function recordQueryRun(caseKey) {
   const store = readStore();
   const entry = store[caseKey] ?? { opened: false, queries: 0 };
-  writeStore({ ...store, [caseKey]: { ...entry, opened: true, queries: entry.queries + 1 } });
+  writeJson(STORAGE_KEY, { ...store, [caseKey]: { ...entry, opened: true, queries: entry.queries + 1 } });
 }
 
 export function isCaseLocked(caseKey, progress) {

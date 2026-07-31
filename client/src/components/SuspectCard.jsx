@@ -1,3 +1,4 @@
+import { memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { Pin, PinOff, TerminalSquare, UserRound } from 'lucide-react';
 import { StatusBadge, resolveStatusTone } from './StatusBadge';
@@ -19,8 +20,11 @@ const tints = [
   'from-fuchsia-950 to-charcoal',
 ];
 
-export function SuspectCard({ suspect, index, isPrime, onTogglePrime, onInspect }) {
+function SuspectCardComponent({ suspect, index, isPrime, onTogglePrime, onInspect }) {
   const tone = resolveStatusTone(suspect.status);
+
+  const handleTogglePrime = useCallback(() => onTogglePrime(suspect.name), [onTogglePrime, suspect.name]);
+  const handleInspect = useCallback(() => onInspect(suspect), [onInspect, suspect]);
 
   return (
     <motion.article
@@ -35,7 +39,7 @@ export function SuspectCard({ suspect, index, isPrime, onTogglePrime, onInspect 
       <div className="flex gap-3.5 p-4">
         {/* Portrait */}
         <div className={`clip-corner-sm relative flex h-14 w-14 shrink-0 items-center justify-center bg-gradient-to-br ${tints[index % tints.length]} ring-1 ring-white/12`}>
-          <UserRound size={22} className="absolute text-white/12" strokeWidth={1.5} />
+          <UserRound size={22} className="absolute text-white/12" strokeWidth={1.5} aria-hidden="true" />
           <span className="relative font-display text-base font-semibold tracking-wide text-bone">{initialsOf(suspect.name)}</span>
         </div>
 
@@ -44,12 +48,13 @@ export function SuspectCard({ suspect, index, isPrime, onTogglePrime, onInspect 
             <h3 className="truncate text-[0.95rem] font-semibold leading-snug text-bone">{suspect.name}</h3>
             <button
               type="button"
-              onClick={onTogglePrime}
+              onClick={handleTogglePrime}
               aria-pressed={isPrime}
               aria-label={isPrime ? `Remove prime suspect flag from ${suspect.name}` : `Flag ${suspect.name} as prime suspect`}
+              title={isPrime ? 'Remove prime suspect flag' : 'Flag as prime suspect'}
               className={`shrink-0 p-1 transition-colors ${isPrime ? 'text-crimson-glow' : 'text-bone-dim hover:text-gold-bright'}`}
             >
-              {isPrime ? <Pin size={15} strokeWidth={2.4} /> : <PinOff size={15} strokeWidth={2} />}
+              {isPrime ? <Pin size={15} strokeWidth={2.4} aria-hidden="true" /> : <PinOff size={15} strokeWidth={2} aria-hidden="true" />}
             </button>
           </div>
           <p className="mt-1 truncate text-sm text-bone-muted">{suspect.occupation}</p>
@@ -62,11 +67,13 @@ export function SuspectCard({ suspect, index, isPrime, onTogglePrime, onInspect 
 
       <button
         type="button"
-        onClick={onInspect}
+        onClick={handleInspect}
         className="flex w-full items-center justify-center gap-2 border-t border-white/10 bg-white/[0.03] py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-bone-muted transition-colors hover:bg-gold/10 hover:text-gold-bright"
       >
-        <TerminalSquare size={14} strokeWidth={2.2} /> Query this profile
+        <TerminalSquare size={14} strokeWidth={2.2} aria-hidden="true" /> Query this profile
       </button>
     </motion.article>
   );
 }
+
+export const SuspectCard = memo(SuspectCardComponent);

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { motion } from 'framer-motion';
 import { Quote } from 'lucide-react';
 
@@ -12,7 +13,7 @@ function initialsOf(name) {
   return name.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase();
 }
 
-export function WitnessReport({ entries }) {
+function WitnessReportComponent({ entries }) {
   if (entries.length === 0) return <p className="px-4 py-6 text-sm text-bone-dim">No statements on file.</p>;
 
   return (
@@ -46,3 +47,5 @@ export function WitnessReport({ entries }) {
     </div>
   );
 }
+
+export const WitnessReport = memo(WitnessReportComponent);
