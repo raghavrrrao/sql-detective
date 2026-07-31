@@ -5,30 +5,28 @@ import { SuspectCard } from './SuspectCard';
 import { useInvestigationSession } from '../state/investigationSession';
 
 /**
- * The suspect roster. Motive and alibi deliberately stay out of this panel —
- * they are what the player is meant to dig out with SQL, so each card offers a
- * one-click profile query instead of handing the answer over.
- *
- * Exactly one name can carry the prime-suspect pin, and the choice is saved.
+ * The suspect roster. Every profile starts at Unknown and moves only as the
+ * player's own records accumulate — the case's status column never reaches
+ * this panel, and neither do motive or alibi.
  */
-export function SuspectPanel({ suspects, onInspectSuspect }) {
-  const { primeSuspect, setPrimeSuspect } = useInvestigationSession();
+export function SuspectPanel({ onInspectSuspect }) {
+  const { intel, setPrimeSuspect } = useInvestigationSession();
 
   const handleTogglePrime = useCallback((name) => setPrimeSuspect(name), [setPrimeSuspect]);
+  const known = intel.filter((profile) => profile.status !== 'unknown').length;
 
   return (
     <Panel
       icon={UsersRound}
       title="Suspects"
-      meta={<span className="font-mono">{suspects.length} on file</span>}
+      meta={<span className="font-mono">{known} / {intel.length} investigated</span>}
       bodyClassName="grid gap-3 p-3 sm:grid-cols-2 lg:grid-cols-1"
     >
-      {suspects.map((suspect, index) => (
+      {intel.map((profile, index) => (
         <SuspectCard
-          key={suspect.name}
-          suspect={suspect}
+          key={profile.name}
+          profile={profile}
           index={index}
-          isPrime={primeSuspect === suspect.name}
           onTogglePrime={handleTogglePrime}
           onInspect={onInspectSuspect}
         />

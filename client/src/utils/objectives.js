@@ -87,33 +87,3 @@ export function objectiveTally(objectives) {
   const active = objectives.filter((objective) => !objective.locked);
   return { done: active.filter((objective) => objective.isDone).length, total: active.length };
 }
-
-/**
- * The investigation ledger shown in the notebook. Deliberately not a percentage
- * — a detective tracks what is accounted for, not how full a bar is.
- */
-export function summariseInvestigation(discovery, totals) {
-  const timelineDone = discovery.tables.some((table) => table === 'cctv_logs' || table === 'security_logs')
-    && discovery.features.includes('order_by');
-  const contradictionFound = countOf(discovery.tables, recordTables) >= 2
-    && (discovery.features.includes('where') || discovery.features.includes('join'));
-
-  return [
-    { id: 'victim', label: 'Victim', value: has(discovery.tables, 'victims') ? 'Identified' : 'Unknown', state: has(discovery.tables, 'victims') ? 'done' : 'todo' },
-    { id: 'witnesses', label: 'Witnesses', value: has(discovery.tables, 'witnesses') ? 'Reviewed' : 'Not read', state: has(discovery.tables, 'witnesses') ? 'done' : 'todo' },
-    {
-      id: 'suspects',
-      label: 'Suspects seen',
-      value: `${discovery.suspectsSeen.length} / ${totals.suspects}`,
-      state: totals.suspects > 0 && discovery.suspectsSeen.length >= totals.suspects ? 'done' : discovery.suspectsSeen.length > 0 ? 'partial' : 'todo',
-    },
-    {
-      id: 'evidence',
-      label: 'Evidence seen',
-      value: `${discovery.evidenceSeen.length} / ${totals.evidence}`,
-      state: totals.evidence > 0 && discovery.evidenceSeen.length >= totals.evidence ? 'done' : discovery.evidenceSeen.length > 0 ? 'partial' : 'todo',
-    },
-    { id: 'timeline', label: 'Timeline', value: timelineDone ? 'Reconstructed' : 'Incomplete', state: timelineDone ? 'done' : 'todo' },
-    { id: 'contradiction', label: 'Contradiction', value: contradictionFound ? 'Found' : 'Not found', state: contradictionFound ? 'done' : 'todo' },
-  ];
-}

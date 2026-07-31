@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
 import { AnimatedBackground } from './AnimatedBackground';
+import { GlobalSearchModal } from './GlobalSearchModal';
 import { HeaderBar } from './HeaderBar';
 import { InventoryPanel } from './InventoryPanel';
 import { NotebookModal } from './NotebookModal';
@@ -48,7 +49,8 @@ function ResultsPanel() {
 function InvestigationBoard({ caseData, briefing, difficulty }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
-  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql } = useInvestigationSession();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql, setNotebookSection } = useInvestigationSession();
 
   const editorRef = useRef(null);
   const handleEditorReady = useCallback((editor) => { editorRef.current = editor; }, []);
@@ -60,6 +62,20 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
   const openSidebar = useCallback(() => setIsSidebarOpen(true), []);
   const openNotebook = useCallback(() => setIsNotebookOpen(true), []);
   const closeNotebook = useCallback(() => setIsNotebookOpen(false), []);
+  // Search and the notebook are both modal, so one always replaces the other —
+  // two stacked dialogs would mean two focus traps fighting over the keyboard.
+  const openSearch = useCallback(() => {
+    setIsNotebookOpen(false);
+    setIsSearchOpen(true);
+  }, []);
+  const closeSearch = useCallback(() => setIsSearchOpen(false), []);
+
+  // Jumping from a search result lands the player on the matching notebook tab.
+  const openSection = useCallback((section) => {
+    setNotebookSection(section);
+    setIsSearchOpen(false);
+    setIsNotebookOpen(true);
+  }, [setNotebookSection]);
 
   // Loads a starter query for a suspect instead of revealing their file for free.
   const inspectSuspect = useCallback((suspect) => {
@@ -76,13 +92,25 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         setIsSidebarOpen(false);
         return;
       }
+
+      const modifier = event.ctrlKey || event.metaKey;
+      if (!modifier) return;
+
+      // Search is reachable from anywhere, including from inside the notebook.
+      if (event.key === 'k' || event.key === 'K') {
+        event.preventDefault();
+        setIsSearchOpen((open) => {
+          if (!open) setIsNotebookOpen(false);
+          return !open;
+        });
+        return;
+      }
+
       // While a dialog is open it owns the keyboard, and a text field always
       // keeps its own keystrokes — neither should reach the terminal.
       if (document.querySelector('[role="dialog"]')) return;
       if (event.target?.closest?.('input, textarea')) return;
 
-      const modifier = event.ctrlKey || event.metaKey;
-      if (!modifier) return;
       if (event.key === 'Enter') {
         event.preventDefault();
         runQuery();
@@ -106,6 +134,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
           difficulty={difficulty}
           onOpenSidebar={openSidebar}
           onOpenNotebook={openNotebook}
+          onOpenSearch={openSearch}
         />
 
         <div className="relative flex min-h-0 flex-1">
@@ -144,7 +173,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
               transition={{ duration: 0.45, delay: 0.1 }}
               className="grid content-start gap-5"
             >
-              <SuspectPanel suspects={briefing.suspects} onInspectSuspect={inspectSuspect} />
+              <SuspectPanel onInspectSuspect={inspectSuspect} />
               <InventoryPanel items={briefing.inventory} />
             </motion.aside>
           </main>
@@ -166,6 +195,13 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         caseFacts={caseFacts}
         briefing={briefing}
         leads={leads}
+      />
+
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        onClose={closeSearch}
+        briefing={briefing}
+        onOpenSection={openSection}
       />
     </div>
   );

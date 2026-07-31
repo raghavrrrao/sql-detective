@@ -58,19 +58,19 @@ const Row = memo(function Row({ row, columns, index }) {
   );
 });
 
-function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false, error = null, executionTime = null, rowCount = 0, hasRun = false }) {
+function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false, error = null, rowCount = 0, hasRun = false, summary = null }) {
   const isEmpty = !isLoading && !error && rows.length === 0;
   const hint = error ? hintFor(error) : null;
 
+  // `summary` names what was actually recovered ("Recovered 8 witness
+  // statements") and is built from the tables the statement referenced.
   const statusLine = isLoading
     ? 'Searching database…'
     : error
       ? 'Query rejected.'
       : !hasRun
         ? 'Awaiting your first query.'
-        : rows.length === 0
-          ? 'No matching records found.'
-          : `Recovered ${rowCount} ${rowCount === 1 ? 'record' : 'records'}${executionTime === null ? '' : ` in ${executionTime} ms`}.`;
+        : summary ?? (rows.length === 0 ? 'No matching records found.' : `Recovered ${rowCount} ${rowCount === 1 ? 'record' : 'records'}.`);
 
   return (
     <section className="clip-corner flex min-h-[18rem] flex-col overflow-hidden panel-surface shadow-panel backdrop-blur-xl">
@@ -137,7 +137,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
           >
             <FileSearch size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
             <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">
-              {hasRun ? 'No matching records found' : 'The terminal is ready'}
+              {hasRun ? (summary ?? 'No matching records found') : 'The terminal is ready'}
             </p>
             <p className="max-w-md text-base leading-7 text-bone-muted">
               {hasRun

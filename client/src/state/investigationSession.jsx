@@ -1,16 +1,23 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { executeCaseQuery } from '../services/caseService';
 import { recordQueryRun } from '../utils/caseProgress';
-import { evaluateObjectives, objectiveTally, summariseInvestigation } from '../utils/objectives';
+import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
+import { buildInsights } from '../utils/insights';
+import { buildProgressLedger } from '../utils/investigationProgress';
+import { buildTimeline } from '../utils/investigationTimeline';
+import { evaluateObjectives, objectiveTally } from '../utils/objectives';
+import { describeResult, nounFor } from '../utils/queryFeedback';
+import { applyDiscoveriesToFiles, buildSuspectIntel } from '../utils/suspectIntel';
 import { inspectStatement } from '../utils/sqlInsights';
 import { readJson, writeJson } from '../utils/storage';
 
-const SESSION_VERSION = 1;
+const SESSION_VERSION = 2;
 const HISTORY_LIMIT = 50;
+const JOURNAL_LIMIT = 200;
 const PERSIST_DELAY = 350;
 /** Identical statements fired inside this window are treated as a double-click. */
 const REPEAT_GUARD_MS = 400;
-/** Row scanning for discovery is capped so a huge result set never blocks paint. */
+/** Row scanning is capped so a huge result set never blocks paint. */
 const SCAN_ROW_LIMIT = 250;
 
 /**
@@ -22,9 +29,9 @@ const SessionDataContext = createContext(null);
 const SessionActionsContext = createContext(null);
 const SqlDraftContext = createContext(null);
 
-const emptyDiscovery = () => ({ tables: [], features: [], suspectsSeen: [], evidenceSeen: [], successes: 0, failures: 0 });
+const emptyReach = () => ({ tables: [], features: [], successes: 0, failures: 0 });
 
-const emptyResult = { columns: [], rows: [], rowCount: 0, executionTime: null, isLoading: false, error: null, hasRun: false };
+const emptyResult = { columns: [], rows: [], rowCount: 0, executionTime: null, isLoading: false, error: null, hasRun: false, summary: null };
 
 const uniqueMerge = (current, additions) => {
   if (additions.length === 0) return current;
@@ -35,22 +42,35 @@ const uniqueMerge = (current, additions) => {
 
 const asArray = (value) => (Array.isArray(value) ? value : []);
 const asString = (value, fallback = '') => (typeof value === 'string' ? value : fallback);
-
-/** Finds which roster names and exhibit titles actually appeared in a result set. */
-function scanRows(rows, catalog, suspectsSeen, evidenceSeen) {
-  const limit = Math.min(rows.length, SCAN_ROW_LIMIT);
-  for (let index = 0; index < limit; index += 1) {
-    const blob = Object.values(rows[index])
-      .filter((value) => typeof value === 'string' && value !== '')
-      .join(' | ');
-    if (blob === '') continue;
-    for (const name of catalog.suspects) if (blob.includes(name)) suspectsSeen.add(name);
-    for (const title of catalog.evidence) if (blob.includes(title)) evidenceSeen.add(title);
-  }
-}
+const asObject = (value) => (value && typeof value === 'object' && !Array.isArray(value) ? value : {});
 
 function toggleInList(list, value) {
   return list.includes(value) ? list.filter((entry) => entry !== value) : [...list, value];
+}
+
+let journalSequence = 0;
+const journalEntry = (at, type, title, detail = null) => ({
+  id: `${at}-${(journalSequence += 1)}`,
+  at,
+  type,
+  title,
+  detail,
+});
+
+/** Newest-first, capped. */
+const pushJournal = (journal, entries) => (entries.length === 0 ? journal : [...entries.reverse(), ...journal].slice(0, JOURNAL_LIMIT));
+
+/**
+ * A single unfiltered read of one table tells us how many rows that table
+ * holds, which is the only honest way to show a denominator without asking the
+ * server for one.
+ */
+function fullScanTotal(insights, rowCount) {
+  if (insights.tables.length !== 1) return null;
+  const narrowing = ['where', 'limit', 'group_by', 'having', 'join', 'distinct', 'subquery', 'cte'];
+  if (narrowing.some((feature) => insights.features.includes(feature))) return null;
+  if (insights.features.includes('aggregate')) return null;
+  return { table: insights.tables[0], total: rowCount };
 }
 
 function reducer(state, action) {
@@ -62,12 +82,68 @@ function reducer(state, action) {
       return { ...state, result: { ...state.result, isLoading: true, error: null } };
 
     case 'querySuccess': {
-      const { statement, result, insights, catalog, startedAt } = action;
+      const { statement, result, insights, rosterNames, startedAt } = action;
       const rows = result.rows ?? [];
-      const suspectsSeen = new Set(state.discovery.suspectsSeen);
-      const evidenceSeen = new Set(state.discovery.evidenceSeen);
-      scanRows(rows, catalog, suspectsSeen, evidenceSeen);
       const rowCount = result.rowCount ?? rows.length;
+
+      // --- discovery engine -------------------------------------------------
+      const incoming = extractDiscoveries({
+        sql: statement,
+        tables: insights.tables,
+        rows: rows.slice(0, SCAN_ROW_LIMIT),
+        rosterNames,
+        at: startedAt,
+      });
+      const { discoveries, added } = mergeDiscoveries(state.discoveries, incoming);
+      const suspectFiles = applyDiscoveriesToFiles(state.suspectFiles, added);
+
+      const reach = {
+        tables: uniqueMerge(state.reach.tables, insights.tables),
+        features: uniqueMerge(state.reach.features, insights.features),
+        successes: state.reach.successes + 1,
+        failures: state.reach.failures,
+      };
+
+      const scan = fullScanTotal(insights, rowCount);
+      const tableTotals = scan && state.tableTotals[scan.table] !== scan.total
+        ? { ...state.tableTotals, [scan.table]: scan.total }
+        : state.tableTotals;
+
+      // --- journal ----------------------------------------------------------
+      const entries = [];
+      if (added.length > 0) {
+        const byTable = added.reduce((totals, record) => {
+          totals[record.table] = (totals[record.table] ?? 0) + 1;
+          return totals;
+        }, {});
+        const breakdown = Object.entries(byTable)
+          .map(([table, count]) => `${count} ${nounFor(table, count)}`)
+          .join(', ');
+        entries.push(journalEntry(startedAt, 'discovery', `Recovered ${breakdown}`, statement));
+      }
+
+      // A table opened for the first time is worth marking in its own right.
+      const freshTables = insights.tables.filter((table) => !state.reach.tables.includes(table));
+      freshTables.forEach((table) => {
+        entries.push(journalEntry(startedAt, 'source', `Opened ${table.replace(/_/g, ' ')} for the first time`));
+      });
+
+      // Objectives tick off gameplay, so the log has to be written where they change.
+      const before = evaluateObjectives(state.reach);
+      const after = evaluateObjectives(reach);
+      after.forEach((objective, index) => {
+        if (objective.isDone && !before[index].isDone) {
+          entries.push(journalEntry(startedAt, 'objective', `Objective complete — ${objective.label}`));
+        }
+      });
+
+      // Someone crossing into a substantial file is a milestone for the player.
+      added.forEach((record) => {
+        record.suspects.forEach((name) => {
+          const wasKnown = Boolean(state.suspectFiles[name]);
+          if (!wasKnown) entries.push(journalEntry(startedAt, 'suspect', `${name} now has a file`));
+        });
+      });
 
       return {
         ...state,
@@ -79,17 +155,15 @@ function reducer(state, action) {
           isLoading: false,
           error: null,
           hasRun: true,
+          summary: describeResult({ tables: insights.tables, rowCount, executionTime: result.executionTime ?? null }),
         },
-        discovery: {
-          tables: uniqueMerge(state.discovery.tables, insights.tables),
-          features: uniqueMerge(state.discovery.features, insights.features),
-          suspectsSeen: [...suspectsSeen],
-          evidenceSeen: [...evidenceSeen],
-          successes: state.discovery.successes + 1,
-          failures: state.discovery.failures,
-        },
+        discoveries,
+        suspectFiles,
+        reach,
+        tableTotals,
+        journal: pushJournal(state.journal, entries),
         history: [
-          { id: `${startedAt}-${state.discovery.successes + state.discovery.failures}`, sql: statement, at: startedAt, ok: true, rowCount, executionTime: result.executionTime ?? null, error: null },
+          { id: `${startedAt}-${state.reach.successes + state.reach.failures}`, sql: statement, at: startedAt, ok: true, rowCount, executionTime: result.executionTime ?? null, error: null },
           ...state.history,
         ].slice(0, HISTORY_LIMIT),
       };
@@ -99,10 +173,10 @@ function reducer(state, action) {
       const { statement, message, startedAt } = action;
       return {
         ...state,
-        result: { ...state.result, isLoading: false, error: message, hasRun: true },
-        discovery: { ...state.discovery, failures: state.discovery.failures + 1 },
+        result: { ...state.result, isLoading: false, error: message, hasRun: true, summary: null },
+        reach: { ...state.reach, failures: state.reach.failures + 1 },
         history: [
-          { id: `${startedAt}-${state.discovery.successes + state.discovery.failures}`, sql: statement, at: startedAt, ok: false, rowCount: 0, executionTime: null, error: message },
+          { id: `${startedAt}-${state.reach.successes + state.reach.failures}`, sql: statement, at: startedAt, ok: false, rowCount: 0, executionTime: null, error: message },
           ...state.history,
         ].slice(0, HISTORY_LIMIT),
       };
@@ -110,7 +184,7 @@ function reducer(state, action) {
 
     // A problem caught before anything was sent: worth showing, not worth logging.
     case 'localFailure':
-      return { ...state, result: { ...state.result, isLoading: false, error: action.message } };
+      return { ...state, result: { ...state.result, isLoading: false, error: action.message, summary: null } };
 
     case 'deleteHistoryEntry':
       return { ...state, history: state.history.filter((entry) => entry.id !== action.id) };
@@ -119,8 +193,30 @@ function reducer(state, action) {
       return state.history.length === 0 ? state : { ...state, history: [] };
 
     // Only one suspect can carry the pin; re-selecting the current one clears it.
-    case 'setPrimeSuspect':
-      return { ...state, primeSuspect: state.primeSuspect === action.name ? null : action.name };
+    case 'setPrimeSuspect': {
+      const primeSuspect = state.primeSuspect === action.name ? null : action.name;
+      return {
+        ...state,
+        primeSuspect,
+        // The pin and a clearance are opposite judgements about the same person.
+        cleared: primeSuspect ? state.cleared.filter((name) => name !== primeSuspect) : state.cleared,
+        journal: primeSuspect
+          ? pushJournal(state.journal, [journalEntry(action.at, 'prime', `Flagged ${primeSuspect} as prime suspect`)])
+          : state.journal,
+      };
+    }
+
+    case 'toggleCleared': {
+      const isCleared = state.cleared.includes(action.name);
+      return {
+        ...state,
+        cleared: toggleInList(state.cleared, action.name),
+        primeSuspect: !isCleared && state.primeSuspect === action.name ? null : state.primeSuspect,
+        journal: isCleared
+          ? state.journal
+          : pushJournal(state.journal, [journalEntry(action.at, 'cleared', `Marked ${action.name} as accounted for`)]),
+      };
+    }
 
     case 'setNotes':
       return state.notes === action.notes ? state : { ...state, notes: action.notes };
@@ -159,6 +255,11 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     version: SESSION_VERSION,
     sql: starterSql,
     history: [],
+    journal: [],
+    discoveries: [],
+    suspectFiles: {},
+    tableTotals: {},
+    cleared: [],
     primeSuspect: null,
     notes: '',
     evidenceNotes: {},
@@ -168,34 +269,41 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     boardFolder: defaultFolder,
     expanded: {},
     scrollPositions: {},
-    discovery: emptyDiscovery(),
+    reach: emptyReach(),
     result: emptyResult,
   };
 
   const stored = readJson(`session:${difficulty}`, null);
   if (!stored || stored.version !== SESSION_VERSION) return fresh;
 
-  const discovery = stored.discovery ?? {};
+  const reach = asObject(stored.reach);
+  const discoveries = asArray(stored.discoveries).filter((record) => record && typeof record.key === 'string');
+  // Journal ids must keep climbing past whatever was restored.
+  journalSequence = Math.max(journalSequence, asArray(stored.journal).length);
+
   return {
     ...fresh,
     sql: asString(stored.sql, starterSql),
     history: asArray(stored.history).filter((entry) => entry && typeof entry.sql === 'string').slice(0, HISTORY_LIMIT),
+    journal: asArray(stored.journal).filter((entry) => entry && typeof entry.title === 'string').slice(0, JOURNAL_LIMIT),
+    discoveries: discoveries.map((record) => ({ ...record, suspects: asArray(record.suspects) })),
+    suspectFiles: asObject(stored.suspectFiles),
+    tableTotals: asObject(stored.tableTotals),
+    cleared: asArray(stored.cleared).filter((value) => typeof value === 'string'),
     primeSuspect: typeof stored.primeSuspect === 'string' ? stored.primeSuspect : null,
     notes: asString(stored.notes),
-    evidenceNotes: stored.evidenceNotes && typeof stored.evidenceNotes === 'object' ? stored.evidenceNotes : {},
+    evidenceNotes: asObject(stored.evidenceNotes),
     bookmarks: asArray(stored.bookmarks).filter((value) => typeof value === 'string'),
     leadsDone: asArray(stored.leadsDone).filter((value) => typeof value === 'string'),
     notebookSection: asString(stored.notebookSection, 'overview'),
     boardFolder: asString(stored.boardFolder, defaultFolder),
-    expanded: stored.expanded && typeof stored.expanded === 'object' ? stored.expanded : {},
-    scrollPositions: stored.scrollPositions && typeof stored.scrollPositions === 'object' ? stored.scrollPositions : {},
-    discovery: {
-      tables: asArray(discovery.tables),
-      features: asArray(discovery.features),
-      suspectsSeen: asArray(discovery.suspectsSeen),
-      evidenceSeen: asArray(discovery.evidenceSeen),
-      successes: Number.isFinite(discovery.successes) ? discovery.successes : 0,
-      failures: Number.isFinite(discovery.failures) ? discovery.failures : 0,
+    expanded: asObject(stored.expanded),
+    scrollPositions: asObject(stored.scrollPositions),
+    reach: {
+      tables: asArray(reach.tables),
+      features: asArray(reach.features),
+      successes: Number.isFinite(reach.successes) ? reach.successes : 0,
+      failures: Number.isFinite(reach.failures) ? reach.failures : 0,
     },
   };
 }
@@ -210,13 +318,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
   const inFlightRef = useRef(false);
   const lastRunRef = useRef({ sql: '', at: 0 });
 
-  const catalog = useMemo(
-    () => ({
-      suspects: briefing.suspects.map((suspect) => suspect.name),
-      evidence: briefing.evidence.map((item) => item.title),
-    }),
-    [briefing.suspects, briefing.evidence],
-  );
+  const rosterNames = useMemo(() => briefing.suspects.map((suspect) => suspect.name), [briefing.suspects]);
 
   /* ---------------------------------------------------------------- autosave */
 
@@ -225,6 +327,11 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       version: SESSION_VERSION,
       sql: state.sql,
       history: state.history,
+      journal: state.journal,
+      discoveries: state.discoveries,
+      suspectFiles: state.suspectFiles,
+      tableTotals: state.tableTotals,
+      cleared: state.cleared,
       primeSuspect: state.primeSuspect,
       notes: state.notes,
       evidenceNotes: state.evidenceNotes,
@@ -234,12 +341,13 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       boardFolder: state.boardFolder,
       expanded: state.expanded,
       scrollPositions: state.scrollPositions,
-      discovery: state.discovery,
+      reach: state.reach,
     }),
     [
-      state.sql, state.history, state.primeSuspect, state.notes, state.evidenceNotes,
+      state.sql, state.history, state.journal, state.discoveries, state.suspectFiles,
+      state.tableTotals, state.cleared, state.primeSuspect, state.notes, state.evidenceNotes,
       state.bookmarks, state.leadsDone, state.notebookSection, state.boardFolder,
-      state.expanded, state.scrollPositions, state.discovery,
+      state.expanded, state.scrollPositions, state.reach,
     ],
   );
 
@@ -285,7 +393,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
 
     try {
       const result = await executeCaseQuery(difficulty, statement);
-      dispatch({ type: 'querySuccess', statement, result, insights: inspectStatement(statement), catalog, startedAt: now });
+      dispatch({ type: 'querySuccess', statement, result, insights: inspectStatement(statement), rosterNames, startedAt: now });
       recordQueryRun(difficulty);
     } catch (error) {
       dispatch({ type: 'queryFailure', statement, message: error.message, startedAt: now });
@@ -293,7 +401,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       inFlightRef.current = false;
       lastRunRef.current = { sql: statement, at: Date.now() };
     }
-  }, [catalog, difficulty]);
+  }, [difficulty, rosterNames]);
 
   /* ---------------------------------------------------------------- actions */
 
@@ -304,7 +412,8 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     runQuery,
     deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
     clearHistory: () => dispatch({ type: 'clearHistory' }),
-    setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name }),
+    setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),
+    toggleCleared: (name) => dispatch({ type: 'toggleCleared', name, at: Date.now() }),
     setNotes: (notes) => dispatch({ type: 'setNotes', notes }),
     setEvidenceNote: (key, note) => dispatch({ type: 'setEvidenceNote', key, note }),
     toggleBookmark: (value) => dispatch({ type: 'toggleBookmark', value }),
@@ -317,17 +426,40 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
 
   /* -------------------------------------------------------------- selectors */
 
-  const objectives = useMemo(() => evaluateObjectives(state.discovery), [state.discovery]);
+  const objectives = useMemo(() => evaluateObjectives(state.reach), [state.reach]);
   const tally = useMemo(() => objectiveTally(objectives), [objectives]);
+  const timeline = useMemo(() => buildTimeline(state.discoveries), [state.discoveries]);
+  const intel = useMemo(
+    () => buildSuspectIntel({
+      suspects: briefing.suspects,
+      suspectFiles: state.suspectFiles,
+      primeSuspect: state.primeSuspect,
+      cleared: state.cleared,
+    }),
+    [briefing.suspects, state.suspectFiles, state.primeSuspect, state.cleared],
+  );
   const ledger = useMemo(
-    () => summariseInvestigation(state.discovery, { suspects: briefing.suspects.length, evidence: briefing.evidence.length }),
-    [state.discovery, briefing.suspects.length, briefing.evidence.length],
+    () => buildProgressLedger({
+      discoveries: state.discoveries,
+      tableTotals: state.tableTotals,
+      timelineCount: timeline.length,
+      intel,
+    }),
+    [state.discoveries, state.tableTotals, timeline.length, intel],
+  );
+  const insights = useMemo(
+    () => buildInsights({ tables: state.reach.tables, discoveries: state.discoveries, timeline, intel, primeSuspect: state.primeSuspect }),
+    [state.reach.tables, state.discoveries, timeline, intel, state.primeSuspect],
   );
 
   const data = useMemo(() => ({
     result: state.result,
     history: state.history,
+    journal: state.journal,
+    discoveries: state.discoveries,
+    tableTotals: state.tableTotals,
     primeSuspect: state.primeSuspect,
+    cleared: state.cleared,
     notes: state.notes,
     evidenceNotes: state.evidenceNotes,
     bookmarks: state.bookmarks,
@@ -336,15 +468,20 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     boardFolder: state.boardFolder,
     expanded: state.expanded,
     scrollPositions: state.scrollPositions,
-    discovery: state.discovery,
+    reach: state.reach,
     objectives,
     tally,
+    timeline,
+    intel,
     ledger,
+    insights,
     starterSql,
   }), [
-    state.result, state.history, state.primeSuspect, state.notes, state.evidenceNotes,
-    state.bookmarks, state.leadsDone, state.notebookSection, state.boardFolder,
-    state.expanded, state.scrollPositions, state.discovery, objectives, tally, ledger, starterSql,
+    state.result, state.history, state.journal, state.discoveries, state.tableTotals,
+    state.primeSuspect, state.cleared, state.notes, state.evidenceNotes, state.bookmarks,
+    state.leadsDone, state.notebookSection, state.boardFolder, state.expanded,
+    state.scrollPositions, state.reach,
+    objectives, tally, timeline, intel, ledger, insights, starterSql,
   ]);
 
   const sqlDraft = useMemo(() => ({ sql: state.sql, isDirty: state.sql !== starterSql }), [state.sql, starterSql]);

@@ -1,22 +1,30 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { BookOpen, ClipboardCheck, FileText, History, NotebookPen, ScrollText, Target } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Clock, FileText, History, NotebookPen, ScrollText, Telescope, UsersRound } from 'lucide-react';
 import { ReusableModal } from './ReusableModal';
+import { NotebookDiscoveries } from './notebook/NotebookDiscoveries';
 import { NotebookEvidenceNotes } from './notebook/NotebookEvidenceNotes';
+import { NotebookJournal } from './notebook/NotebookJournal';
 import { NotebookObjectives } from './notebook/NotebookObjectives';
 import { NotebookOverview } from './notebook/NotebookOverview';
 import { NotebookPersonalNotes } from './notebook/NotebookPersonalNotes';
-import { NotebookPrimeSuspect } from './notebook/NotebookPrimeSuspect';
 import { NotebookQueryHistory } from './notebook/NotebookQueryHistory';
+import { NotebookSuspects } from './notebook/NotebookSuspects';
+import { NotebookTimeline } from './notebook/NotebookTimeline';
 import { useInvestigationSession } from '../state/investigationSession';
 
 const sections = [
   { id: 'overview', label: 'Overview', icon: ScrollText },
   { id: 'objectives', label: 'Objectives', icon: ClipboardCheck },
-  { id: 'evidence', label: 'Evidence', icon: FileText },
+  { id: 'journal', label: 'Journal', icon: BookOpen },
+  { id: 'discoveries', label: 'Discoveries', icon: Telescope },
+  { id: 'timeline', label: 'Timeline', icon: Clock },
+  { id: 'suspects', label: 'Suspects', icon: UsersRound },
+  { id: 'evidence', label: 'Case file', icon: FileText },
   { id: 'history', label: 'History', icon: History },
-  { id: 'suspect', label: 'Prime suspect', icon: Target },
   { id: 'notes', label: 'Notes', icon: NotebookPen },
 ];
+
+export const notebookSections = sections;
 
 /**
  * The detective notebook: the player's companion across the whole case. Which
@@ -24,7 +32,10 @@ const sections = [
  * and everything typed into it all survive a refresh.
  */
 export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, leads = [] }) {
-  const { notebookSection, setNotebookSection, scrollPositions, rememberScroll, tally } = useInvestigationSession();
+  const {
+    notebookSection, setNotebookSection, scrollPositions, rememberScroll,
+    tally, discoveries, timeline, journal,
+  } = useInvestigationSession();
 
   const bodyRef = useRef(null);
   // Scroll offset is tracked in a ref and only committed when the section
@@ -35,6 +46,13 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
   sectionRef.current = notebookSection;
 
   const active = sections.find((section) => section.id === notebookSection) ?? sections[0];
+
+  const counts = {
+    objectives: `${tally.done}/${tally.total}`,
+    discoveries: discoveries.length || null,
+    timeline: timeline.length || null,
+    journal: journal.length || null,
+  };
 
   const commitScroll = useCallback(() => {
     rememberScroll(sectionRef.current, offsetRef.current);
@@ -99,6 +117,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
         {sections.map((section) => {
           const Icon = section.icon;
           const isActive = section.id === active.id;
+          const count = counts[section.id];
           return (
             <button
               key={section.id}
@@ -116,9 +135,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
               }`}
             >
               <Icon size={13} strokeWidth={2.2} aria-hidden="true" /> {section.label}
-              {section.id === 'objectives' && (
-                <span className="font-mono text-xs text-bone-muted">{tally.done}/{tally.total}</span>
-              )}
+              {count && <span className="font-mono text-xs text-bone-muted">{count}</span>}
             </button>
           );
         })}
@@ -127,9 +144,12 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
       <div id={`notebook-panel-${active.id}`} role="tabpanel" aria-labelledby={`notebook-tab-${active.id}`} tabIndex={-1} className="outline-none">
         {active.id === 'overview' && <NotebookOverview caseData={caseData} caseFacts={caseFacts} />}
         {active.id === 'objectives' && <NotebookObjectives leads={leads} />}
+        {active.id === 'journal' && <NotebookJournal />}
+        {active.id === 'discoveries' && <NotebookDiscoveries />}
+        {active.id === 'timeline' && <NotebookTimeline />}
+        {active.id === 'suspects' && <NotebookSuspects />}
         {active.id === 'evidence' && <NotebookEvidenceNotes evidence={briefing.evidence} />}
         {active.id === 'history' && <NotebookQueryHistory onClose={handleClose} />}
-        {active.id === 'suspect' && <NotebookPrimeSuspect suspects={briefing.suspects} />}
         {active.id === 'notes' && <NotebookPersonalNotes />}
       </div>
     </ReusableModal>

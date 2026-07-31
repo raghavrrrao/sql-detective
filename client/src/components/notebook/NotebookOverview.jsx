@@ -1,4 +1,5 @@
-import { CalendarDays, CircleDot, CircleSlash, MapPin, ShieldCheck, Timer, UserX } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { CalendarDays, CircleDot, CircleSlash, Lightbulb, MapPin, ShieldCheck, Timer, UserX } from 'lucide-react';
 import { useInvestigationSession } from '../../state/investigationSession';
 
 const stateStyles = {
@@ -14,12 +15,12 @@ const facts = [
 ];
 
 /**
- * Case Overview. Carries the investigation ledger — deliberately a set of
- * accounted-for facts rather than a completion percentage, because a detective
- * tracks what is settled, not how full a bar is.
+ * Case Overview. The ledger counts what the player has recovered, and the
+ * observations react to the shape of that pile — which categories are present
+ * and which are missing. Neither reads the contents of a record.
  */
 export function NotebookOverview({ caseData, caseFacts }) {
-  const { ledger, discovery } = useInvestigationSession();
+  const { ledger, insights, discoveries, reach } = useInvestigationSession();
 
   return (
     <div className="space-y-6">
@@ -47,7 +48,9 @@ export function NotebookOverview({ caseData, caseFacts }) {
 
       <section>
         <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Investigation ledger</h3>
-        <p className="mt-1.5 text-sm leading-6 text-bone-dim">Updates on its own as your queries turn up records.</p>
+        <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+          Counts what you have recovered. A total only appears once you have read that table in full.
+        </p>
 
         <ul className="mt-4 space-y-2.5">
           {ledger.map((entry) => {
@@ -66,11 +69,36 @@ export function NotebookOverview({ caseData, caseFacts }) {
         </ul>
       </section>
 
+      {insights.length > 0 && (
+        <section>
+          <h3 className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">
+            <Lightbulb size={15} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> Observations
+          </h3>
+          <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+            Notes on where your file is thin. These react to what you have collected — they never tell you what it means.
+          </p>
+
+          <ul className="mt-4 space-y-2.5">
+            {insights.map((insight, index) => (
+              <motion.li
+                key={insight.id}
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
+                className="clip-corner-sm border border-gold/25 bg-gold/[0.06] p-4 text-base leading-7 text-bone-muted"
+              >
+                {insight.text}
+              </motion.li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       <section className="clip-corner-sm grid grid-cols-3 gap-px overflow-hidden border border-white/10 bg-white/10">
         {[
-          { label: 'Queries run', value: discovery.successes + discovery.failures },
-          { label: 'Successful', value: discovery.successes },
-          { label: 'Rejected', value: discovery.failures },
+          { label: 'Discoveries', value: discoveries.length },
+          { label: 'Sources used', value: reach.tables.length },
+          { label: 'Queries run', value: reach.successes + reach.failures },
         ].map((stat) => (
           <div key={stat.label} className="bg-charcoal px-4 py-4 text-center">
             <p className="font-display text-2xl font-bold text-gold-bright">{stat.value}</p>

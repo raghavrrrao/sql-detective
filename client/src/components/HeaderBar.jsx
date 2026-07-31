@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, LayoutPanelLeft, Star, Timer } from 'lucide-react';
+import { ArrowLeft, BookOpen, LayoutPanelLeft, Search, Star, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
 import { SoundToggle } from './SoundToggle';
@@ -6,7 +6,7 @@ import { SoundToggle } from './SoundToggle';
 const timingByDifficulty = { Easy: '20:00', Medium: '35:00', Expert: '60:00' };
 const scoreByDifficulty = { Easy: '1000', Medium: '2000', Expert: '3000' };
 
-export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, difficulty }) {
+export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearch, difficulty }) {
   return (
     <header className="relative z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-white/10 bg-ink/85 px-4 py-3 backdrop-blur-xl sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
@@ -46,6 +46,17 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, difficulty 
         </div>
 
         <SoundToggle />
+
+        <button
+          type="button"
+          onClick={onOpenSearch}
+          aria-label="Search the investigation"
+          aria-keyshortcuts="Control+K Meta+K"
+          title="Search the investigation (Ctrl+K)"
+          className="clip-corner-sm border border-white/12 bg-white/[0.04] p-2.5 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
+        >
+          <Search size={18} strokeWidth={2} aria-hidden="true" />
+        </button>
 
         <button
           type="button"
