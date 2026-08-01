@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, CalendarDays, MapPin, Timer, UserX } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CalendarDays, FileSearch, MapPin, Timer, UserX } from 'lucide-react';
 import { Navigate, useParams } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ActionButton } from '../components/ActionButton';
@@ -8,12 +8,13 @@ import { CaseFile } from '../components/CaseFile';
 import { CaseHeader } from '../components/CaseHeader';
 import { MissionCard } from '../components/MissionCard';
 import { TypewriterText } from '../components/TypewriterText';
-import { getCase, getCaseRoutePath, isPlayable, resolveCaseRouteParam } from '../catalog/caseCatalog';
+import { getCase, getCaseRoutePath, getCaseWording, isPlayable, resolveCaseRouteParam } from '../catalog/caseCatalog';
 import { getProgress, isCaseLocked, markCaseOpened } from '../utils/caseProgress';
 
-const facts = [
+/** A theft has no time of death, so the middle label comes from the case. */
+const factsFor = (wording) => [
   { key: 'date', label: 'Date', icon: CalendarDays },
-  { key: 'time', label: 'Time of death', icon: Timer },
+  { key: 'time', label: wording.time, icon: Timer },
   { key: 'location', label: 'Location', icon: MapPin },
 ];
 
@@ -21,6 +22,8 @@ export function CaseIntroPage() {
   const { difficulty: routeDifficulty } = useParams();
   const difficulty = resolveCaseRouteParam(routeDifficulty) ?? routeDifficulty;
   const caseData = getCase(difficulty);
+  const wording = getCaseWording(difficulty);
+  const facts = factsFor(wording);
   // A sealed slot has no database, and a locked one has not been earned yet.
   // Either way the board is the only honest place to send a direct link.
   const isOpen = isPlayable(caseData) && !isCaseLocked(difficulty, getProgress());
@@ -38,13 +41,13 @@ export function CaseIntroPage() {
 
       <main className="relative z-10 mx-auto max-w-5xl px-6 py-14 sm:px-10 lg:py-20">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.15 }} className="text-center">
-          <p className="font-mono text-sm font-semibold uppercase tracking-[0.28em] text-crimson-glow">Investigation briefing</p>
+          <p className="font-mono text-sm font-medium uppercase tracking-[0.28em] text-crimson-glow">Investigation briefing</p>
           <h1 className="mt-6 min-h-[5.5rem] font-display text-5xl font-medium uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-7xl">
             <TypewriterText text={caseData.title} delay={350} speed={32} />
           </h1>
         </motion.div>
 
-        {/* Victim placard */}
+        {/* Subject placard — the victim, or what was taken */}
         <motion.section
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -59,7 +62,7 @@ export function CaseIntroPage() {
             <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.06] mix-blend-overlay" />
             <div className="relative">
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">
-                <UserX size={15} strokeWidth={2.4} /> Victim
+                {wording.isTheft ? <FileSearch size={15} strokeWidth={2.4} /> : <UserX size={15} strokeWidth={2.4} />} {wording.subject}
               </p>
               <h2 className="mt-3 font-display text-4xl font-medium uppercase text-bone sm:text-5xl">{caseData.victim}</h2>
             </div>

@@ -22,6 +22,9 @@
  * @property {string}   caseNumber    as printed on the dossier
  * @property {string}   title
  * @property {string}   database      file the server opens for this case
+ * @property {string}   crimeType     'homicide' or 'theft' — drives the wording
+ * @property {string}   subjectLabel  what to call that on a dossier
+ * @property {string}   timeLabel     what `time` means for this crime
  * @property {string}   estimatedTime
  * @property {string}   recommendedExperience
  * @property {string[]} sqlConcepts
@@ -40,6 +43,11 @@
 /** Applied to every entry so a new case only has to state what differs. */
 const defaults = {
   status: 'available',
+  // A theft has no body, so nothing may print "Victim" or "Time of death" over
+  // it. Every screen that shows those two facts reads these labels instead.
+  crimeType: 'homicide',
+  subjectLabel: 'Victim',
+  timeLabel: 'Time of death',
   tier: 'Easy',
   tierRank: 2,
   estimatedTime: '20 Minutes',
@@ -95,9 +103,12 @@ export const caseCatalog = [
       'Take one fact from a statement and use it to rule someone out.',
     ],
     preview: 'Confidential research papers were copied from a locked university office. Nothing was forced and nothing was carried away. Three people were in the building, and every door keeps a record.',
+    crimeType: 'theft',
+    subjectLabel: 'Reported by',
+    timeLabel: 'Theft window',
     victim: 'Professor Sarah Collins',
     date: 'September 15, 2026',
-    time: '6:52 PM',
+    time: '6:45 PM – 7:30 PM',
     location: 'Hawthorne University · North Wing, Office N-118',
     witnesses: 'Professor Collins herself, a research assistant, and the night porter.',
     crimeScene: 'An undamaged card-controlled door, a locked drawer with nothing missing from it, and a photocopier still warm two doors along.',
@@ -183,9 +194,12 @@ export const caseCatalog = [
       'Match text with LIKE and strip repeats with DISTINCT.',
     ],
     preview: 'A painting was swapped for a forgery overnight inside a locked gallery. Six people had a card that works after hours, and the busiest person on the door log is not the one you want.',
+    crimeType: 'theft',
+    subjectLabel: 'Stolen work',
+    timeLabel: 'Theft window',
     victim: 'Harbour at Dusk (Ashcroft Gallery)',
-    date: 'June 10, 2026',
-    time: '1:48 AM',
+    date: 'June 10 – 11, 2026',
+    time: '11:00 PM – 7:40 AM',
     location: 'Ashcroft Gallery · Riverside, Room 3',
     witnesses: 'The curator, the registrar, the night guard, the facilities supervisor, the morning porter, an independent conservator and the courier.',
     crimeScene: 'No forced entry, a wedged loading bay shutter, and a copy hanging on the original wire with the varnish still tacky.',
@@ -335,6 +349,16 @@ export function getStarterQuery(id) {
 
 export function getObjectiveIds(id) {
   return getCase(id)?.objectives ?? defaults.objectives;
+}
+
+/** How this case refers to its subject and its key moment. @returns {{subject:string,time:string,isTheft:boolean}} */
+export function getCaseWording(id) {
+  const entry = getCase(id);
+  return {
+    subject: entry?.subjectLabel ?? defaults.subjectLabel,
+    time: entry?.timeLabel ?? defaults.timeLabel,
+    isTheft: (entry?.crimeType ?? defaults.crimeType) === 'theft',
+  };
 }
 
 /** The case that follows this one, or null at the end of the chain. */

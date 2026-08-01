@@ -48,12 +48,12 @@ function SuspectCardComponent({ profile, index, onTogglePrime, onInspect }) {
         {/* Portrait */}
         <div className={`clip-corner-sm relative flex h-14 w-14 shrink-0 items-center justify-center bg-gradient-to-br ${tints[index % tints.length]} ring-1 ring-white/12`}>
           <UserRound size={22} className="absolute text-white/12" strokeWidth={1.5} aria-hidden="true" />
-          <span className="relative font-display text-base font-semibold tracking-wide text-bone">{initialsOf(profile.name)}</span>
+          <span className="relative font-display text-base font-medium tracking-wide text-bone">{initialsOf(profile.name)}</span>
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="truncate text-[0.95rem] font-semibold leading-snug text-bone">{profile.name}</h3>
+            <h3 className="truncate text-[0.95rem] font-medium leading-snug text-bone">{profile.name}</h3>
             <button
               type="button"
               onClick={handleTogglePrime}
@@ -77,7 +77,7 @@ function SuspectCardComponent({ profile, index, onTogglePrime, onInspect }) {
       <button
         type="button"
         onClick={handleInspect}
-        className="flex w-full items-center justify-center gap-2 border-t border-white/10 bg-white/[0.03] py-2.5 text-xs font-semibold uppercase tracking-[0.14em] text-bone-muted transition-colors hover:bg-gold/10 hover:text-gold-bright"
+        className="flex w-full items-center justify-center gap-2 border-t border-white/10 bg-white/[0.03] py-2.5 text-xs font-medium uppercase tracking-[0.14em] text-bone-muted transition-colors hover:bg-gold/10 hover:text-gold-bright"
       >
         <TerminalSquare size={14} strokeWidth={2.2} aria-hidden="true" /> Query this profile
       </button>

@@ -13,7 +13,7 @@ const byRank = {
 export function DifficultyBadge({ difficulty, rank = 2, className = '' }) {
   return (
     <span
-      className={`clip-corner-sm inline-flex items-center border px-3 py-1.5 font-display text-xs font-semibold uppercase tracking-[0.22em] ${byRank[rank] ?? byRank[2]} ${className}`}
+      className={`clip-corner-sm inline-flex items-center border px-3 py-1.5 font-display text-xs font-medium uppercase tracking-[0.22em] ${byRank[rank] ?? byRank[2]} ${className}`}
     >
       {difficulty}
     </span>

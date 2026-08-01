@@ -26,13 +26,13 @@ function EvidenceNote({ item }) {
             className={`mt-1 shrink-0 text-bone-dim transition-transform duration-200 ${isOpen ? 'rotate-180 text-gold-bright' : ''}`}
           />
           <span className="min-w-0 flex-1">
-            <span className="block typo-body text-base font-semibold text-bone">{item.title}</span>
+            <span className="block typo-body text-base font-medium text-bone">{item.title}</span>
             <span className="mt-1 flex flex-wrap items-center gap-2">
-              <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-bone-muted">
+              <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-bone-muted">
                 {item.category}
               </span>
               {note.trim() !== '' && (
-                <span className="clip-corner-sm border border-gold/40 bg-gold/10 px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-gold-bright">
+                <span className="clip-corner-sm border border-gold/40 bg-gold/10 px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-gold-bright">
                   Noted
                 </span>
               )}
@@ -55,7 +55,7 @@ function EvidenceNote({ item }) {
         <div className="border-t border-white/10 p-4">
           <p className="typo-body-secondary text-sm text-bone-muted">{item.description}</p>
           <label className="mt-4 block">
-            <span className="text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">Your note</span>
+            <span className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Your note</span>
             <textarea
               value={note}
               onChange={(event) => setNote(event.target.value)}
@@ -108,7 +108,7 @@ export function NotebookEvidenceNotes({ evidence }) {
           type="button"
           onClick={() => setSavedOnly((value) => !value)}
           aria-pressed={savedOnly}
-          className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-3 text-sm font-semibold transition-colors ${
+          className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-3 text-sm font-medium transition-colors ${
             savedOnly ? 'border-gold/55 bg-gold/12 text-gold-bright' : 'border-white/12 bg-white/[0.04] text-bone-muted hover:border-gold/40 hover:text-gold-bright'
           }`}
         >

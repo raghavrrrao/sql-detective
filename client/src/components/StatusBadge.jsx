@@ -22,7 +22,7 @@ export function StatusBadge({ tone, label, size = 'md', className = '' }) {
 
   return (
     <span
-      className={`clip-corner-sm inline-flex items-center gap-1.5 border font-semibold uppercase tracking-[0.14em] ${padding} ${config.className} ${className}`}
+      className={`clip-corner-sm inline-flex items-center gap-1.5 border font-medium uppercase tracking-[0.14em] ${padding} ${config.className} ${className}`}
     >
       <Icon size={size === 'sm' ? 12 : 14} strokeWidth={2.2} aria-hidden="true" />
       {label ?? config.label}

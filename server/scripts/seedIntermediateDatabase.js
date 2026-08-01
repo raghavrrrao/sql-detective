@@ -15,7 +15,7 @@ import { close, createCaseDatabase, insert, run } from './seedHelpers.js';
  * walks the building all night; he is the red herring an unfiltered aggregate
  * hands you. Narrowing the same count to the swap window with BETWEEN moves him
  * to the far side of the gallery and leaves Ruben Castellanos on the loading
- * bay four times while nobody else is there more than once.
+ * bay three times while nobody else is there more than once.
  *
  * Two further herrings hold up for a while: Ivy Zhang's card opens the bay at
  * 01:12 for a legitimate crate return, and Marta Lindqvist is the outsider with
@@ -41,7 +41,7 @@ export async function seedIntermediateDatabase() {
     await insert(database, 'locations', ['id', 'name', 'address', 'description'], [
       [1, 'Gallery Room 3', 'Ashcroft Gallery, Riverside', 'The long room where the nineteenth-century collection hangs.'],
       [2, 'Loading Bay', 'Ashcroft Gallery, Riverside', 'Goods entrance with a roller shutter and a card reader. No public access.'],
-      [3, 'Conservation Workshop', 'Ashcroft Gallery, Riverside', 'Restoration studio with solvent storage and a extraction hood.'],
+      [3, 'Conservation Workshop', 'Ashcroft Gallery, Riverside', 'Restoration studio with solvent storage and an extraction hood.'],
       [4, 'East Wing Corridor', 'Ashcroft Gallery, Riverside', 'Runs the length of the building away from the loading bay.'],
       [5, 'Staff Entrance', 'Ashcroft Gallery, Riverside', 'Card-controlled side door onto the square.'],
       [6, 'Registrar’s Office', 'Ashcroft Gallery, Riverside', 'Where condition reports and crate paperwork are filed.'],
@@ -93,10 +93,10 @@ export async function seedIntermediateDatabase() {
       [13, 'Ruben Castellanos', 'Gallery Room 3', '2026-06-11 01:48:00', 'Granted'],
       [14, 'Peter Halloran', 'East Wing Corridor', '2026-06-11 02:02:00', 'Granted'],
       [15, 'Ruben Castellanos', 'Loading Bay', '2026-06-11 02:11:00', 'Granted'],
-      [17, 'Ruben Castellanos', 'Loading Bay', '2026-06-11 02:38:00', 'Granted'],
-      [18, 'Peter Halloran', 'East Wing Corridor', '2026-06-11 02:44:00', 'Granted'],
-      [19, 'Peter Halloran', 'Gallery Room 3', '2026-06-11 03:30:00', 'Granted'],
-      [20, 'Peter Halloran', 'Staff Entrance', '2026-06-11 05:58:00', 'Granted'],
+      [16, 'Ruben Castellanos', 'Loading Bay', '2026-06-11 02:38:00', 'Granted'],
+      [17, 'Peter Halloran', 'East Wing Corridor', '2026-06-11 02:44:00', 'Granted'],
+      [18, 'Peter Halloran', 'Gallery Room 3', '2026-06-11 03:30:00', 'Granted'],
+      [19, 'Peter Halloran', 'Staff Entrance', '2026-06-11 05:58:00', 'Granted'],
     ]);
 
     await insert(database, 'cctv_logs', ['id', 'camera_id', 'observed_at', 'subject', 'observation'], [
@@ -108,12 +108,12 @@ export async function seedIntermediateDatabase() {
       [6, 'BAY-01', '2026-06-11 01:12:00', 'Ivy Zhang', 'Ivy wheels an empty crate into the bay.'],
       [7, 'BAY-01', '2026-06-11 01:15:00', 'Ivy Zhang', 'Ivy leaves the bay empty-handed.'],
       [8, 'EAST-01', '2026-06-11 01:20:00', 'Peter Halloran', 'Peter walks the east wing corridor checking door handles.'],
-      [9, 'BAY-02', '2026-06-11 01:31:00', 'Ruben Castellanos', 'A figure carries a flat wrapped panel in from the bay. The face is turned away.'],
-      [10, 'ROOM3-01', '2026-06-11 01:49:00', 'Ruben Castellanos', 'Someone lifts the frame off its wire in Room 3.'],
+      [9, 'BAY-02', '2026-06-11 01:31:00', 'Unidentified person', 'A figure carries a flat wrapped panel in from the bay. The face is turned away.'],
+      [10, 'ROOM3-01', '2026-06-11 01:49:00', 'Unidentified person', 'Someone lifts the frame off its wire in Room 3. The camera sees only a back and a sleeve.'],
       [11, 'EAST-01', '2026-06-11 02:02:00', 'Peter Halloran', 'Peter is still in the east wing.'],
-      [12, 'BAY-02', '2026-06-11 02:12:00', 'Ruben Castellanos', 'A wrapped panel goes out through the bay into a crate.'],
+      [12, 'BAY-02', '2026-06-11 02:12:00', 'Unidentified person', 'A wrapped panel goes out through the bay into a crate. The figure keeps their back to the lens.'],
       [13, 'EAST-01', '2026-06-11 02:44:00', 'Peter Halloran', 'Peter reaches the far end of the east wing.'],
-      [14, 'BAY-01', '2026-06-11 02:38:00', 'Ruben Castellanos', 'The bay shutter is lifted and lowered again from inside.'],
+      [14, 'BAY-01', '2026-06-11 02:38:00', 'Unidentified person', 'The bay shutter is lifted and lowered again from inside. Nobody is in frame.'],
     ]);
 
     await insert(database, 'security_logs', ['id', 'event_time', 'system_name', 'event_type', 'details'], [

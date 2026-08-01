@@ -12,7 +12,7 @@ const reveal = (delay) => ({
 function Panel({ icon: Icon, label, children, delay }) {
   return (
     <motion.section {...reveal(delay)} className="clip-corner-sm border border-white/10 bg-white/[0.035] p-5">
-      <h3 className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-bright">
+      <h3 className="flex items-center gap-2 font-display text-xs font-medium uppercase tracking-[0.2em] text-gold-bright">
         <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> {label}
       </h3>
       <div className="mt-3 typo-body text-base text-bone-muted">{children}</div>
@@ -61,7 +61,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
           </motion.h2>
 
           <motion.p {...reveal(0.3)} className="mt-6 text-center typo-body text-lg text-bone-muted">
-            The case against <span className="font-semibold text-bone">{verdict?.suspect}</span> is proven.
+            The case against <span className="font-medium text-bone">{verdict?.suspect}</span> is proven.
           </motion.p>
 
           <motion.div {...reveal(0.45)} className="clip-corner mt-12 border border-crimson/40 bg-crimson-deep/15 p-7 text-center">
@@ -103,7 +103,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
           </div>
 
           <motion.section {...reveal(1)} className="clip-corner-sm mt-6 border border-white/10 bg-white/[0.035] p-5">
-            <h3 className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-bright">
+            <h3 className="flex items-center gap-2 font-display text-xs font-medium uppercase tracking-[0.2em] text-gold-bright">
               <Target size={14} strokeWidth={2.2} aria-hidden="true" /> How you worked it
             </h3>
             <dl className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -128,7 +128,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
 
             {untouched.length > 0 && (
               <div className="mt-5 border-t border-white/10 pt-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">Sources you never opened</p>
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Sources you never opened</p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {untouched.map((table) => (
                     <span key={table} className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
@@ -147,14 +147,14 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
             <button
               type="button"
               onClick={onLeave}
-              className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
+              className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
               Back to the case board
             </button>
             <button
               type="button"
               onClick={onOpenReport}
-              className="clip-corner-sm inline-flex items-center gap-2.5 border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
+              className="clip-corner-sm inline-flex items-center gap-2.5 border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
               <FileText size={17} strokeWidth={2.2} aria-hidden="true" /> Open the investigation report
             </button>
@@ -162,7 +162,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
               <button
                 type="button"
                 onClick={onContinue}
-                className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5"
+                className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5"
               >
                 <Trophy size={17} strokeWidth={2.2} aria-hidden="true" /> See your score
               </button>

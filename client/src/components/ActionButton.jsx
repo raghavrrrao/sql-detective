@@ -20,7 +20,7 @@ const sizes = {
  * router <Link>.
  */
 export function ActionButton({ as = 'button', to, href, variant = 'primary', size = 'md', icon: Icon, iconRight: IconRight, children, className = '', ...rest }) {
-  const classes = `group clip-corner-sm relative inline-flex items-center justify-center gap-2.5 overflow-hidden font-display font-semibold uppercase tracking-[0.16em] transition-colors duration-200 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`;
+  const classes = `group clip-corner-sm relative inline-flex items-center justify-center gap-2.5 overflow-hidden font-display font-medium uppercase tracking-[0.16em] transition-colors duration-200 disabled:cursor-not-allowed ${variants[variant]} ${sizes[size]} ${className}`;
 
   const inner = (
     <>

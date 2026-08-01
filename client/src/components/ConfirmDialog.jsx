@@ -17,7 +17,7 @@ export function ConfirmDialog({ isOpen, onClose, onConfirm, title, description, 
         </p>
       )}
 
-      <p className="clip-corner-sm mt-4 border border-verdict-alert/40 bg-verdict-alert/10 p-3.5 font-display text-sm font-semibold uppercase tracking-[0.14em] text-verdict-alert">
+      <p className="clip-corner-sm mt-4 border border-verdict-alert/40 bg-verdict-alert/10 p-3.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-verdict-alert">
         This action cannot be undone.
       </p>
 
@@ -25,14 +25,14 @@ export function ConfirmDialog({ isOpen, onClose, onConfirm, title, description, 
         <button
           type="button"
           onClick={onClose}
-          className="clip-corner-sm border border-white/12 bg-white/[0.04] px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-white/30"
+          className="clip-corner-sm border border-white/12 bg-white/[0.04] px-5 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-white/30"
         >
           Cancel
         </button>
         <button
           type="button"
           onClick={() => { onConfirm(); onClose(); }}
-          className="clip-corner-sm border border-verdict-alert/60 bg-verdict-alert/15 px-5 py-3 font-display text-sm font-semibold uppercase tracking-[0.16em] text-verdict-alert transition-colors hover:bg-verdict-alert/25"
+          className="clip-corner-sm border border-verdict-alert/60 bg-verdict-alert/15 px-5 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-verdict-alert transition-colors hover:bg-verdict-alert/25"
         >
           {confirmLabel}
         </button>

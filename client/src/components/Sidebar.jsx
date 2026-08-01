@@ -65,7 +65,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
       <div className="clip-corner flex min-h-0 flex-1 flex-col panel-surface xl:shadow-panel">
         <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-4">
           <FolderOpen size={18} className="text-crimson-glow" strokeWidth={2} aria-hidden="true" />
-          <h2 className="font-display text-base font-semibold uppercase tracking-[0.18em] text-bone">Case board</h2>
+          <h2 className="font-display text-base font-medium uppercase tracking-[0.18em] text-bone">Case board</h2>
           <button
             type="button"
             onClick={onClose}
@@ -92,7 +92,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
                 aria-controls="board-panel"
                 tabIndex={isActive ? 0 : -1}
                 onClick={() => onSelectFolder(entry.id)}
-                className={`clip-corner-sm inline-flex items-center gap-1.5 border px-2.5 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+                className={`clip-corner-sm inline-flex items-center gap-1.5 border px-2.5 py-2 text-xs font-medium uppercase tracking-[0.1em] transition-colors ${
                   isActive
                     ? 'border-gold/55 bg-gold/12 text-gold-bright'
                     : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'

@@ -32,14 +32,14 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
         <div className="flex items-center gap-3">
           <Clock3 size={17} className="shrink-0 text-gold-bright" strokeWidth={2} />
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-bone-dim">Estimated time</dt>
+            <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">Estimated time</dt>
             <dd className="mt-0.5 text-base font-medium text-bone">{time}</dd>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Database size={17} className="mt-1 shrink-0 text-gold-bright" strokeWidth={2} />
           <div>
-            <dt className="text-xs font-semibold uppercase tracking-[0.18em] text-bone-dim">SQL concepts</dt>
+            <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">SQL concepts</dt>
             <dd className="mt-1.5 flex flex-wrap gap-2">
               {concepts.map((concept) => (
                 <span key={concept} className="clip-corner-sm border border-white/10 bg-white/[0.06] px-2.5 py-1 font-mono text-xs text-bone">{concept}</span>

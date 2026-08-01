@@ -63,12 +63,12 @@ function EvidenceCardComponent({ item, index, isOpen: controlledOpen, onToggle }
         </span>
 
         <span className="min-w-0 flex-1">
-          <span className="block text-[0.95rem] font-semibold leading-snug text-bone">{item.title}</span>
+          <span className="block text-[0.95rem] font-medium leading-snug text-bone">{item.title}</span>
           <span className="mt-2 flex flex-wrap items-center gap-2">
-            <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-bone-muted">
+            <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-bone-muted">
               {item.category}
             </span>
-            <span className={`clip-corner-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] ${importance.className}`}>
+            <span className={`clip-corner-sm border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] ${importance.className}`}>
               {importance.label}
             </span>
             {stamp && <span className="font-mono text-xs text-bone-dim">{stamp}</span>}

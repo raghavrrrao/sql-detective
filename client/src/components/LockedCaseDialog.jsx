@@ -40,7 +40,7 @@ export function LockedCaseDialog({ isOpen, onClose, caseData, requirement }) {
       <dl className="mt-6 space-y-5 border-y border-white/10 py-6">
         <div>
           <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">Status</dt>
-          <dd className="mt-1.5 flex items-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-crimson-glow">
+          <dd className="mt-1.5 flex items-center gap-2 font-display text-base font-medium uppercase tracking-[0.16em] text-crimson-glow">
             <Lock size={15} strokeWidth={2.4} aria-hidden="true" /> Locked
           </dd>
         </div>

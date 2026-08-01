@@ -13,7 +13,7 @@ const rows = [
   { id: 'documents', label: 'Documents', table: 'documents', verb: 'reviewed' },
 ];
 
-export function buildProgressLedger({ discoveries = [], tableTotals = {}, timelineCount = 0, intel = [] }) {
+export function buildProgressLedger({ discoveries = [], tableTotals = {}, timelineCount = 0, intel = [], hasVictim = true }) {
   const counts = discoveries.reduce((totals, record) => {
     totals[record.table] = (totals[record.table] ?? 0) + 1;
     return totals;
@@ -21,13 +21,17 @@ export function buildProgressLedger({ discoveries = [], tableTotals = {}, timeli
 
   const ledger = [];
 
-  const victimCount = counts.victims ?? 0;
-  ledger.push({
-    id: 'victim',
-    label: 'Victim',
-    value: victimCount > 0 ? 'Confirmed' : 'Unidentified',
-    state: victimCount > 0 ? 'done' : 'todo',
-  });
+  // A theft has no victim record to pull, so the row would sit at
+  // "Unidentified" forever and read as an outstanding task that does not exist.
+  if (hasVictim) {
+    const victimCount = counts.victims ?? 0;
+    ledger.push({
+      id: 'victim',
+      label: 'Victim',
+      value: victimCount > 0 ? 'Confirmed' : 'Unidentified',
+      state: victimCount > 0 ? 'done' : 'todo',
+    });
+  }
 
   const investigated = intel.filter((profile) => profile.status !== 'unknown').length;
   ledger.push({

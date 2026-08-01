@@ -11,7 +11,7 @@ export function NotebookPersonalNotes() {
 
   return (
     <div>
-      <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Working theory</h3>
+      <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Working theory</h3>
       <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
         Who cannot account for themselves, and what proves it? Write it out — the argument is usually where the hole shows up.
       </p>

@@ -13,7 +13,9 @@ database/*.sqlite
 database/*.sqlite-*
 database/*.db
 database/*.db-*
+!database/beginner.db
 !database/easy.db
+!database/intermediate.db
 !database/medium.db
 !database/expert.db
 

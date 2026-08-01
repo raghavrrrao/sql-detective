@@ -61,7 +61,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <span className="flex items-center gap-2 text-base text-bone-muted">
           <Clock3 size={16} className="text-gold-bright" strokeWidth={2} /> {caseData.estimatedTime}
         </span>
-        <span className={`clip-corner-sm inline-flex items-center gap-1.5 border px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.14em] ${chip.className}`}>
+        <span className={`clip-corner-sm inline-flex items-center gap-1.5 border px-2.5 py-1 text-xs font-medium uppercase tracking-[0.14em] ${chip.className}`}>
           <ChipIcon size={12} strokeWidth={2.4} /> {chip.label}
         </span>
       </div>
@@ -97,7 +97,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         {body}
         <div className="mt-8 border-t border-white/10 pt-5 text-center">
           <p className="font-display text-sm font-medium uppercase tracking-[0.3em] text-gold-bright">Classified</p>
-          <p className="mt-2 flex items-center justify-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-bone">
+          <p className="mt-2 flex items-center justify-center gap-2 font-display text-base font-medium uppercase tracking-[0.16em] text-bone">
             <Lock size={16} strokeWidth={2.2} aria-hidden="true" /> Investigation file sealed
           </p>
           <p className="mt-2 text-sm text-bone-dim">Coming soon</p>
@@ -124,14 +124,14 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         >
           <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-ink/72 px-6 text-center backdrop-blur-[3px] transition-colors duration-300 group-hover:bg-ink/60">
             <Lock size={30} className="text-gold-bright" strokeWidth={1.8} />
-            <p className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">Case sealed</p>
+            <p className="font-display text-xl font-medium uppercase tracking-[0.16em] text-bone">Case sealed</p>
             <p className="max-w-[17rem] typo-body-secondary text-sm text-bone-muted">
               {requirement ? `Complete ${requirement.tier} to unlock` : 'Not yet available'}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.16em] text-bone-dim">Select for details</p>
           </div>
           <div className="opacity-70 grayscale">{body}</div>
-          <span className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone-dim">
+          <span className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone-dim">
             Locked <Lock size={17} />
           </span>
         </button>
@@ -160,13 +160,13 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
 
       {isSolved ? (
         <div className="mt-8 border-t border-white/10 pt-5">
-          <p className="flex items-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-verdict-clear">
+          <p className="flex items-center gap-2 font-display text-base font-medium uppercase tracking-[0.16em] text-verdict-clear">
             <BadgeCheck size={19} strokeWidth={2.2} aria-hidden="true" /> Solved
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5">
             <Link
               to={getCaseRoutePath(caseKey, 'investigation')}
-              className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
+              className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
               Review the case file
             </Link>
@@ -174,7 +174,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
               type="button"
               onClick={handleReplay}
               onBlur={() => setConfirmReplay(false)}
-              className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-semibold transition-colors ${
+              className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-medium transition-colors ${
                 confirmReplay
                   ? 'border-crimson-bright/60 bg-crimson/15 text-crimson-glow'
                   : 'border-white/12 bg-white/[0.04] text-bone-muted hover:border-crimson-bright/50 hover:text-crimson-glow'
@@ -191,7 +191,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
       ) : (
         <Link
           to={getCaseRoutePath(caseKey, 'case')}
-          className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-base font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:text-gold-bright"
+          className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-base font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:text-gold-bright"
         >
           <span>Open case file</span>
           <ArrowUpRight size={20} className="transition-transform duration-200 group-hover:translate-x-1 group-hover:-translate-y-1" />

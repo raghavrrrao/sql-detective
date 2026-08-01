@@ -56,8 +56,12 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
           <span aria-label={`Elapsed time ${formatClock(elapsedMs)}${isRunning ? '' : ', paused'}`}>{formatClock(elapsedMs)}</span>
           <span className="text-bone-dim">/ {caseData.timer}</span>
         </div>
-        <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone xl:flex">
-          <Star size={15} className="text-gold-bright" strokeWidth={2.2} /> {caseData.score}
+        <div
+          title={`Base score for this case: ${caseData.score}`}
+          className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone xl:flex"
+        >
+          <Star size={15} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" />
+          <span aria-label={`Base score for this case, ${caseData.score} points`}>{caseData.score}</span>
         </div>
 
         <SoundToggle />

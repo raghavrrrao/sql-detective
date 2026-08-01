@@ -62,12 +62,12 @@ export function GlobalSearchModal({ isOpen, onClose, briefing, onOpenSection }) 
         {results.groups.map((group) => (
           <section key={group.id}>
             <div className="flex items-center justify-between gap-3">
-              <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-gold-bright">{group.label}</h3>
+              <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-gold-bright">{group.label}</h3>
               {group.section && (
                 <button
                   type="button"
                   onClick={() => onOpenSection(group.section)}
-                  className="text-xs font-semibold uppercase tracking-[0.12em] text-bone-dim transition-colors hover:text-gold-bright"
+                  className="text-xs font-medium uppercase tracking-[0.12em] text-bone-dim transition-colors hover:text-gold-bright"
                 >
                   Open section
                 </button>

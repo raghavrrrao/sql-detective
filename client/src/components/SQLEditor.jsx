@@ -82,7 +82,7 @@ function SQLEditorComponent({ sql, onSqlChange, onRun, onReset, onClear, isRunni
     <section className="clip-corner flex min-h-[21rem] flex-col overflow-hidden panel-surface shadow-panel backdrop-blur-xl lg:min-h-0">
       <header className="flex flex-wrap items-center gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-4">
         <TerminalSquare size={18} className="text-crimson-glow" strokeWidth={2} aria-hidden="true" />
-        <h2 className="font-display text-base font-semibold uppercase tracking-[0.18em] text-bone">Investigation terminal</h2>
+        <h2 className="font-display text-base font-medium uppercase tracking-[0.18em] text-bone">Investigation terminal</h2>
 
         <div className="ml-auto flex items-center gap-2">
           <span className="clip-corner-sm inline-flex items-center gap-1.5 border border-verdict-clear/35 bg-verdict-clear/10 px-2.5 py-1.5 font-mono text-xs font-medium text-verdict-clear">

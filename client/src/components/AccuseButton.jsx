@@ -33,7 +33,7 @@ export function AccuseButton({ onOpen }) {
         onClick={onOpen}
         disabled={!readiness.isReady}
         aria-describedby="accuse-readiness"
-        className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:border-white/12 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none disabled:hover:translate-y-0"
+        className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-5 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:border-white/12 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none disabled:hover:translate-y-0"
       >
         <Gavel size={17} strokeWidth={2.2} aria-hidden="true" /> Accuse
       </button>

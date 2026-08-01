@@ -22,7 +22,7 @@ function StepRail({ current }) {
           <li
             key={step.id}
             aria-current={state === 'active' ? 'step' : undefined}
-            className={`clip-corner-sm flex items-center gap-2 border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] ${
+            className={`clip-corner-sm flex items-center gap-2 border px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] ${
               state === 'active'
                 ? 'border-gold/55 bg-gold/12 text-gold-bright'
                 : state === 'done'
@@ -140,7 +140,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           <button
             type="button"
             onClick={handleClose}
-            className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
+            className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
           >
             Return to the investigation
           </button>
@@ -168,7 +168,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               type="button"
               onClick={() => setStep('reasoning')}
               disabled={isSubmitting}
-              className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-white/30 disabled:cursor-not-allowed disabled:text-bone-dim"
+              className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-white/30 disabled:cursor-not-allowed disabled:text-bone-dim"
             >
               Cancel
             </button>
@@ -176,7 +176,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               type="button"
               onClick={handleConfirm}
               disabled={isSubmitting}
-              className="clip-corner-sm border border-crimson-bright/60 bg-crimson px-6 py-3 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
+              className="clip-corner-sm border border-crimson-bright/60 bg-crimson px-6 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
             >
               {isSubmitting ? 'Filing…' : 'Confirm accusation'}
             </button>
@@ -188,7 +188,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
 
           {step === 'suspect' && (
             <fieldset>
-              <legend className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Who are you accusing?</legend>
+              <legend className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Who are you accusing?</legend>
               <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Only people your investigation has actually turned up can be named.
               </p>
@@ -223,7 +223,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
                         <UserRound size={20} strokeWidth={2} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-base font-semibold text-bone">{profile.name}</span>
+                        <span className="block truncate text-base font-medium text-bone">{profile.name}</span>
                         <span className="block truncate text-sm text-bone-muted">{profile.occupation}</span>
                         <span className="mt-1 block font-mono text-xs text-bone-dim">
                           {profile.recordCount} {profile.recordCount === 1 ? 'record' : 'records'} on file
@@ -238,7 +238,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
 
           {step === 'evidence' && (
             <fieldset>
-              <legend className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Cite your evidence</legend>
+              <legend className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Cite your evidence</legend>
               <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Pick the records that support the accusation. A case reads more strongly the more independent records stand behind it.
               </p>
@@ -284,7 +284,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
                         <Check size={13} strokeWidth={3} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[0.95rem] font-semibold leading-6 text-bone">{record.title}</span>
+                        <span className="block text-[0.95rem] font-medium leading-6 text-bone">{record.title}</span>
                         <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 typo-body-secondary text-xs text-bone-dim">
                           <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono">
                             {record.table.replace(/_/g, ' ')}
@@ -313,7 +313,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
 
           {step === 'reasoning' && (
             <div>
-              <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">State your case</h3>
+              <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">State your case</h3>
               <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Set out how the records fit together. This is for the case file — it is not marked, and it is saved as you type.
               </p>
@@ -336,7 +336,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               type="button"
               onClick={() => setStep(step === 'evidence' ? 'suspect' : 'evidence')}
               disabled={step === 'suspect'}
-              className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-white/30 hover:text-bone disabled:cursor-not-allowed disabled:text-bone-dim"
+              className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-white/30 hover:text-bone disabled:cursor-not-allowed disabled:text-bone-dim"
             >
               <ArrowLeft size={15} strokeWidth={2.2} aria-hidden="true" /> Back
             </button>
@@ -345,7 +345,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               <button
                 type="button"
                 onClick={() => setStep('confirm')}
-                className="clip-corner-sm inline-flex items-center gap-2 border border-crimson-bright/60 bg-crimson px-5 py-2.5 font-display text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
+                className="clip-corner-sm inline-flex items-center gap-2 border border-crimson-bright/60 bg-crimson px-5 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
               >
                 <Gavel size={15} strokeWidth={2.2} aria-hidden="true" /> File the accusation
               </button>
@@ -354,7 +354,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
                 type="button"
                 onClick={() => setStep(step === 'suspect' ? 'evidence' : 'reasoning')}
                 disabled={(step === 'suspect' && !suspect) || (step === 'evidence' && cited.size === 0)}
-                className="clip-corner-sm inline-flex items-center gap-2 border border-gold-bright/70 bg-gold px-5 py-2.5 font-display text-sm font-semibold uppercase tracking-[0.14em] text-ink transition-colors hover:bg-gold-bright disabled:cursor-not-allowed disabled:border-white/12 disabled:bg-charcoal-light disabled:text-bone-dim"
+                className="clip-corner-sm inline-flex items-center gap-2 border border-gold-bright/70 bg-gold px-5 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-ink transition-colors hover:bg-gold-bright disabled:cursor-not-allowed disabled:border-white/12 disabled:bg-charcoal-light disabled:text-bone-dim"
               >
                 Continue <ArrowRight size={15} strokeWidth={2.2} aria-hidden="true" />
               </button>

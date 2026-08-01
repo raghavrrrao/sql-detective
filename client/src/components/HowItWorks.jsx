@@ -1,11 +1,12 @@
 import { motion } from 'framer-motion';
-import { Database, Gavel, Target, TerminalSquare } from 'lucide-react';
+import { ArrowRight, Database, Gavel, Target, TerminalSquare } from 'lucide-react';
+import { ActionButton } from './ActionButton';
 
 const steps = [
-  { title: 'Open the case', icon: Target, detail: 'Read the briefing, the victim file, and the first set of leads.' },
+  { title: 'Open the case', icon: Target, detail: 'Read the briefing, the case file, and the first set of leads.' },
   { title: 'Read the board', icon: Database, detail: 'Sixteen linked tables hold every statement, log, and forensic report.' },
   { title: 'Query the evidence', icon: TerminalSquare, detail: 'Write real SQL to break alibis and place people at the scene.' },
-  { title: 'Name the killer', icon: Gavel, detail: 'One suspect will have no record where they claim to have been.' },
+  { title: 'Make the accusation', icon: Gavel, detail: 'One person will have no record where they claim to have been. Prove it, then name them.' },
 ];
 
 export function HowItWorks() {
@@ -19,9 +20,16 @@ export function HowItWorks() {
             </p>
             <h2 className="font-display text-4xl font-medium uppercase text-bone sm:text-5xl">Follow the evidence</h2>
           </div>
-          <p className="max-w-md typo-body text-base text-bone-muted">
-            Four steps, repeated until the board is clear. Every case teaches the SQL you need for the next one.
-          </p>
+          <div className="max-w-md">
+            <p className="typo-body text-base text-bone-muted">
+              Four steps, repeated until the board is clear. Every case teaches the SQL you need for the next one.
+            </p>
+            <div className="mt-5">
+              <ActionButton as="link" to="/how-to-play" variant="ghost" iconRight={ArrowRight}>
+                Never written SQL? Start here
+              </ActionButton>
+            </div>
+          </div>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
@@ -36,7 +44,7 @@ export function HowItWorks() {
             >
               <span className="font-mono text-sm font-medium tracking-[0.2em] text-crimson-glow">0{index + 1}</span>
               <Icon className="mt-7 text-gold-bright" size={28} strokeWidth={1.7} />
-              <h3 className="mt-7 font-display text-xl font-semibold uppercase tracking-wide text-bone">{title}</h3>
+              <h3 className="mt-7 font-display text-xl font-medium uppercase tracking-wide text-bone">{title}</h3>
               <p className="mt-3 typo-body text-base text-bone-muted">{detail}</p>
             </motion.div>
           ))}

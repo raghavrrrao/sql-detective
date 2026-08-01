@@ -10,7 +10,7 @@ import { CaseDebrief } from './CaseDebrief';
 import { FestivalScoreSummary } from './FestivalScoreSummary';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { HeaderBar } from './HeaderBar';
-import { InventoryPanel } from './InventoryPanel';
+import { CaseTablesPanel } from './CaseTablesPanel';
 import { NotebookModal } from './NotebookModal';
 import { QueryResultsTable } from './QueryResultsTable';
 import { Sidebar } from './Sidebar';
@@ -117,6 +117,13 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
     setIsScoreOpen(true);
   }, []);
 
+  // Writes a plain SELECT for a table the player picked from the board, so a
+  // first query never requires knowing the syntax by heart.
+  const pickTable = useCallback((table) => {
+    setSql(`SELECT * FROM ${table};`);
+    editorRef.current?.focus();
+  }, [setSql]);
+
   // Loads a starter query for a suspect instead of revealing their file for free.
   const inspectSuspect = useCallback((suspect) => {
     setSql(`SELECT * FROM suspects WHERE name = '${suspect.name.replace(/'/g, "''")}';`);
@@ -214,7 +221,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
               className="grid content-start gap-5"
             >
               <SuspectPanel onInspectSuspect={inspectSuspect} />
-              <InventoryPanel items={briefing.inventory} />
+              <CaseTablesPanel tables={briefing.tables ?? []} onPickTable={pickTable} />
             </motion.aside>
           </main>
         </div>
@@ -223,7 +230,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
       <button
         type="button"
         onClick={openNotebook}
-        className="clip-corner-sm fixed bottom-6 left-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 xl:left-auto xl:right-[13rem]"
+        className="clip-corner-sm fixed bottom-6 left-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 xl:left-auto xl:right-[13rem]"
       >
         <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" /> Notebook
       </button>
@@ -232,7 +239,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         <button
           type="button"
           onClick={() => setIsReportOpen(true)}
-          className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5"
+          className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-5 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5"
         >
           Case closed · Report
         </button>

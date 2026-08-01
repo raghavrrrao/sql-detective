@@ -13,7 +13,7 @@ function Row({ title, description, children }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 py-5 last:border-0">
       <div className="min-w-[14rem] flex-1">
-        <p className="text-base font-semibold text-bone">{title}</p>
+        <p className="text-base font-medium text-bone">{title}</p>
         {description && <p className="mt-1 typo-body-secondary text-sm text-bone-dim">{description}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2.5">{children}</div>
@@ -28,7 +28,7 @@ function Toggle({ label, isOn, onChange, icon: Icon }) {
       role="switch"
       aria-checked={isOn}
       onClick={() => onChange(!isOn)}
-      className={`clip-corner-sm inline-flex items-center gap-2 border px-4 py-2.5 text-sm font-semibold transition-colors ${
+      className={`clip-corner-sm inline-flex items-center gap-2 border px-4 py-2.5 text-sm font-medium transition-colors ${
         isOn
           ? 'border-verdict-clear/50 bg-verdict-clear/12 text-verdict-clear'
           : 'border-white/12 bg-white/[0.04] text-bone-dim hover:border-white/30'
@@ -39,8 +39,8 @@ function Toggle({ label, isOn, onChange, icon: Icon }) {
   );
 }
 
-const danger = 'clip-corner-sm inline-flex items-center gap-2 border border-verdict-alert/45 bg-verdict-alert/10 px-4 py-2.5 text-sm font-semibold text-verdict-alert transition-colors hover:bg-verdict-alert/20';
-const neutral = 'clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright';
+const danger = 'clip-corner-sm inline-flex items-center gap-2 border border-verdict-alert/45 bg-verdict-alert/10 px-4 py-2.5 text-sm font-medium text-verdict-alert transition-colors hover:bg-verdict-alert/20';
+const neutral = 'clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright';
 
 export function SettingsPage() {
   const {
@@ -103,7 +103,7 @@ export function SettingsPage() {
       <div className="relative z-10 mx-auto max-w-4xl">
         <Link
           to="/"
-          className="inline-flex items-center gap-2.5 font-display text-sm font-semibold uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
+          className="inline-flex items-center gap-2.5 font-display text-sm font-medium uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
         >
           <ArrowLeft size={16} strokeWidth={2.2} /> Return to briefing
         </Link>
@@ -117,9 +117,9 @@ export function SettingsPage() {
         </div>
 
         <section className="clip-corner panel-surface p-7 shadow-panel">
-          <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Mode</h2>
+          <h2 className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">Mode</h2>
           <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
-            Currently running in <span className="font-semibold text-bone">{isFestival ? 'Festival Mode' : 'Personal Mode'}</span>
+            Currently running in <span className="font-medium text-bone">{isFestival ? 'Festival Mode' : 'Personal Mode'}</span>
             {isFestival && detectiveName ? ` · Detective ${detectiveName}` : ''}.
           </p>
 
@@ -144,7 +144,7 @@ export function SettingsPage() {
         </section>
 
         <section className="clip-corner mt-6 panel-surface p-7 shadow-panel">
-          <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Audio</h2>
+          <h2 className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">Audio</h2>
           <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
             These switches are saved now and take effect once the audio pack ships. Nothing plays yet.
           </p>
@@ -157,7 +157,7 @@ export function SettingsPage() {
         <LeaderboardPanel className="mt-6" />
 
         <section className="clip-corner mt-6 border border-verdict-alert/30 panel-surface p-7 shadow-panel">
-          <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-[0.16em] text-verdict-alert">
+          <h2 className="flex items-center gap-2 font-display text-lg font-medium uppercase tracking-[0.16em] text-verdict-alert">
             <ShieldAlert size={18} strokeWidth={2.2} aria-hidden="true" /> Admin
           </h2>
           <p className="mt-2 typo-body-secondary text-sm text-bone-dim">

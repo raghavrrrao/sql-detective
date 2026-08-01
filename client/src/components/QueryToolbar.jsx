@@ -3,7 +3,7 @@ import { Eraser, Play, RotateCcw, ShieldCheck } from 'lucide-react';
 
 function Shortcut({ children }) {
   return (
-    <kbd className="clip-corner-sm border border-white/12 bg-white/[0.06] px-1.5 py-0.5 font-mono text-xs font-semibold text-bone-muted">
+    <kbd className="clip-corner-sm border border-white/12 bg-white/[0.06] px-1.5 py-0.5 font-mono text-xs font-medium text-bone-muted">
       {children}
     </kbd>
   );
@@ -18,7 +18,7 @@ function QueryToolbarComponent({ onRun, onReset, onClear, isRunning, canReset, c
         disabled={isRunning}
         aria-busy={isRunning}
         aria-keyshortcuts="Control+Enter Meta+Enter"
-        className="clip-corner-sm group relative inline-flex items-center gap-2 overflow-hidden border border-crimson-bright/60 bg-crimson px-4 py-2.5 font-display text-sm font-semibold uppercase tracking-[0.14em] text-white shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:border-white/10 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
+        className="clip-corner-sm group relative inline-flex items-center gap-2 overflow-hidden border border-crimson-bright/60 bg-crimson px-4 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-white shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:border-white/10 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
       >
         <span aria-hidden="true" className="absolute inset-y-0 -left-full w-1/3 skew-x-[-20deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-[400%]" />
         <span className="relative flex items-center gap-2">
@@ -31,7 +31,7 @@ function QueryToolbarComponent({ onRun, onReset, onClear, isRunning, canReset, c
         onClick={onReset}
         disabled={!canReset}
         title="Restore this case's opening query"
-        className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright disabled:cursor-not-allowed disabled:text-bone-dim disabled:hover:border-white/12"
+        className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright disabled:cursor-not-allowed disabled:text-bone-dim disabled:hover:border-white/12"
       >
         <RotateCcw size={15} strokeWidth={2.2} aria-hidden="true" /> Reset
       </button>
@@ -42,7 +42,7 @@ function QueryToolbarComponent({ onRun, onReset, onClear, isRunning, canReset, c
         disabled={!canClear}
         aria-keyshortcuts="Control+L Meta+L"
         title="Empty the terminal"
-        className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright disabled:cursor-not-allowed disabled:text-bone-dim disabled:hover:border-white/12"
+        className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright disabled:cursor-not-allowed disabled:text-bone-dim disabled:hover:border-white/12"
       >
         <Eraser size={15} strokeWidth={2.2} aria-hidden="true" /> Clear
       </button>

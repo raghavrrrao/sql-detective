@@ -43,7 +43,7 @@
   [role='button'],
   input[type='button'],
   input[type='submit'] {
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.14em;
   }
 
@@ -100,7 +100,7 @@
   }
 
   .typo-button {
-    font-weight: 600;
+    font-weight: 500;
     letter-spacing: 0.14em;
   }
 

@@ -131,7 +131,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
               aria-controls={`notebook-panel-${section.id}`}
               tabIndex={isActive ? 0 : -1}
               onClick={() => selectSection(section.id)}
-              className={`clip-corner-sm inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+              className={`clip-corner-sm inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] transition-colors ${
                 isActive
                   ? 'border-gold/55 bg-gold/12 text-gold-bright'
                   : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'

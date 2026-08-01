@@ -99,7 +99,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
           >
             <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-6 py-4">
               {Icon && <Icon size={19} className="text-gold-bright" strokeWidth={2} aria-hidden="true" />}
-              <h2 id={titleId} className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">{title}</h2>
+              <h2 id={titleId} className="font-display text-xl font-medium uppercase tracking-[0.16em] text-bone">{title}</h2>
               {dismissible && (
                 <button
                   type="button"

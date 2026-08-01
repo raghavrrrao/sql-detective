@@ -13,7 +13,7 @@ export function NotebookObjectives({ leads }) {
     <div className="space-y-7">
       <section>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Investigation objectives</h3>
+          <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Investigation objectives</h3>
           <p className="font-mono text-sm text-gold-bright">{tally.done} of {tally.total} complete</p>
         </div>
         <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">These complete on their own as you work the database.</p>
@@ -40,7 +40,7 @@ export function NotebookObjectives({ leads }) {
               </span>
 
               <div className="min-w-0 flex-1">
-                <p className={`text-base font-semibold leading-6 ${objective.isDone ? 'text-verdict-clear' : 'text-bone'}`}>
+                <p className={`text-base font-medium leading-6 ${objective.isDone ? 'text-verdict-clear' : 'text-bone'}`}>
                   {objective.label}
                   <span className="sr-only">{objective.locked ? ' — locked' : objective.isDone ? ' — complete' : ' — outstanding'}</span>
                 </p>
@@ -54,7 +54,7 @@ export function NotebookObjectives({ leads }) {
       {leads.length > 0 && (
         <section>
           <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Case leads</h3>
+            <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Case leads</h3>
             <p className="font-mono text-sm text-bone-dim">{leadsDone.length} of {leads.length} followed</p>
           </div>
           <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">Your own checklist — tick these off as you work through them.</p>

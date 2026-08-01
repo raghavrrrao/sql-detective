@@ -11,7 +11,7 @@ const rise = {
 const stats = [
   { value: String(displayCases.length).padStart(2, '0'), label: 'Case files' },
   { value: '16', label: 'Evidence tables' },
-  { value: '318', label: 'Case records' },
+  { value: '428', label: 'Case records' },
 ];
 
 export function Hero() {
@@ -48,7 +48,7 @@ export function Hero() {
             <ActionButton as="link" to="/difficulty" variant="primary" size="lg" iconRight={ArrowRight}>
               Start Investigation
             </ActionButton>
-            <ActionButton as="a" href="#how-it-works" variant="ghost" size="lg" icon={PlayCircle}>
+            <ActionButton as="link" to="/how-to-play" variant="ghost" size="lg" icon={PlayCircle}>
               How to Play
             </ActionButton>
             <ActionButton as="link" to="/settings" variant="ghost" size="lg" icon={SlidersHorizontal}>

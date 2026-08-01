@@ -1,14 +1,15 @@
 import { motion } from 'framer-motion';
 import { Eye, FileWarning, MapPin, Users } from 'lucide-react';
 
-const entries = [
-  { key: 'victim', label: 'Victim', icon: Eye },
+const entriesFor = (subjectLabel) => [
+  { key: 'victim', label: subjectLabel, icon: Eye },
   { key: 'crimeScene', label: 'Crime scene', icon: MapPin },
   { key: 'witnesses', label: 'Persons of interest', icon: Users },
   { key: 'evidence', label: 'Initial evidence', icon: FileWarning },
 ];
 
 export function CaseFile({ caseData }) {
+  const entries = entriesFor(caseData.subjectLabel ?? 'Victim');
   return (
     <motion.section
       initial={{ opacity: 0, y: 24 }}

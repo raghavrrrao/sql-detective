@@ -29,7 +29,7 @@ export function NotebookSuspects() {
 
   return (
     <div>
-      <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Suspect files</h3>
+      <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Suspect files</h3>
       <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
         A file grows as your queries turn up records naming that person. Nothing here reads their alibi.
       </p>
@@ -47,11 +47,11 @@ export function NotebookSuspects() {
               >
                 <span className="clip-corner-sm relative flex h-12 w-12 shrink-0 items-center justify-center bg-gradient-to-br from-charcoal-light to-charcoal ring-1 ring-white/12">
                   <UserRound size={20} className="absolute text-white/12" strokeWidth={1.5} aria-hidden="true" />
-                  <span className="relative font-display text-sm font-semibold text-bone">{initialsOf(profile.name)}</span>
+                  <span className="relative font-display text-sm font-medium text-bone">{initialsOf(profile.name)}</span>
                 </span>
 
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-base font-semibold text-bone">{profile.name}</span>
+                  <span className="block truncate text-base font-medium text-bone">{profile.name}</span>
                   <span className="block truncate text-sm text-bone-muted">{profile.occupation}</span>
                   <span className="mt-1 block font-mono text-xs text-bone-dim">
                     {profile.recordCount === 0
@@ -72,7 +72,7 @@ export function NotebookSuspects() {
 
                   {profile.sources.length > 0 && (
                     <div className="mt-3.5">
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">Sources on file</p>
+                      <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Sources on file</p>
                       <div className="mt-2 flex flex-wrap gap-1.5">
                         {profile.sources.map((source) => (
                           <span key={source} className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
@@ -94,7 +94,7 @@ export function NotebookSuspects() {
                       type="button"
                       onClick={() => setPrimeSuspect(profile.name)}
                       aria-pressed={profile.isPrime}
-                      className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-semibold transition-colors ${
+                      className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-medium transition-colors ${
                         profile.isPrime
                           ? 'border-crimson-bright/60 bg-crimson/15 text-crimson-glow'
                           : 'border-white/12 bg-white/[0.04] text-bone-muted hover:border-crimson-bright/50 hover:text-crimson-glow'
@@ -114,7 +114,7 @@ export function NotebookSuspects() {
                           ? 'Your own judgement — the game does not check it'
                           : 'Recover a badge, camera, phone or security record naming this person first'
                       }
-                      className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:text-bone-dim ${
+                      className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:text-bone-dim ${
                         profile.isCleared
                           ? 'border-verdict-clear/50 bg-verdict-clear/12 text-verdict-clear'
                           : 'border-white/12 bg-white/[0.04] text-bone-muted enabled:hover:border-verdict-clear/45 enabled:hover:text-verdict-clear'

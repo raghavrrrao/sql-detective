@@ -23,7 +23,7 @@ export function NotebookHints({ difficulty }) {
   return (
     <div>
       <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Hints</h3>
+        <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Hints</h3>
         <p className="font-mono text-sm text-gold-bright">{hintsRevealed} of {hints.length} taken</p>
       </div>
       <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
@@ -45,7 +45,7 @@ export function NotebookHints({ difficulty }) {
               <div className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
-                  className={`clip-corner-sm mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center border font-mono text-xs font-semibold ${
+                  className={`clip-corner-sm mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center border font-mono text-xs font-medium ${
                     isRevealed ? 'border-gold/45 bg-gold-deep/25 text-gold-bright' : 'border-white/15 text-bone-dim'
                   }`}
                 >
@@ -64,7 +64,7 @@ export function NotebookHints({ difficulty }) {
                       <button
                         type="button"
                         onClick={() => revealHint(hints.length)}
-                        className="clip-corner-sm inline-flex items-center gap-2 border border-gold/45 bg-gold/10 px-3.5 py-2.5 text-sm font-semibold text-gold-bright transition-colors hover:bg-gold/20"
+                        className="clip-corner-sm inline-flex items-center gap-2 border border-gold/45 bg-gold/10 px-3.5 py-2.5 text-sm font-medium text-gold-bright transition-colors hover:bg-gold/20"
                       >
                         <Lightbulb size={15} strokeWidth={2.2} aria-hidden="true" /> Take this hint
                       </button>

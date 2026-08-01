@@ -7,7 +7,7 @@
  * from the case database at reveal time through the ordinary read-only query
  * API, so this file stays as small as it possibly can be.
  *
- * CAVEAT, stated plainly: these three names ship inside the JavaScript bundle,
+ * CAVEAT, stated plainly: these five names ship inside the JavaScript bundle,
  * so anyone who opens developer tools can read them. Grading a verdict without
  * that exposure needs a server endpoint that checks the accusation, and the
  * backend is out of scope for this sprint. Treat the accusation as an honour

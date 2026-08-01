@@ -29,7 +29,7 @@ function TimelineBoardComponent({ entries }) {
           >
             <span aria-hidden="true" className="absolute -left-[1.32rem] top-5 h-2.5 w-2.5 rounded-full border-2 border-crimson-bright bg-ink" />
             {stamp && (
-              <span className="flex items-center gap-1.5 font-mono text-sm font-semibold tracking-wide text-gold-bright">
+              <span className="flex items-center gap-1.5 font-mono text-sm font-medium tracking-wide text-gold-bright">
                 <Clock size={13} strokeWidth={2.4} /> {stamp}
               </span>
             )}

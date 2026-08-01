@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { CalendarDays, CircleDot, CircleSlash, Lightbulb, MapPin, ShieldCheck, Timer, UserX } from 'lucide-react';
+import { CalendarDays, CircleDot, CircleSlash, FileSearch, Lightbulb, MapPin, ShieldCheck, Timer, UserX } from 'lucide-react';
 import { useInvestigationSession } from '../../state/investigationSession';
 
 const stateStyles = {
@@ -8,9 +8,9 @@ const stateStyles = {
   todo: { icon: CircleSlash, chip: 'border-white/12 bg-white/[0.04] text-bone-dim', tone: 'text-bone-dim' },
 };
 
-const facts = [
+const factsFor = (timeLabel) => [
   { key: 'date', label: 'Date', icon: CalendarDays },
-  { key: 'time', label: 'Time of death', icon: Timer },
+  { key: 'time', label: timeLabel, icon: Timer },
   { key: 'location', label: 'Location', icon: MapPin },
 ];
 
@@ -21,6 +21,8 @@ const facts = [
  */
 export function NotebookOverview({ caseData, caseFacts }) {
   const { ledger, insights, discoveries, reach } = useInvestigationSession();
+  const isTheft = caseFacts?.crimeType === 'theft';
+  const facts = factsFor(caseFacts?.timeLabel ?? 'Time of death');
 
   return (
     <div className="space-y-6">
@@ -28,8 +30,10 @@ export function NotebookOverview({ caseData, caseFacts }) {
         <p className="font-mono text-xs uppercase tracking-[0.2em] text-crimson-glow">{caseData.caseNumber} · {caseFacts?.tier ?? caseData.difficulty}</p>
         <h3 className="mt-2 font-display text-2xl font-medium uppercase leading-tight text-bone">{caseData.title}</h3>
         <p className="mt-3 flex items-center gap-2 text-base text-bone-muted">
-          <UserX size={16} className="shrink-0 text-crimson-glow" strokeWidth={2.2} aria-hidden="true" />
-          Victim: <span className="font-semibold text-bone">{caseData.victim}</span>
+          {isTheft
+            ? <FileSearch size={16} className="shrink-0 text-crimson-glow" strokeWidth={2.2} aria-hidden="true" />
+            : <UserX size={16} className="shrink-0 text-crimson-glow" strokeWidth={2.2} aria-hidden="true" />}
+          {caseFacts?.subjectLabel ?? 'Victim'}: <span className="font-medium text-bone">{caseData.victim}</span>
         </p>
 
         {caseFacts && (
@@ -47,7 +51,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
       </section>
 
       <section>
-        <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Investigation ledger</h3>
+        <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Investigation ledger</h3>
         <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
           Counts what you have recovered. A total only appears once you have read that table in full.
         </p>
@@ -59,8 +63,8 @@ export function NotebookOverview({ caseData, caseFacts }) {
             return (
               <li key={entry.id} className="clip-corner-sm flex items-center gap-3 border border-white/10 bg-white/[0.035] px-4 py-3">
                 <Icon size={17} className={style.tone} strokeWidth={2.2} aria-hidden="true" />
-                <span className="text-base font-semibold text-bone">{entry.label}</span>
-                <span className={`clip-corner-sm ml-auto border px-2.5 py-1 font-mono text-xs font-semibold uppercase tracking-[0.1em] ${style.chip}`}>
+                <span className="text-base font-medium text-bone">{entry.label}</span>
+                <span className={`clip-corner-sm ml-auto border px-2.5 py-1 font-mono text-xs font-medium uppercase tracking-[0.1em] ${style.chip}`}>
                   {entry.value}
                 </span>
               </li>
@@ -71,7 +75,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
 
       {insights.length > 0 && (
         <section>
-          <h3 className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">
+          <h3 className="flex items-center gap-2 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">
             <Lightbulb size={15} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> Observations
           </h3>
           <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">

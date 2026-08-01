@@ -14,7 +14,7 @@ const features = [
   { title: 'Real SQL, real database', description: 'Every query runs against a live read-only SQLite case file. Nothing is faked or scripted.', icon: DatabaseZap },
   { title: 'Evidence that connects', description: 'Sixteen linked tables — statements, badge logs, cameras, forensics — all pointing at one person.', icon: Layers },
   { title: 'Beat the clock', description: 'Each case carries a target time. Ask sharper questions and you finish with time to spare.', icon: Clock3 },
-  { title: 'Fair every time', description: 'No guesswork and no trick endings. The killer can always be proved from the data.', icon: ShieldQuestion },
+  { title: 'Fair every time', description: 'No guesswork and no trick endings. The answer can always be proved from the data.', icon: ShieldQuestion },
 ];
 
 /** Landing-page previews stay in sync with the real case dossiers. */

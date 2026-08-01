@@ -96,7 +96,7 @@ export function ModeSelectionGate() {
 
               <button
                 type="submit"
-                className="clip-corner-sm mt-7 inline-flex w-full items-center justify-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-4 font-display text-base font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
+                className="clip-corner-sm mt-7 inline-flex w-full items-center justify-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-4 font-display text-base font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
               >
                 <UserRound size={18} strokeWidth={2.2} aria-hidden="true" /> Begin investigation
               </button>
@@ -126,7 +126,7 @@ export function ModeSelectionGate() {
                     <h2 className="mt-5 font-display text-2xl font-medium uppercase leading-tight text-bone">{mode.label}</h2>
                     <p className="mt-1.5 font-mono text-xs uppercase tracking-[0.16em] text-crimson-glow">{mode.strapline}</p>
                     <p className="mt-4 flex-1 typo-body text-base text-bone-muted">{mode.detail}</p>
-                    <span className="mt-6 flex items-center gap-2 border-t border-white/10 pt-4 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors group-hover:text-gold-bright">
+                    <span className="mt-6 flex items-center gap-2 border-t border-white/10 pt-4 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors group-hover:text-gold-bright">
                       Select <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />
                     </span>
                   </button>

@@ -29,11 +29,11 @@ function WitnessReportComponent({ entries }) {
             className="clip-corner-sm dossier-surface p-4"
           >
             <header className="flex items-center gap-3 border-b border-gold/15 pb-3">
-              <span className="clip-corner-sm flex h-9 w-9 shrink-0 items-center justify-center border border-gold/30 bg-gold-deep/25 font-display text-sm font-semibold text-gold-bright">
+              <span className="clip-corner-sm flex h-9 w-9 shrink-0 items-center justify-center border border-gold/30 bg-gold-deep/25 font-display text-sm font-medium text-gold-bright">
                 {initialsOf(name)}
               </span>
               <div className="min-w-0">
-                <p className="truncate text-[0.9rem] font-semibold text-bone">{name}</p>
+                <p className="truncate text-[0.9rem] font-medium text-bone">{name}</p>
                 <p className="text-xs uppercase tracking-[0.16em] text-bone-dim">Interview record</p>
               </div>
             </header>

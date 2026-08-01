@@ -1,4 +1,4 @@
-import { getObjectiveIds } from '../catalog/caseCatalog';
+import { getCaseWording, getObjectiveIds } from '../catalog/caseCatalog';
 
 /**
  * The objective board.
@@ -58,7 +58,7 @@ export const objectiveLibrary = {
       countOf(tables, recordTables) >= 2 && (has(features, 'where') || has(features, 'join')),
   },
   accusation: {
-    label: 'Name the killer',
+    label: 'Name the person responsible',
     hint: 'File a formal accusation once your file stands up.',
     isComplete: ({ isSolved }) => Boolean(isSolved),
   },

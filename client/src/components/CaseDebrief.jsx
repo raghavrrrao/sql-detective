@@ -21,7 +21,7 @@ function Field({ label, value }) {
 function Section({ title, count, children }) {
   return (
     <section className="mt-8 break-inside-avoid">
-      <h3 className="flex items-baseline justify-between gap-3 border-b border-white/15 pb-2 font-display text-sm font-semibold uppercase tracking-[0.18em] text-gold-bright">
+      <h3 className="flex items-baseline justify-between gap-3 border-b border-white/15 pb-2 font-display text-sm font-medium uppercase tracking-[0.18em] text-gold-bright">
         {title}
         {count !== undefined && <span className="font-mono text-xs text-bone-dim">{count}</span>}
       </h3>
@@ -53,7 +53,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
         <button
           type="button"
           onClick={() => window.print()}
-          className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
+          className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-4 py-2.5 text-sm font-medium text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
         >
           <Printer size={15} strokeWidth={2.2} aria-hidden="true" /> Print or save as PDF
         </button>
@@ -68,7 +68,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
         <dl className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Difficulty" value={report.difficulty} />
           <Field label="Date solved" value={formatDate(report.solvedAt)} />
-          <Field label="Victim" value={report.victim} />
+          <Field label={report.subjectLabel ?? 'Victim'} value={report.victim} />
           <Field label="Your prime suspect" value={report.primeSuspect ?? 'None flagged'} />
           <Field label="Accused" value={report.accused} />
           <Field label="Responsible" value={report.reveal?.killer?.name ?? report.accused} />
@@ -173,7 +173,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           <ul className="space-y-1.5">
             {(report.suspects ?? []).map((profile) => (
               <li key={profile.name} className="flex flex-wrap items-baseline gap-x-3 typo-body text-base text-bone-muted">
-                <span className="font-semibold text-bone">{profile.name}</span>
+                <span className="font-medium text-bone">{profile.name}</span>
                 <span className="typo-body text-sm">{profile.occupation}</span>
                 <span className="font-mono text-xs text-bone-dim">{profile.recordCount} records</span>
               </li>

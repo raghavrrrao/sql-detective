@@ -55,7 +55,7 @@ export async function seedBeginnerDatabase() {
     await insert(database, 'evidence', ['id', 'title', 'category', 'description', 'location_found', 'discovered_at'], [
       [1, 'Undamaged desk drawer', 'Physical', 'The drawer lock shows no scratches and no tool marks. It was opened with its own key, or it was never forced at all.', 'Office N-118', '2026-09-15 20:10:00'],
       [2, 'Door reader log', 'Digital', 'The N-118 door reader recorded every card presented to it that evening. Nothing was overridden.', 'Office N-118', '2026-09-15 20:15:00'],
-      [3, 'Photocopier page counter', 'Digital', 'The copy room machine counted 48 pages between 6:55 PM and 7:05 PM. The research file runs to 48 pages.', 'Copy Room N-120', '2026-09-15 20:20:00'],
+      [3, 'Photocopier page counter', 'Digital', 'The copy room machine counted 48 pages between 6:57 PM and 7:08 PM. The research file runs to 48 pages.', 'Copy Room N-120', '2026-09-15 20:20:00'],
       [4, 'Papers returned to the drawer', 'Document', 'Nothing was carried away. The papers were copied and put back, which is why nobody noticed until the Wednesday review.', 'Office N-118', '2026-09-15 20:25:00'],
     ]);
 

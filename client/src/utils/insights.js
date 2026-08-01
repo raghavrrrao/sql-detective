@@ -14,7 +14,7 @@ const GAP_MINUTES = 12;
 const has = (tables, name) => tables.includes(name);
 const hasAny = (tables, names) => names.some((name) => tables.includes(name));
 
-export function buildInsights({ tables = [], discoveries = [], timeline = [], intel = [], primeSuspect = null }) {
+export function buildInsights({ tables = [], discoveries = [], timeline = [], intel = [], primeSuspect = null, hasVictim = true }) {
   const insights = [];
   const add = (id, tone, text) => insights.push({ id, tone, text });
 
@@ -23,7 +23,7 @@ export function buildInsights({ tables = [], discoveries = [], timeline = [], in
     return insights;
   }
 
-  if (!has(tables, 'victims')) {
+  if (hasVictim && !has(tables, 'victims')) {
     add('victim', 'prompt', 'You have not opened the victim record. The time and place of death anchor everything else.');
   }
 

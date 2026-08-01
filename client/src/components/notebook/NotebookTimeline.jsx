@@ -23,7 +23,7 @@ export function NotebookTimeline() {
     return (
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <Clock size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
-        <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">No chronology yet</p>
+        <p className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">No chronology yet</p>
         <p className="max-w-sm typo-body text-base text-bone-muted">
           Recover records that carry a time — cameras, badges, calls, security events — and they assemble here in order.
         </p>
@@ -62,13 +62,13 @@ export function NotebookTimeline() {
             <span aria-hidden="true" className="absolute -left-[1.32rem] top-5 h-2.5 w-2.5 rounded-full border-2 border-crimson-bright bg-ink" />
 
             <div className="flex flex-wrap items-center gap-2.5">
-              <span className="flex items-center gap-1.5 font-mono text-sm font-semibold tracking-wide text-gold-bright">
+              <span className="flex items-center gap-1.5 font-mono text-sm font-medium tracking-wide text-gold-bright">
                 <Clock size={13} strokeWidth={2.4} aria-hidden="true" /> {event.clock}
               </span>
               <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
                 {event.source.replace(/_/g, ' ')}
               </span>
-              <span className="clip-corner-sm border border-white/12 bg-white/[0.04] px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-bone-dim">
+              <span className="clip-corner-sm border border-white/12 bg-white/[0.04] px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] text-bone-dim">
                 {event.confidence}
               </span>
             </div>

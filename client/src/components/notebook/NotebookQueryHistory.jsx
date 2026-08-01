@@ -24,7 +24,7 @@ function HistoryEntry({ entry, onRerun }) {
     <li className={`clip-corner-sm border bg-white/[0.035] ${entry.ok ? 'border-white/10' : 'border-verdict-alert/35'}`}>
       <div className="flex flex-wrap items-center gap-2 border-b border-white/10 px-4 py-2.5">
         <span
-          className={`clip-corner-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] ${
+          className={`clip-corner-sm border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] ${
             entry.ok ? 'border-verdict-clear/45 bg-verdict-clear/10 text-verdict-clear' : 'border-verdict-alert/50 bg-verdict-alert/10 text-verdict-alert'
           }`}
         >
@@ -96,7 +96,7 @@ export function NotebookQueryHistory({ onClose }) {
     return (
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <History size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
-        <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">No queries yet</p>
+        <p className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">No queries yet</p>
         <p className="max-w-sm typo-body text-base text-bone-muted">Every statement you run is logged here so you can re-run, copy or clear it.</p>
       </div>
     );
@@ -125,7 +125,7 @@ export function NotebookQueryHistory({ onClose }) {
             setConfirmClear(false);
           }}
           onBlur={() => setConfirmClear(false)}
-          className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-3 text-sm font-semibold transition-colors ${
+          className={`clip-corner-sm inline-flex items-center gap-2 border px-3.5 py-3 text-sm font-medium transition-colors ${
             confirmClear ? 'border-verdict-alert/60 bg-verdict-alert/12 text-verdict-alert' : 'border-white/12 bg-white/[0.04] text-bone-muted hover:border-verdict-alert/50 hover:text-verdict-alert'
           }`}
         >

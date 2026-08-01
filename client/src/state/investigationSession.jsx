@@ -4,7 +4,7 @@ import { assessReadiness, evaluateAccusation } from '../utils/accusation';
 import { getSolution } from '../utils/caseSolution';
 import { markCaseSolved, recordQueryRun } from '../utils/caseProgress';
 import { computeScore } from '../utils/scoring';
-import { getCase, getCaseThresholds } from '../catalog/caseCatalog';
+import { getCase, getCaseThresholds, getCaseWording } from '../catalog/caseCatalog';
 import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
 import { buildInsights } from '../utils/insights';
 import { buildProgressLedger } from '../utils/investigationProgress';
@@ -542,6 +542,9 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
   );
   const tally = useMemo(() => objectiveTally(objectives), [objectives]);
   const timeline = useMemo(() => buildTimeline(state.discoveries), [state.discoveries]);
+  // A theft case carries no victim record; the ledger and the observations
+  // must not ask the player to go and find one.
+  const hasVictim = !getCaseWording(difficulty).isTheft;
   const intel = useMemo(
     () => buildSuspectIntel({
       suspects: briefing.suspects,
@@ -557,12 +560,13 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       tableTotals: state.tableTotals,
       timelineCount: timeline.length,
       intel,
+      hasVictim,
     }),
-    [state.discoveries, state.tableTotals, timeline.length, intel],
+    [state.discoveries, state.tableTotals, timeline.length, intel, hasVictim],
   );
   const insights = useMemo(
-    () => buildInsights({ tables: state.reach.tables, discoveries: state.discoveries, timeline, intel, primeSuspect: state.primeSuspect }),
-    [state.reach.tables, state.discoveries, timeline, intel, state.primeSuspect],
+    () => buildInsights({ tables: state.reach.tables, discoveries: state.discoveries, timeline, intel, primeSuspect: state.primeSuspect, hasVictim }),
+    [state.reach.tables, state.discoveries, timeline, intel, state.primeSuspect, hasVictim],
   );
 
   const readiness = useMemo(
@@ -641,6 +645,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       title: briefing.case.title,
       difficulty: briefing.case.difficulty,
       victim: briefing.case.victim,
+      subjectLabel: getCaseWording(difficulty).subject,
       solvedAt: new Date(at).toISOString(),
       accused: suspect,
       primeSuspect: current.primeSuspect,

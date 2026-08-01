@@ -21,7 +21,7 @@ export function CaseHeader({ caseData }) {
           >
             <ArrowLeft size={18} strokeWidth={2.2} />
           </Link>
-          <p className="font-mono text-sm font-semibold uppercase tracking-[0.2em] text-bone-dim">
+          <p className="font-mono text-sm font-medium uppercase tracking-[0.2em] text-bone-dim">
             {caseData.caseNumber} <span className="text-crimson-glow">/ classified</span>
           </p>
         </div>

@@ -22,12 +22,12 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
         aria-expanded={isOpen}
         className="w-full p-4 text-left"
       >
-        <span className="block typo-body text-base font-semibold text-bone">{record.title}</span>
+        <span className="block typo-body text-base font-medium text-bone">{record.title}</span>
         <span className="mt-2 flex flex-wrap items-center gap-2">
           <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
             {record.table.replace(/_/g, ' ')}
           </span>
-          <span className={`clip-corner-sm border px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] ${confidenceStyles[record.confidence] ?? confidenceStyles.Documented}`}>
+          <span className={`clip-corner-sm border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.12em] ${confidenceStyles[record.confidence] ?? confidenceStyles.Documented}`}>
             {record.confidence}
           </span>
           {record.occurredAt && (
@@ -50,10 +50,10 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
 
       {isOpen && (
         <div className="border-t border-white/10 p-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">Recovered by</p>
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Recovered by</p>
           <pre className="mt-2 overflow-x-auto font-mono text-xs leading-6 text-bone-muted">{record.sql}</pre>
 
-          <p className="mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">
+          <p className="mt-4 flex items-center gap-2 text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">
             <Link2 size={13} strokeWidth={2.2} aria-hidden="true" /> Related records you hold
           </p>
           {links.length === 0 ? (
@@ -67,7 +67,7 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
                   <p className="typo-body-secondary text-sm text-bone-muted">{related.title}</p>
                   <p className="mt-1 flex flex-wrap gap-1.5">
                     {reasons.map((reason) => (
-                      <span key={reason} className="clip-corner-sm border border-gold/30 bg-gold/[0.07] px-1.5 py-0.5 text-xs font-semibold uppercase tracking-[0.1em] text-gold-bright">
+                      <span key={reason} className="clip-corner-sm border border-gold/30 bg-gold/[0.07] px-1.5 py-0.5 text-xs font-medium uppercase tracking-[0.1em] text-gold-bright">
                         {reason}
                       </span>
                     ))}
@@ -111,7 +111,7 @@ export function NotebookDiscoveries() {
     return (
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <Telescope size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
-        <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Nothing discovered yet</p>
+        <p className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">Nothing discovered yet</p>
         <p className="max-w-sm typo-body text-base text-bone-muted">
           Every row a successful query returns is filed here, with the statement that recovered it.
         </p>
@@ -140,7 +140,7 @@ export function NotebookDiscoveries() {
             type="button"
             onClick={() => setSource(value)}
             aria-pressed={source === value}
-            className={`clip-corner-sm border px-2.5 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] transition-colors ${
+            className={`clip-corner-sm border px-2.5 py-1.5 text-xs font-medium uppercase tracking-[0.1em] transition-colors ${
               source === value
                 ? 'border-gold/55 bg-gold/12 text-gold-bright'
                 : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'

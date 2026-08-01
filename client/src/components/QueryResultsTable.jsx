@@ -76,9 +76,9 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
     <section className="clip-corner flex min-h-[18rem] flex-col overflow-hidden panel-surface shadow-panel backdrop-blur-xl">
       <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-4">
         <DatabaseZap size={18} className="text-crimson-glow" strokeWidth={2} aria-hidden="true" />
-        <h2 className="font-display text-base font-semibold uppercase tracking-[0.18em] text-bone">Recovered records</h2>
+        <h2 className="font-display text-base font-medium uppercase tracking-[0.18em] text-bone">Recovered records</h2>
         {!isLoading && !error && rowCount > 0 && (
-          <span className="clip-corner-sm ml-auto border border-gold/40 bg-gold/10 px-2.5 py-1 font-mono text-xs font-semibold text-gold-bright">
+          <span className="clip-corner-sm ml-auto border border-gold/40 bg-gold/10 px-2.5 py-1 font-mono text-xs font-medium text-gold-bright">
             {rowCount} {rowCount === 1 ? 'row' : 'rows'}
           </span>
         )}
@@ -102,7 +102,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
             <div aria-hidden="true" className="absolute inset-0 scanlines opacity-40" />
             <div aria-hidden="true" className="absolute inset-x-0 top-0 h-16 animate-scan bg-gradient-to-b from-crimson/25 to-transparent" />
             <Search size={30} className="relative text-crimson-glow" strokeWidth={1.8} aria-hidden="true" />
-            <p className="relative font-display text-lg font-semibold uppercase tracking-[0.2em] text-bone">Searching database…</p>
+            <p className="relative font-display text-lg font-medium uppercase tracking-[0.2em] text-bone">Searching database…</p>
             <div className="relative h-1 w-52 overflow-hidden bg-white/10">
               <span className="block h-full w-1/3 animate-sweep bg-crimson-bright" />
             </div>
@@ -117,7 +117,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
             className="flex min-h-[16rem] flex-col items-center justify-center gap-3 px-8 py-6 text-center"
           >
             <AlertTriangle size={30} className="text-verdict-alert" strokeWidth={1.9} aria-hidden="true" />
-            <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Query rejected</p>
+            <p className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">Query rejected</p>
             <p className="max-w-lg typo-body text-base text-bone-muted">{error}</p>
             {hint && (
               <p className="clip-corner-sm mt-1 flex max-w-lg items-start gap-2.5 border border-gold/30 bg-gold/[0.07] p-3.5 text-left typo-body-secondary text-sm text-bone-muted">
@@ -136,7 +136,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
             className="flex min-h-[16rem] flex-col items-center justify-center gap-3 px-8 text-center"
           >
             <FileSearch size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
-            <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">
+            <p className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">
               {hasRun ? (summary ?? 'No matching records found') : 'The terminal is ready'}
             </p>
             <p className="max-w-md typo-body text-base text-bone-muted">
@@ -163,7 +163,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
                     <th
                       key={column}
                       scope="col"
-                      className="whitespace-nowrap border-b border-gold/25 px-5 py-3.5 font-display text-xs font-semibold uppercase tracking-[0.16em] text-gold-bright"
+                      className="whitespace-nowrap border-b border-gold/25 px-5 py-3.5 font-display text-xs font-medium uppercase tracking-[0.16em] text-gold-bright"
                     >
                       {formatHeader(column)}
                     </th>

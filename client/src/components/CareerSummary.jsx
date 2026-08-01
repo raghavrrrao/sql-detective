@@ -76,7 +76,7 @@ export function CareerSummary() {
                 {solved.map((entry) => (
                   <li
                     key={entry.id}
-                    className="clip-corner-sm inline-flex items-center gap-1.5 border border-verdict-clear/45 bg-verdict-clear/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.12em] text-verdict-clear"
+                    className="clip-corner-sm inline-flex items-center gap-1.5 border border-verdict-clear/45 bg-verdict-clear/10 px-2.5 py-1 text-xs font-medium uppercase tracking-[0.12em] text-verdict-clear"
                   >
                     <BadgeCheck size={12} strokeWidth={2.4} aria-hidden="true" /> {entry.caseNumber} · {entry.title}
                   </li>

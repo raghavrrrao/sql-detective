@@ -130,14 +130,14 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
           <button
             type="button"
             onClick={onOpenReport}
-            className="clip-corner-sm inline-flex items-center gap-2.5 border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
+            className="clip-corner-sm inline-flex items-center gap-2.5 border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
           >
             <FileText size={17} strokeWidth={2.2} aria-hidden="true" /> Investigation report
           </button>
           <button
             type="button"
             onClick={handleNext}
-            className="clip-corner-sm inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5"
+            className="clip-corner-sm inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5"
           >
             <UserRoundPlus size={17} strokeWidth={2.2} aria-hidden="true" /> Next detective
           </button>

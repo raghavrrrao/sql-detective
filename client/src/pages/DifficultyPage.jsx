@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, GraduationCap } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { CaseSelectionCard } from '../components/CaseSelectionCard';
@@ -27,9 +27,16 @@ export function DifficultyPage() {
       <div className="relative z-10 mx-auto max-w-6xl">
         <Link
           to="/"
-          className="inline-flex items-center gap-2.5 font-display text-sm font-semibold uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
+          className="inline-flex items-center gap-2.5 font-display text-sm font-medium uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
         >
-          <ArrowLeft size={16} strokeWidth={2.2} /> Return to briefing
+          <ArrowLeft size={16} strokeWidth={2.2} aria-hidden="true" /> Return to briefing
+        </Link>
+
+        <Link
+          to="/how-to-play"
+          className="ml-6 inline-flex items-center gap-2.5 font-display text-sm font-medium uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
+        >
+          <GraduationCap size={16} strokeWidth={2.2} aria-hidden="true" /> New to SQL? How to play
         </Link>
 
         <div className="pt-16">
