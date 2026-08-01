@@ -21,7 +21,7 @@ export function DifficultyPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.45 }}
-      className="relative min-h-screen overflow-hidden px-6 py-16 sm:px-10 lg:px-16 lg:py-24"
+      className="relative min-h-screen overflow-hidden px-4 py-16 sm:px-10 lg:px-16 lg:py-24"
     >
       <AnimatedBackground />
       <div className="relative z-10 mx-auto max-w-6xl">

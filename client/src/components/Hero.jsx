@@ -16,11 +16,11 @@ const stats = [
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-[92vh] items-center px-6 pb-24 pt-32 sm:px-10 lg:px-16">
+    <section className="relative flex min-h-[92vh] items-center px-4 pb-24 pt-32 sm:px-10 lg:px-16">
       {/* Classified stamp watermark */}
       <div aria-hidden="true" className="pointer-events-none absolute right-4 top-28 hidden select-none lg:block">
         <div className="rotate-[9deg] border-[3px] border-crimson/25 px-8 py-3">
-          <p className="font-display text-4xl font-medium uppercase tracking-[0.3em] text-crimson/20">Classified</p>
+          <p className="font-display text-2xl font-medium uppercase tracking-[0.2em] text-crimson/20 sm:text-4xl sm:tracking-[0.3em]">Classified</p>
         </div>
       </div>
 
@@ -59,7 +59,7 @@ export function Hero() {
           <motion.dl variants={rise} custom={0.44} className="mt-16 flex flex-wrap gap-x-12 gap-y-6 border-t border-white/10 pt-8">
             {stats.map((stat) => (
               <div key={stat.label}>
-                <dt className="font-display text-4xl font-medium text-bone">{stat.value}</dt>
+                <dt className="font-display text-3xl font-medium text-bone sm:text-4xl">{stat.value}</dt>
                 <dd className="mt-1 text-sm uppercase tracking-[0.2em] text-bone-dim">{stat.label}</dd>
               </div>
             ))}

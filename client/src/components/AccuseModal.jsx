@@ -155,7 +155,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           <h3 className="font-display text-3xl font-medium uppercase tracking-[0.14em] text-bone">
             You are about to formally accuse
           </h3>
-          <p className="font-display text-4xl font-medium uppercase tracking-wide text-crimson-glow">{suspect}</p>
+          <p className="font-display text-2xl font-medium uppercase tracking-wide text-crimson-glow sm:text-4xl">{suspect}</p>
           <p className="max-w-xl text-lg leading-8 text-bone-muted">
             This decision cannot be changed until this investigation ends.
           </p>

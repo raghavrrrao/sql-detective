@@ -15,13 +15,13 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
   const { elapsedMs, isRunning } = useInvestigationTimer();
 
   return (
-    <header className="relative z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-white/10 bg-ink/85 px-4 py-3 backdrop-blur-xl sm:px-6">
-      <div className="flex min-w-0 items-center gap-3">
+    <header className="relative z-30 flex min-h-[4.5rem] items-center justify-between gap-2 border-b border-white/10 bg-ink/85 px-3 py-3 backdrop-blur-xl sm:gap-3 sm:px-6">
+      <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={onOpenSidebar}
           aria-label="Open case board"
-          className="clip-corner-sm border border-white/12 bg-white/[0.04] p-2.5 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright xl:hidden"
+          className="clip-corner-sm shrink-0 border border-white/12 bg-white/[0.04] p-2 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright sm:p-2.5 xl:hidden"
         >
           <LayoutPanelLeft size={19} strokeWidth={2} />
         </button>
@@ -35,7 +35,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
         </Link>
 
         <div className="min-w-0">
-          <p className="truncate font-display text-lg font-medium uppercase tracking-wide text-bone sm:text-xl">{caseData.title}</p>
+          <p className="line-clamp-2 font-display text-sm font-medium uppercase leading-tight tracking-wide text-bone sm:truncate sm:text-lg sm:leading-normal md:text-xl">{caseData.title}</p>
           <p className="hidden font-mono text-xs uppercase tracking-[0.18em] text-bone-dim sm:block">
             {caseData.caseNumber} · Active investigation
           </p>
@@ -49,7 +49,9 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
           </div>
         )}
 
-        <DifficultyBadge difficulty={entry?.tier ?? caseData.difficulty} rank={entry?.tierRank} />
+        <div className="hidden sm:block">
+          <DifficultyBadge difficulty={entry?.tier ?? caseData.difficulty} rank={entry?.tierRank} />
+        </div>
 
         <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone md:flex">
           <Timer size={15} className={isRunning ? 'text-crimson-glow' : 'text-bone-dim'} strokeWidth={2.2} aria-hidden="true" />
@@ -72,7 +74,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
           aria-label="Search the investigation"
           aria-keyshortcuts="Control+K Meta+K"
           title="Search the investigation (Ctrl+K)"
-          className="clip-corner-sm border border-white/12 bg-white/[0.04] p-2.5 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
+          className="clip-corner-sm shrink-0 border border-white/12 bg-white/[0.04] p-2 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright sm:p-2.5"
         >
           <Search size={18} strokeWidth={2} aria-hidden="true" />
         </button>
@@ -81,7 +83,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
           type="button"
           onClick={onOpenNotebook}
           aria-label="Open detective notebook"
-          className="clip-corner-sm border border-white/12 bg-white/[0.04] p-2.5 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
+          className="clip-corner-sm shrink-0 border border-white/12 bg-white/[0.04] p-2 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright sm:p-2.5"
         >
           <BookOpen size={18} strokeWidth={2} />
         </button>

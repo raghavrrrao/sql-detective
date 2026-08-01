@@ -38,7 +38,14 @@
  * @property {object}   thresholds    accusation gates, see utils/accusation
  * @property {object}   theme         accent + icon name for presentation
  * @property {string}   status        'available' once its database exists
+ * @property {string}   previewImage  case artwork for preview screens
  */
+
+import case1Image from '../images/case1.png';
+import case2Image from '../images/case2.png';
+import case3Image from '../images/case3.png';
+import case4Image from '../images/case4.png';
+import case5Image from '../images/case5.png';
 
 /** Applied to every entry so a new case only has to state what differs. */
 const defaults = {
@@ -58,6 +65,7 @@ const defaults = {
   learningGoals: [],
   hints: [],
   objectives: ['victim', 'suspects', 'witnesses', 'evidence', 'access', 'timeline', 'contradiction', 'accusation'],
+  previewImage: null,
   theme: { accent: 'crimson', icon: 'Fingerprint' },
   starterQuery: 'SELECT name, occupation FROM suspects;',
   thresholds: {
@@ -106,6 +114,7 @@ export const caseCatalog = [
     crimeType: 'theft',
     subjectLabel: 'Reported by',
     timeLabel: 'Theft window',
+    previewImage: case1Image,
     victim: 'Professor Sarah Collins',
     date: 'September 15, 2026',
     time: '6:45 PM – 7:30 PM',
@@ -150,6 +159,7 @@ export const caseCatalog = [
       'Narrow a result set with WHERE.',
       'Notice who is missing from a set of records.',
     ],
+    previewImage: case2Image,
     preview: 'A professor is stabbed during a ten-minute campus blackout. Five people were in the building. Four of them are on camera. Find the fifth.',
     victim: 'Professor Ethan Ross',
     date: 'October 14, 2026',
@@ -193,6 +203,7 @@ export const caseCatalog = [
       'Narrow a count to the window that matters with BETWEEN.',
       'Match text with LIKE and strip repeats with DISTINCT.',
     ],
+    previewImage: case3Image,
     preview: 'A painting was swapped for a forgery overnight inside a locked gallery. Six people had a card that works after hours, and the busiest person on the door log is not the one you want.',
     crimeType: 'theft',
     subjectLabel: 'Stolen work',
@@ -239,6 +250,7 @@ export const caseCatalog = [
       'Find the row with no match using a LEFT JOIN.',
       'Filter grouped results with HAVING.',
     ],
+    previewImage: case4Image,
     preview: 'Arthur Blackwood announced a new will over dinner and was dead within the hour. The study door log names his estate manager — but she was in the garage on camera at the time.',
     victim: 'Arthur Blackwood',
     date: 'November 03, 2026',
@@ -281,6 +293,7 @@ export const caseCatalog = [
       'Correct a systematic error with date arithmetic.',
       'Treat a record as something that can itself be altered.',
     ],
+    previewImage: case5Image,
     preview: 'A CEO is killed hours before she was due to name the person who stole her company\'s designs. Nine suspects, one ship, and nobody went ashore.',
     victim: 'Celia Voss',
     date: 'December 19, 2026',

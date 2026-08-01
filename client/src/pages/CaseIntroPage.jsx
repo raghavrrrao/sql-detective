@@ -39,36 +39,46 @@ export function CaseIntroPage() {
       <AnimatedBackground />
       <CaseHeader caseData={caseData} />
 
-      <main className="relative z-10 mx-auto max-w-5xl px-6 py-14 sm:px-10 lg:py-20">
+      <main className="relative z-10 mx-auto max-w-5xl px-4 py-14 sm:px-10 lg:py-20">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.15 }} className="text-center">
           <p className="font-mono text-sm font-medium uppercase tracking-[0.28em] text-crimson-glow">Investigation briefing</p>
-          <h1 className="mt-6 min-h-[5.5rem] font-display text-5xl font-medium uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-7xl">
+          <h1 className="mt-6 min-h-[4.5rem] font-display text-4xl font-medium uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-5xl md:text-7xl">
             <TypewriterText text={caseData.title} delay={350} speed={32} />
           </h1>
         </motion.div>
 
-        {/* Subject placard — the victim, or what was taken */}
         <motion.section
           initial={{ opacity: 0, scale: 0.98 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, delay: 0.45 }}
           className="clip-corner mx-auto mt-12 max-w-3xl overflow-hidden panel-surface shadow-panel"
         >
-          <div className="relative flex min-h-[17rem] items-end overflow-hidden bg-gradient-to-br from-charcoal-light via-ink-soft to-crimson-deep/40 p-7 sm:min-h-[21rem] sm:p-9">
-            <div aria-hidden="true" className="absolute inset-0 board-grid-fine opacity-40" />
-            <div aria-hidden="true" className="absolute left-1/2 top-10 h-40 w-32 -translate-x-1/2 rounded-t-[50%] border border-white/10 bg-charcoal/60 shadow-[0_0_90px_rgba(0,0,0,0.8)] sm:h-48 sm:w-40" />
-            <div aria-hidden="true" className="absolute left-1/2 top-[9.5rem] h-44 w-56 -translate-x-1/2 rounded-t-[48%] bg-charcoal/75 sm:top-[11.5rem] sm:h-48 sm:w-72" />
-            <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(115deg,transparent_25%,rgba(255,255,255,0.05)_45%,transparent_55%)]" />
-            <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.06] mix-blend-overlay" />
+          <div className="relative flex min-h-[17rem] items-end overflow-hidden p-5 sm:min-h-[21rem] sm:p-9">
+            {caseData.previewImage && (
+              <img
+                src={caseData.previewImage}
+                alt={`Artwork for ${caseData.title}`}
+                loading="lazy"
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover object-center"
+                style={{ filter: 'brightness(1.1) contrast(1.1) saturate(1.1)' }}
+              />
+            )}
+            <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.04] mix-blend-overlay" />
             <div className="relative">
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">
                 {wording.isTheft ? <FileSearch size={15} strokeWidth={2.4} /> : <UserX size={15} strokeWidth={2.4} />} {wording.subject}
               </p>
-              <h2 className="mt-3 font-display text-4xl font-medium uppercase text-bone sm:text-5xl">{caseData.victim}</h2>
+              <h2
+                className="mt-3 font-display text-3xl font-medium uppercase leading-tight text-bone sm:text-4xl md:text-5xl"
+                style={{ textShadow: '0 3px 10px rgba(0,0,0,0.85)' }}
+              >
+                {caseData.victim}
+              </h2>
             </div>
           </div>
 
-          <dl className="grid gap-6 border-t border-white/10 bg-white/[0.02] p-6 sm:grid-cols-3 sm:p-7">
+          <dl className="grid gap-6 border-t border-white/10 bg-white/[0.02] p-5 sm:grid-cols-3 sm:p-7">
             {facts.map(({ key, label, icon: Icon }) => (
               <div key={key}>
                 <dt className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">

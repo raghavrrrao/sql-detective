@@ -153,9 +153,9 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.28 }}
-            className="max-h-[26rem] overflow-auto"
+            className="max-h-[26rem] overflow-auto overflow-x-auto"
           >
-            <table className="w-full border-collapse text-left text-sm">
+            <table className="min-w-full border-collapse text-left text-sm">
               <caption className="sr-only">{statusLine}</caption>
               <thead className="sticky top-0 z-10 bg-charcoal/95 backdrop-blur">
                 <tr>
@@ -163,7 +163,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
                     <th
                       key={column}
                       scope="col"
-                      className="whitespace-nowrap border-b border-gold/25 px-5 py-3.5 font-display text-xs font-medium uppercase tracking-[0.16em] text-gold-bright"
+                      className="break-words border-b border-gold/25 px-5 py-3.5 font-display text-xs font-medium uppercase tracking-[0.16em] text-gold-bright"
                     >
                       {formatHeader(column)}
                     </th>

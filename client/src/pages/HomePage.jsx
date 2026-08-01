@@ -34,7 +34,7 @@ export function HomePage() {
         <Hero />
         <CareerSummary />
 
-        <section className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
+        <section className="px-4 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-6xl">
             <SectionHeading
               eyebrow="The assignment"
@@ -47,7 +47,7 @@ export function HomePage() {
           </div>
         </section>
 
-        <section className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
+        <section className="px-4 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-6xl">
             <SectionHeading
               eyebrow="Case clearance"

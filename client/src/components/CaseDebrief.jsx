@@ -62,7 +62,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
       <article className="print-report">
         <header className="border-b-2 border-crimson/50 pb-5">
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-crimson-glow">{report.caseNumber} · Closed</p>
-          <h2 className="mt-2 font-display text-4xl font-medium uppercase leading-tight text-bone">{report.title}</h2>
+          <h2 className="mt-2 font-display text-2xl font-medium uppercase leading-tight text-bone sm:text-4xl">{report.title}</h2>
         </header>
 
         <dl className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

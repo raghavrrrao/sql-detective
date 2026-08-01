@@ -71,7 +71,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
     };
   }, [isOpen]);
 
-  const widths = { md: 'max-w-xl', lg: 'max-w-3xl', full: 'max-w-6xl h-[92vh]' };
+  const widths = { md: 'max-w-xl', lg: 'max-w-3xl', full: 'max-w-6xl h-[92dvh]' };
 
   return (
     <AnimatePresence>
@@ -80,7 +80,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end bg-black/78 p-4 backdrop-blur-md sm:items-center sm:justify-center"
+          className="fixed inset-0 z-50 flex items-end bg-black/78 p-2 backdrop-blur-md sm:items-center sm:justify-center sm:p-4"
           onMouseDown={requestClose}
         >
           <motion.section
@@ -94,24 +94,24 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
             aria-labelledby={titleId}
             tabIndex={-1}
             onKeyDown={handleKeyDown}
-            className={`clip-corner flex max-h-[88vh] w-full flex-col panel-surface shadow-panel outline-none ${widths[size]}`}
+            className={`clip-corner flex max-h-[92dvh] w-full flex-col panel-surface shadow-panel outline-none sm:max-h-[88vh] ${widths[size]}`}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-6 py-4">
-              {Icon && <Icon size={19} className="text-gold-bright" strokeWidth={2} aria-hidden="true" />}
-              <h2 id={titleId} className="font-display text-xl font-medium uppercase tracking-[0.16em] text-bone">{title}</h2>
+            <header className="flex items-center gap-2.5 border-b border-white/10 bg-white/[0.03] px-4 py-3.5 sm:gap-3 sm:px-6 sm:py-4">
+              {Icon && <Icon size={19} className="shrink-0 text-gold-bright" strokeWidth={2} aria-hidden="true" />}
+              <h2 id={titleId} className="min-w-0 truncate font-display text-base font-medium uppercase tracking-[0.12em] text-bone sm:text-xl sm:tracking-[0.16em]">{title}</h2>
               {dismissible && (
                 <button
                   type="button"
                   onClick={requestClose}
                   aria-label={`Close ${title}`}
-                  className="clip-corner-sm ml-auto p-2 text-bone-dim transition-colors hover:text-bone"
+                  className="clip-corner-sm ml-auto shrink-0 p-2 text-bone-dim transition-colors hover:text-bone"
                 >
                   <X size={19} aria-hidden="true" />
                 </button>
               )}
             </header>
-            <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto p-6">{children}</div>
+            <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6">{children}</div>
           </motion.section>
         </motion.div>
       )}

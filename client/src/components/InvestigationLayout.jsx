@@ -203,7 +203,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
             />
           )}
 
-          <main className="grid min-w-0 flex-1 gap-5 p-4 sm:p-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
+          <main className="grid min-w-0 flex-1 gap-4 p-3 pb-24 sm:gap-5 sm:p-5 lg:grid-cols-[minmax(0,1fr)_21rem]">
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
@@ -230,7 +230,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
       <button
         type="button"
         onClick={openNotebook}
-        className="clip-corner-sm fixed bottom-6 left-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 xl:left-auto xl:right-[13rem]"
+        className="clip-corner-sm fixed bottom-4 left-4 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-4 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 sm:bottom-6 sm:left-6 sm:px-5 sm:py-3.5 xl:left-auto xl:right-[13rem]"
       >
         <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" /> Notebook
       </button>
@@ -239,7 +239,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         <button
           type="button"
           onClick={() => setIsReportOpen(true)}
-          className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-5 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5"
+          className="clip-corner-sm fixed bottom-4 right-4 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-4 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5 sm:bottom-6 sm:right-6 sm:px-5 sm:py-3.5"
         >
           Case closed · Report
         </button>

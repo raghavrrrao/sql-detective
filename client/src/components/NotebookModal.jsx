@@ -115,7 +115,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
         role="tablist"
         aria-label="Notebook sections"
         onKeyDown={handleTabKeys}
-        className="-mt-1 mb-6 flex flex-wrap gap-1.5"
+        className="-mt-1 mb-4 flex snap-x gap-1.5 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mb-6 sm:flex-wrap sm:overflow-visible sm:pb-0"
       >
         {sections.map((section) => {
           const Icon = section.icon;
@@ -131,14 +131,15 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
               aria-controls={`notebook-panel-${section.id}`}
               tabIndex={isActive ? 0 : -1}
               onClick={() => selectSection(section.id)}
-              className={`clip-corner-sm inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-medium uppercase tracking-[0.1em] transition-colors ${
+              className={`clip-corner-sm inline-flex shrink-0 snap-start items-center gap-1 whitespace-nowrap border px-2.5 py-2 text-[0.68rem] font-semibold uppercase tracking-[0.1em] transition-colors sm:gap-1.5 sm:px-3 sm:text-xs sm:font-medium ${
                 isActive
                   ? 'border-gold/55 bg-gold/12 text-gold-bright'
                   : 'border-white/10 bg-white/[0.03] text-bone-dim hover:border-white/25 hover:text-bone'
               }`}
             >
-              <Icon size={13} strokeWidth={2.2} aria-hidden="true" /> {section.label}
-              {count && <span className="font-mono text-xs text-bone-muted">{count}</span>}
+              <Icon size={13} strokeWidth={2.2} aria-hidden="true" />
+              <span className="truncate">{section.label}</span>
+              {count && <span className="ml-1 hidden font-mono text-xs text-bone-muted sm:inline-flex">{count}</span>}
             </button>
           );
         })}

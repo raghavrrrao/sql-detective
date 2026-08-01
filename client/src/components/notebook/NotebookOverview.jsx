@@ -98,15 +98,15 @@ export function NotebookOverview({ caseData, caseFacts }) {
         </section>
       )}
 
-      <section className="clip-corner-sm grid grid-cols-3 gap-px overflow-hidden border border-white/10 bg-white/10">
+      <section className="clip-corner-sm grid grid-cols-1 gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-3">
         {[
           { label: 'Discoveries', value: discoveries.length },
           { label: 'Sources used', value: reach.tables.length },
           { label: 'Queries run', value: reach.successes + reach.failures },
         ].map((stat) => (
-          <div key={stat.label} className="bg-charcoal px-4 py-4 text-center">
-            <p className="font-display text-2xl font-medium text-gold-bright">{stat.value}</p>
-            <p className="mt-1 text-xs uppercase tracking-[0.14em] text-bone-dim">{stat.label}</p>
+          <div key={stat.label} className="flex items-center justify-between gap-3 bg-charcoal px-4 py-3 text-left sm:block sm:py-4 sm:text-center">
+            <p className="order-2 font-display text-2xl font-medium text-gold-bright sm:order-none">{stat.value}</p>
+            <p className="text-xs uppercase tracking-[0.14em] text-bone-dim sm:mt-1">{stat.label}</p>
           </div>
         ))}
       </section>

@@ -12,9 +12,9 @@ import { useGameMode } from '../state/gameMode';
 function Row({ title, description, children }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 py-5 last:border-0">
-      <div className="min-w-[14rem] flex-1">
-        <p className="text-base font-medium text-bone">{title}</p>
-        {description && <p className="mt-1 typo-body-secondary text-sm text-bone-dim">{description}</p>}
+      <div className="w-full min-w-0 sm:w-auto sm:flex-1 sm:min-w-[14rem]">
+        <p className="text-base font-medium text-bone whitespace-normal break-words">{title}</p>
+        {description && <p className="mt-1 typo-body-secondary text-sm text-bone-dim whitespace-normal break-words">{description}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2.5">{children}</div>
     </div>
@@ -97,7 +97,7 @@ export function SettingsPage() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.4 }}
-      className="relative min-h-screen overflow-hidden px-6 py-16 sm:px-10 lg:px-16 lg:py-24"
+      className="relative min-h-screen overflow-hidden px-4 py-16 sm:px-10 lg:px-16 lg:py-24"
     >
       <AnimatedBackground />
       <div className="relative z-10 mx-auto max-w-4xl">

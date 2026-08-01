@@ -98,7 +98,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
 
         <div className="clip-corner mt-10 border border-gold/40 bg-gold/[0.07] p-8 text-center">
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-gold-bright">Final score</p>
-          <p className="mt-3 font-display text-7xl font-medium leading-none text-gold-bright">{entry.entry.score}</p>
+          <p className="mt-3 font-display text-5xl font-medium leading-none text-gold-bright sm:text-7xl">{entry.entry.score}</p>
           <p className="mt-4 flex items-center justify-center gap-2 text-base text-bone-muted">
             <Trophy size={17} strokeWidth={2.2} aria-hidden="true" />
             Rank today: {entry.rankToday} of {entry.totalToday} · All time: {entry.rank} of {entry.total}

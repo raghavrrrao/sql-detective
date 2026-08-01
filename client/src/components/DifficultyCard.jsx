@@ -19,26 +19,26 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
       whileHover={{ y: -7 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.45, delay: index * 0.1 }}
-      className="clip-corner relative panel-surface p-7 shadow-panel"
+      className="clip-corner relative panel-surface p-5 shadow-panel sm:p-7"
     >
       <span aria-hidden="true" className={`absolute left-0 top-0 h-full w-[3px] ${rails[rank] ?? rails[2]}`} />
 
-      <div className="flex items-start justify-between gap-4">
-        <h3 className="font-display text-3xl font-medium uppercase text-bone">{difficulty}</h3>
+      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+        <h3 className="font-display text-2xl font-medium uppercase text-bone sm:text-3xl">{difficulty}</h3>
         <DifficultyBadge difficulty={difficulty} rank={rank} />
       </div>
 
       <dl className="mt-8 space-y-6">
         <div className="flex items-center gap-3">
           <Clock3 size={17} className="shrink-0 text-gold-bright" strokeWidth={2} />
-          <div>
+          <div className="min-w-0">
             <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">Estimated time</dt>
             <dd className="mt-0.5 text-base font-medium text-bone">{time}</dd>
           </div>
         </div>
         <div className="flex items-start gap-3">
           <Database size={17} className="mt-1 shrink-0 text-gold-bright" strokeWidth={2} />
-          <div>
+          <div className="min-w-0">
             <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">SQL concepts</dt>
             <dd className="mt-1.5 flex flex-wrap gap-2">
               {concepts.map((concept) => (
