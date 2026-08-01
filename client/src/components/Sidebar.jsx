@@ -149,7 +149,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
               {(sectionId === 'crime-scene' || sectionId === 'notes') && (
                 <ul className="space-y-3">
                   {filteredEntries.map((entry) => (
-                    <li key={entry} className="clip-corner-sm panel-surface-raised p-4 typo-body text-[0.9rem] text-bone-muted">
+                    <li key={entry} className="clip-corner-sm panel-surface-raised p-4 typo-document text-[0.9rem] text-bone-muted">
                       {entry}
                     </li>
                   ))}

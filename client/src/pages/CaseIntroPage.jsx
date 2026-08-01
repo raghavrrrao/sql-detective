@@ -42,7 +42,7 @@ export function CaseIntroPage() {
       <main className="relative z-10 mx-auto max-w-5xl px-4 py-14 sm:px-10 lg:py-20">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.15 }} className="text-center">
           <p className="font-mono text-sm font-medium uppercase tracking-[0.28em] text-crimson-glow">Investigation briefing</p>
-          <h1 className="mt-6 min-h-[4.5rem] font-display text-4xl font-medium uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-5xl md:text-7xl">
+          <h1 className="mt-6 min-h-[4.5rem] typo-logo text-4xl leading-[1.12] text-bone sm:min-h-[7rem] sm:text-5xl md:text-7xl">
             <TypewriterText text={caseData.title} delay={350} speed={32} />
           </h1>
         </motion.div>
@@ -84,7 +84,7 @@ export function CaseIntroPage() {
                 <dt className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">
                   <Icon size={14} className="text-gold-bright" strokeWidth={2.2} /> {label}
                 </dt>
-                <dd className="mt-2 typo-body text-base text-bone">{caseData[key]}</dd>
+                <dd className="mt-2 typo-document text-base text-bone">{caseData[key]}</dd>
               </div>
             ))}
           </dl>

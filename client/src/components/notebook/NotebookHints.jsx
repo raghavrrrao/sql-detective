@@ -53,7 +53,7 @@ export function NotebookHints({ difficulty }) {
                 </span>
 
                 {isRevealed ? (
-                  <p className="flex-1 typo-body text-base text-bone-muted">{hint}</p>
+                  <p className="flex-1 typo-document text-base text-bone-muted">{hint}</p>
                 ) : (
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
                     <p className="flex items-center gap-2 text-base text-bone-dim">

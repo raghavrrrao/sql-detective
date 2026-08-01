@@ -33,7 +33,7 @@ export function CaseFile({ caseData }) {
             <dt className="flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.2em] text-gold">
               <Icon size={15} strokeWidth={2.2} /> {label}
             </dt>
-            <dd className="mt-3 typo-body text-base text-bone-muted">{caseData[key]}</dd>
+            <dd className="mt-3 typo-document text-base text-bone-muted">{caseData[key]}</dd>
           </div>
         ))}
       </dl>

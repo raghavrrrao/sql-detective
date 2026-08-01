@@ -22,7 +22,7 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
         aria-expanded={isOpen}
         className="w-full p-4 text-left"
       >
-        <span className="block typo-body text-base font-medium text-bone">{record.title}</span>
+        <span className="block typo-document text-base text-bone">{record.title}</span>
         <span className="mt-2 flex flex-wrap items-center gap-2">
           <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
             {record.table.replace(/_/g, ' ')}

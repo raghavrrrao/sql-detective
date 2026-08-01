@@ -76,7 +76,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <SkillRow icon={Fingerprint} label="Detective skills" items={caseData.detectiveSkills} />
       </div>
 
-      <p className="mt-6 flex-1 typo-body text-base text-bone-muted">{caseData.preview}</p>
+      <p className="mt-6 flex-1 typo-document text-base text-bone-muted">{caseData.preview}</p>
     </>
   );
 

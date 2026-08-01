@@ -14,7 +14,7 @@ export function MissionCard() {
         <Crosshair className="mt-1 shrink-0 text-crimson-glow" size={26} strokeWidth={2} />
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">Your objective</p>
-          <p className="mt-4 max-w-2xl font-display text-xl font-normal leading-8 text-bone typo-body sm:text-2xl">
+          <p className="mt-4 max-w-2xl typo-document text-xl text-bone sm:text-2xl">
             Query the evidence database, break every alibi, and prove which suspect had no record where they claim to have been.
           </p>
         </div>

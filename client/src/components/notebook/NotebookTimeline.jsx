@@ -73,7 +73,7 @@ export function NotebookTimeline() {
               </span>
             </div>
 
-            <p className="mt-2 typo-body text-[0.95rem] text-bone">{event.title}</p>
+            <p className="mt-2 typo-document text-[0.95rem] text-bone">{event.title}</p>
 
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-bone-dim">
               {event.location && (

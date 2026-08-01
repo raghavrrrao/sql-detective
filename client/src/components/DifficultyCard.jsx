@@ -49,7 +49,7 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
         </div>
       </dl>
 
-      <p className="mt-7 border-t border-white/10 pt-6 typo-body text-base text-bone-muted">{story}</p>
+      <p className="mt-7 border-t border-white/10 pt-6 typo-document text-base text-bone-muted">{story}</p>
     </motion.article>
   );
 }

@@ -13,7 +13,7 @@ function Field({ label, value }) {
   return (
     <div>
       <dt className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">{label}</dt>
-      <dd className="mt-1.5 typo-body text-base text-bone">{value ?? '—'}</dd>
+      <dd className="mt-1.5 typo-document text-base text-bone">{value ?? '—'}</dd>
     </div>
   );
 }
@@ -124,7 +124,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
 
         <Section title="Your reasoning">
           {report.reasoning?.trim() ? (
-            <p className="whitespace-pre-wrap typo-body text-base text-bone-muted">{report.reasoning}</p>
+            <p className="whitespace-pre-wrap typo-document text-base text-bone-muted">{report.reasoning}</p>
           ) : (
             <p className="text-base text-bone-dim">No reasoning was entered.</p>
           )}

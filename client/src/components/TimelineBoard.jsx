@@ -33,7 +33,7 @@ function TimelineBoardComponent({ entries }) {
                 <Clock size={13} strokeWidth={2.4} /> {stamp}
               </span>
             )}
-            <p className="mt-2 typo-body text-[0.9rem] text-bone-muted">{text}</p>
+            <p className="mt-2 typo-document text-[0.9rem] text-bone-muted">{text}</p>
           </motion.li>
         );
       })}

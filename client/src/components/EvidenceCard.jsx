@@ -87,7 +87,7 @@ function EvidenceCardComponent({ item, index, isOpen: controlledOpen, onToggle }
             transition={{ duration: 0.24, ease: 'easeOut' }}
             className="overflow-hidden"
           >
-            <p className="border-t border-white/10 px-4 py-4 typo-body text-[0.9rem] text-bone-muted">{item.description}</p>
+            <p className="border-t border-white/10 px-4 py-4 typo-document text-[0.9rem] text-bone-muted">{item.description}</p>
           </motion.div>
         )}
       </AnimatePresence>

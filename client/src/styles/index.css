@@ -1,3 +1,46 @@
+/* Self-hosted so the game keeps its typography with no network — it is played
+   offline on a festival laptop as often as it is played from Render. Latin
+   subset only; Inter, Oswald and JetBrains Mono are variable faces. */
+@font-face {
+  font-family: 'IM Fell English SC';
+  src: url('/fonts/imfellenglishsc.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Special Elite';
+  src: url('/fonts/specialelite.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/fonts/oswald.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrainsmono.woff2') format('woff2');
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -91,6 +134,29 @@
     line-height: 1.7;
     letter-spacing: 0.01em;
     opacity: 0.92;
+  }
+
+  /* Investigation documents. Special Elite measures x-height 49 against Inter's
+     55, so it reads ~11% small at the same size — but it also sets ~9% wider
+     per line. The nudge is deliberately partial: correcting the full 11% would
+     cost a word a line on a 320px screen. Single weight, so never pair it with
+     a weight utility. */
+  .typo-document {
+    font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
+    font-weight: 400;
+    font-size: 1.05em;
+    line-height: 1.75;
+    letter-spacing: 0;
+  }
+
+  /* The wordmark and the title screens. Small-caps face: it must not be
+     CSS-uppercased or the small caps collapse into plain caps. Cap height 68
+     against Oswald's 81, so titles that swap carry a size bump. */
+  .typo-logo {
+    font-family: 'IM Fell English SC', Georgia, ui-serif, serif;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    text-transform: none;
   }
 
   .typo-meta {

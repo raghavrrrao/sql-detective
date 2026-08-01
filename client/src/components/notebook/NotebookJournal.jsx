@@ -80,7 +80,7 @@ export function NotebookJournal() {
                 <Icon size={16} className={style.tone} strokeWidth={2} aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="typo-body text-base font-medium text-bone">{entry.title}</p>
+                <p className="typo-document text-base text-bone">{entry.title}</p>
                 {entry.detail && (
                   <pre className="mt-1.5 overflow-x-auto font-mono text-xs leading-6 text-bone-dim">{entry.detail}</pre>
                 )}

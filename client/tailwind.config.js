@@ -5,6 +5,10 @@ export default {
     extend: {
       fontFamily: {
         display: ['Oswald', 'Impact', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        // The wordmark and the title screens only.
+        logo: ['"IM Fell English SC"', 'Georgia', 'ui-serif', 'serif'],
+        // Anything that is meant to read as a document out of the case file.
+        document: ['"Special Elite"', '"Courier New"', 'ui-monospace', 'monospace'],
         sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },

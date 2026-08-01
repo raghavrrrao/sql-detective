@@ -43,7 +43,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
                 <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">
                   <Icon size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> {label}
                 </dt>
-                <dd className="mt-1.5 typo-body-secondary text-sm text-bone">{caseFacts[key]}</dd>
+                <dd className="mt-1.5 typo-document text-sm text-bone">{caseFacts[key]}</dd>
               </div>
             ))}
           </dl>
@@ -89,7 +89,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
-                className="clip-corner-sm border border-gold/25 bg-gold/[0.06] p-4 typo-body text-base text-bone-muted"
+                className="clip-corner-sm border border-gold/25 bg-gold/[0.06] p-4 typo-document text-base text-bone-muted"
               >
                 {insight.text}
               </motion.li>

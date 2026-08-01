@@ -78,7 +78,7 @@ export function NotebookObjectives({ leads }) {
                     >
                       <Check size={13} strokeWidth={3} />
                     </span>
-                    <span className={`flex-1 typo-body text-base ${isDone ? 'text-bone-dim line-through' : 'text-bone-muted'}`}>{lead}</span>
+                    <span className={`flex-1 typo-document text-base ${isDone ? 'text-bone-dim line-through' : 'text-bone-muted'}`}>{lead}</span>
                   </button>
                 </li>
               );

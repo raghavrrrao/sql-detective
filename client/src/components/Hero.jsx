@@ -33,10 +33,10 @@ export function Hero() {
             </p>
           </motion.div>
 
-          <motion.h1 variants={rise} custom={0.12} className="text-balance font-display text-6xl font-medium uppercase leading-[0.92] tracking-tight text-bone sm:text-8xl lg:text-[7rem]">
+          <motion.h1 variants={rise} custom={0.12} className="text-balance typo-logo text-6xl leading-[1.02] text-bone sm:text-8xl lg:text-[7.5rem]">
             SQL Detective
           </motion.h1>
-          <motion.p variants={rise} custom={0.18} className="mt-4 font-display text-xl font-medium uppercase tracking-[0.34em] text-gold-bright sm:text-3xl">
+          <motion.p variants={rise} custom={0.18} className="mt-4 typo-logo text-xl tracking-[0.22em] text-gold-bright sm:text-3xl">
             Countdown to Justice
           </motion.p>
 
