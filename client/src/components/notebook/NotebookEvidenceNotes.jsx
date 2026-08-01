@@ -26,7 +26,7 @@ function EvidenceNote({ item }) {
             className={`mt-1 shrink-0 text-bone-dim transition-transform duration-200 ${isOpen ? 'rotate-180 text-gold-bright' : ''}`}
           />
           <span className="min-w-0 flex-1">
-            <span className="block text-base font-semibold leading-6 text-bone">{item.title}</span>
+            <span className="block typo-body text-base font-semibold text-bone">{item.title}</span>
             <span className="mt-1 flex flex-wrap items-center gap-2">
               <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 text-xs font-semibold uppercase tracking-[0.12em] text-bone-muted">
                 {item.category}
@@ -53,7 +53,7 @@ function EvidenceNote({ item }) {
 
       {isOpen && (
         <div className="border-t border-white/10 p-4">
-          <p className="text-sm leading-7 text-bone-muted">{item.description}</p>
+          <p className="typo-body-secondary text-sm text-bone-muted">{item.description}</p>
           <label className="mt-4 block">
             <span className="text-xs font-semibold uppercase tracking-[0.16em] text-bone-dim">Your note</span>
             <textarea
@@ -62,7 +62,7 @@ function EvidenceNote({ item }) {
               onBlur={flushNote}
               rows={3}
               placeholder="What does this exhibit prove, and who does it point at?"
-              className="clip-corner-sm mt-2 w-full resize-y border border-white/10 bg-black/40 p-3.5 text-sm leading-7 text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
+              className="clip-corner-sm mt-2 w-full resize-y border border-white/10 bg-black/40 p-3.5 typo-body-secondary text-sm text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
             />
           </label>
         </div>

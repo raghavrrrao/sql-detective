@@ -118,9 +118,9 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
           >
             <AlertTriangle size={30} className="text-verdict-alert" strokeWidth={1.9} aria-hidden="true" />
             <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Query rejected</p>
-            <p className="max-w-lg text-base leading-7 text-bone-muted">{error}</p>
+            <p className="max-w-lg typo-body text-base text-bone-muted">{error}</p>
             {hint && (
-              <p className="clip-corner-sm mt-1 flex max-w-lg items-start gap-2.5 border border-gold/30 bg-gold/[0.07] p-3.5 text-left text-sm leading-6 text-bone-muted">
+              <p className="clip-corner-sm mt-1 flex max-w-lg items-start gap-2.5 border border-gold/30 bg-gold/[0.07] p-3.5 text-left typo-body-secondary text-sm text-bone-muted">
                 <Lightbulb size={16} className="mt-0.5 shrink-0 text-gold-bright" strokeWidth={2} aria-hidden="true" />
                 {hint}
               </p>
@@ -139,7 +139,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
             <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">
               {hasRun ? (summary ?? 'No matching records found') : 'The terminal is ready'}
             </p>
-            <p className="max-w-md text-base leading-7 text-bone-muted">
+            <p className="max-w-md typo-body text-base text-bone-muted">
               {hasRun
                 ? 'The database answered, but nothing matched. Widen your filter or check the table name.'
                 : 'Run a query to pull records out of the evidence database. Start with SELECT * FROM suspects;'}

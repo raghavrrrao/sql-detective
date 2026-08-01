@@ -97,7 +97,7 @@ export function NotebookQueryHistory({ onClose }) {
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <History size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
         <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">No queries yet</p>
-        <p className="max-w-sm text-base leading-7 text-bone-muted">Every statement you run is logged here so you can re-run, copy or clear it.</p>
+        <p className="max-w-sm typo-body text-base text-bone-muted">Every statement you run is logged here so you can re-run, copy or clear it.</p>
       </div>
     );
   }

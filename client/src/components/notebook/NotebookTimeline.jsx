@@ -24,7 +24,7 @@ export function NotebookTimeline() {
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <Clock size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
         <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">No chronology yet</p>
-        <p className="max-w-sm text-base leading-7 text-bone-muted">
+        <p className="max-w-sm typo-body text-base text-bone-muted">
           Recover records that carry a time — cameras, badges, calls, security events — and they assemble here in order.
         </p>
       </div>
@@ -73,7 +73,7 @@ export function NotebookTimeline() {
               </span>
             </div>
 
-            <p className="mt-2 text-[0.95rem] leading-7 text-bone">{event.title}</p>
+            <p className="mt-2 typo-body text-[0.95rem] text-bone">{event.title}</p>
 
             <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs text-bone-dim">
               {event.location && (

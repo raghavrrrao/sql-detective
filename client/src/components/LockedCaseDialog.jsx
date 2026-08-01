@@ -6,7 +6,7 @@ function Skills({ icon: Icon, label, items }) {
   if (!items || items.length === 0) return null;
   return (
     <div>
-      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-dim">
+      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">
         <Icon size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> {label}
       </p>
       <div className="mt-2.5 flex flex-wrap gap-2">
@@ -35,19 +35,19 @@ export function LockedCaseDialog({ isOpen, onClose, caseData, requirement }) {
         <span className="font-mono text-sm text-bone-dim">{caseData.caseNumber}</span>
       </div>
 
-      <h3 className="mt-5 font-display text-3xl font-bold uppercase leading-tight text-bone">{caseData.title}</h3>
+      <h3 className="mt-5 font-display text-3xl font-medium uppercase leading-tight text-bone">{caseData.title}</h3>
 
       <dl className="mt-6 space-y-5 border-y border-white/10 py-6">
         <div>
-          <dt className="text-xs font-bold uppercase tracking-[0.18em] text-bone-dim">Status</dt>
+          <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">Status</dt>
           <dd className="mt-1.5 flex items-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-crimson-glow">
             <Lock size={15} strokeWidth={2.4} aria-hidden="true" /> Locked
           </dd>
         </div>
 
         <div>
-          <dt className="text-xs font-bold uppercase tracking-[0.18em] text-bone-dim">Unlock requirement</dt>
-          <dd className="mt-1.5 text-base leading-7 text-bone">
+          <dt className="text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">Unlock requirement</dt>
+          <dd className="mt-1.5 typo-body text-base text-bone">
             {requirement
               ? `Close ${requirement.caseNumber} — ${requirement.title} — to open this file.`
               : 'This file is sealed until its investigation is prepared.'}
@@ -55,7 +55,7 @@ export function LockedCaseDialog({ isOpen, onClose, caseData, requirement }) {
         </div>
 
         <div>
-          <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-dim">
+          <dt className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">
             <Clock3 size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> Estimated time
           </dt>
           <dd className="mt-1.5 text-base text-bone">{caseData.estimatedTime}</dd>
@@ -67,7 +67,7 @@ export function LockedCaseDialog({ isOpen, onClose, caseData, requirement }) {
         <Skills icon={Fingerprint} label="Detective skills" items={caseData.detectiveSkills} />
       </div>
 
-      <p className="mt-6 text-sm leading-6 text-bone-dim">{caseData.preview}</p>
+      <p className="mt-6 typo-body-secondary text-sm text-bone-dim">{caseData.preview}</p>
     </ReusableModal>
   );
 }

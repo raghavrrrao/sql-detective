@@ -66,10 +66,10 @@ export function ModeSelectionGate() {
         {askingForName ? (
           <>
             <p className="text-center font-mono text-sm uppercase tracking-[0.3em] text-crimson-glow">Festival Mode</p>
-            <h1 className="mt-5 text-center font-display text-5xl font-bold uppercase leading-none text-bone sm:text-6xl">
+            <h1 className="mt-5 text-center font-display text-5xl font-medium uppercase leading-none text-bone sm:text-6xl">
               Enter detective name
             </h1>
-            <p className="mx-auto mt-5 max-w-lg text-center text-base leading-7 text-bone-muted">
+            <p className="mx-auto mt-5 max-w-lg text-center typo-body text-base text-bone-muted">
               This is the name that appears on the leaderboard when you close a case.
             </p>
 
@@ -105,10 +105,10 @@ export function ModeSelectionGate() {
         ) : (
           <>
             <p className="text-center font-mono text-sm uppercase tracking-[0.3em] text-crimson-glow">Welcome detective</p>
-            <h1 className="mt-5 text-center font-display text-5xl font-bold uppercase leading-none text-bone sm:text-6xl">
+            <h1 className="mt-5 text-center font-display text-5xl font-medium uppercase leading-none text-bone sm:text-6xl">
               Choose how you want to play
             </h1>
-            <p className="mx-auto mt-5 max-w-xl text-center text-base leading-7 text-bone-muted">
+            <p className="mx-auto mt-5 max-w-xl text-center typo-body text-base text-bone-muted">
               You will only be asked once. It can be changed at any time from Settings.
             </p>
 
@@ -123,9 +123,9 @@ export function ModeSelectionGate() {
                     className="clip-corner group flex flex-col p-7 text-left panel-surface shadow-panel transition-colors duration-200 hover:border-gold/45"
                   >
                     <Icon size={30} className="text-gold-bright" strokeWidth={1.8} aria-hidden="true" />
-                    <h2 className="mt-5 font-display text-2xl font-bold uppercase leading-tight text-bone">{mode.label}</h2>
+                    <h2 className="mt-5 font-display text-2xl font-medium uppercase leading-tight text-bone">{mode.label}</h2>
                     <p className="mt-1.5 font-mono text-xs uppercase tracking-[0.16em] text-crimson-glow">{mode.strapline}</p>
-                    <p className="mt-4 flex-1 text-base leading-7 text-bone-muted">{mode.detail}</p>
+                    <p className="mt-4 flex-1 typo-body text-base text-bone-muted">{mode.detail}</p>
                     <span className="mt-6 flex items-center gap-2 border-t border-white/10 pt-4 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors group-hover:text-gold-bright">
                       Select <ArrowRight size={16} strokeWidth={2.2} aria-hidden="true" />
                     </span>

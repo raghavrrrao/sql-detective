@@ -13,8 +13,8 @@ export function MissionCard() {
       <div className="relative flex gap-5">
         <Crosshair className="mt-1 shrink-0 text-crimson-glow" size={26} strokeWidth={2} />
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-crimson-glow">Your objective</p>
-          <p className="mt-4 max-w-2xl font-display text-2xl font-medium leading-relaxed text-bone">
+          <p className="text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">Your objective</p>
+          <p className="mt-4 max-w-2xl font-display text-2xl font-normal leading-8 text-bone typo-body">
             Query the evidence database, break every alibi, and prove which suspect had no record where they claim to have been.
           </p>
         </div>

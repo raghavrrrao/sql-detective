@@ -39,7 +39,7 @@ function WitnessReportComponent({ entries }) {
             </header>
             <div className="mt-3 flex gap-2.5">
               <Quote size={15} className="mt-1 shrink-0 text-gold/60" strokeWidth={2} />
-              <p className="text-[0.9rem] leading-7 text-bone-muted">{text}</p>
+              <p className="typo-body text-[0.9rem] text-bone-muted">{text}</p>
             </div>
           </motion.article>
         );

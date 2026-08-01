@@ -135,7 +135,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           role="alert"
         >
           <AlertTriangle size={40} className="text-verdict-watch" strokeWidth={1.8} aria-hidden="true" />
-          <h3 className="font-display text-3xl font-bold uppercase tracking-[0.14em] text-bone">Case not proven</h3>
+          <h3 className="font-display text-3xl font-medium uppercase tracking-[0.14em] text-bone">Case not proven</h3>
           <p className="max-w-xl text-lg leading-8 text-bone-muted">{NOT_PROVEN_MESSAGE}</p>
           <button
             type="button"
@@ -152,10 +152,10 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           className="flex min-h-[24rem] flex-col items-center justify-center gap-5 px-6 text-center"
         >
           <Gavel size={40} className="text-crimson-glow" strokeWidth={1.8} aria-hidden="true" />
-          <h3 className="font-display text-3xl font-bold uppercase tracking-[0.14em] text-bone">
+          <h3 className="font-display text-3xl font-medium uppercase tracking-[0.14em] text-bone">
             You are about to formally accuse
           </h3>
-          <p className="font-display text-4xl font-bold uppercase tracking-wide text-crimson-glow">{suspect}</p>
+          <p className="font-display text-4xl font-medium uppercase tracking-wide text-crimson-glow">{suspect}</p>
           <p className="max-w-xl text-lg leading-8 text-bone-muted">
             This decision cannot be changed until this investigation ends.
           </p>
@@ -189,7 +189,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           {step === 'suspect' && (
             <fieldset>
               <legend className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Who are you accusing?</legend>
-              <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+              <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Only people your investigation has actually turned up can be named.
               </p>
 
@@ -239,7 +239,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           {step === 'evidence' && (
             <fieldset>
               <legend className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Cite your evidence</legend>
-              <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+              <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Pick the records that support the accusation. A case reads more strongly the more independent records stand behind it.
               </p>
 
@@ -285,7 +285,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block text-[0.95rem] font-semibold leading-6 text-bone">{record.title}</span>
-                        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-bone-dim">
+                        <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 typo-body-secondary text-xs text-bone-dim">
                           <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono">
                             {record.table.replace(/_/g, ' ')}
                           </span>
@@ -314,7 +314,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           {step === 'reasoning' && (
             <div>
               <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">State your case</h3>
-              <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+              <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
                 Set out how the records fit together. This is for the case file — it is not marked, and it is saved as you type.
               </p>
               <label className="mt-4 block">
@@ -324,7 +324,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
                   onChange={(event) => setDraft(event.target.value)}
                   onBlur={flushDraft}
                   placeholder={'On the night in question…\n\nThe badge log places them…\n\nNo camera accounts for…'}
-                  className="clip-corner-sm min-h-[18rem] w-full resize-y border border-white/10 bg-black/40 p-4 text-base leading-7 text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
+                  className="clip-corner-sm min-h-[18rem] w-full resize-y border border-white/10 bg-black/40 p-4 typo-body text-base text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
                 />
               </label>
             </div>

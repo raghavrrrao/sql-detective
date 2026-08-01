@@ -14,7 +14,7 @@ function Row({ title, description, children }) {
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 py-5 last:border-0">
       <div className="min-w-[14rem] flex-1">
         <p className="text-base font-semibold text-bone">{title}</p>
-        {description && <p className="mt-1 text-sm leading-6 text-bone-dim">{description}</p>}
+        {description && <p className="mt-1 typo-body-secondary text-sm text-bone-dim">{description}</p>}
       </div>
       <div className="flex shrink-0 flex-wrap gap-2.5">{children}</div>
     </div>
@@ -118,7 +118,7 @@ export function SettingsPage() {
 
         <section className="clip-corner panel-surface p-7 shadow-panel">
           <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Mode</h2>
-          <p className="mt-2 text-sm leading-6 text-bone-dim">
+          <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
             Currently running in <span className="font-semibold text-bone">{isFestival ? 'Festival Mode' : 'Personal Mode'}</span>
             {isFestival && detectiveName ? ` · Detective ${detectiveName}` : ''}.
           </p>
@@ -145,7 +145,7 @@ export function SettingsPage() {
 
         <section className="clip-corner mt-6 panel-surface p-7 shadow-panel">
           <h2 className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Audio</h2>
-          <p className="mt-2 text-sm leading-6 text-bone-dim">
+          <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
             These switches are saved now and take effect once the audio pack ships. Nothing plays yet.
           </p>
           <div className="mt-5 flex flex-wrap gap-2.5">
@@ -160,7 +160,7 @@ export function SettingsPage() {
           <h2 className="flex items-center gap-2 font-display text-lg font-semibold uppercase tracking-[0.16em] text-verdict-alert">
             <ShieldAlert size={18} strokeWidth={2.2} aria-hidden="true" /> Admin
           </h2>
-          <p className="mt-2 text-sm leading-6 text-bone-dim">
+          <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
             Everything here destroys data and asks first. Each one states exactly what survives.
           </p>
 

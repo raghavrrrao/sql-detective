@@ -16,7 +16,7 @@ export function NotebookObjectives({ leads }) {
           <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Investigation objectives</h3>
           <p className="font-mono text-sm text-gold-bright">{tally.done} of {tally.total} complete</p>
         </div>
-        <p className="mt-1.5 text-sm leading-6 text-bone-dim">These complete on their own as you work the database.</p>
+        <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">These complete on their own as you work the database.</p>
 
         <ul className="mt-4 space-y-2.5">
           {objectives.map((objective) => (
@@ -44,7 +44,7 @@ export function NotebookObjectives({ leads }) {
                   {objective.label}
                   <span className="sr-only">{objective.locked ? ' — locked' : objective.isDone ? ' — complete' : ' — outstanding'}</span>
                 </p>
-                {!objective.isDone && <p className="mt-1.5 text-sm leading-6 text-bone-muted">{objective.hint}</p>}
+                {!objective.isDone && <p className="mt-1.5 typo-body-secondary text-sm text-bone-muted">{objective.hint}</p>}
               </div>
             </li>
           ))}
@@ -57,7 +57,7 @@ export function NotebookObjectives({ leads }) {
             <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Case leads</h3>
             <p className="font-mono text-sm text-bone-dim">{leadsDone.length} of {leads.length} followed</p>
           </div>
-          <p className="mt-1.5 text-sm leading-6 text-bone-dim">Your own checklist — tick these off as you work through them.</p>
+          <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">Your own checklist — tick these off as you work through them.</p>
 
           <ul className="mt-4 space-y-2.5">
             {leads.map((lead) => {
@@ -78,7 +78,7 @@ export function NotebookObjectives({ leads }) {
                     >
                       <Check size={13} strokeWidth={3} />
                     </span>
-                    <span className={`flex-1 text-base leading-7 ${isDone ? 'text-bone-dim line-through' : 'text-bone-muted'}`}>{lead}</span>
+                    <span className={`flex-1 typo-body text-base ${isDone ? 'text-bone-dim line-through' : 'text-bone-muted'}`}>{lead}</span>
                   </button>
                 </li>
               );

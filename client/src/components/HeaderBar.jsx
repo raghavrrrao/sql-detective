@@ -1,7 +1,7 @@
 import { ArrowLeft, BookOpen, LayoutPanelLeft, Search, Star, Timer, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
-import { getCase } from '../catalog/caseCatalog';
+import { getCase, getCaseRoutePath } from '../catalog/caseCatalog';
 import { useGameMode } from '../state/gameMode';
 import { useInvestigationTimer } from '../state/investigationSession';
 import { formatClock } from '../utils/clock';
@@ -27,7 +27,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
         </button>
 
         <Link
-          to={`/case/${difficulty}`}
+          to={getCaseRoutePath(difficulty, 'case')}
           aria-label="Back to case briefing"
           className="clip-corner-sm hidden border border-white/12 bg-white/[0.04] p-2.5 text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright sm:inline-flex"
         >
@@ -35,7 +35,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
         </Link>
 
         <div className="min-w-0">
-          <p className="truncate font-display text-lg font-bold uppercase tracking-wide text-bone sm:text-xl">{caseData.title}</p>
+          <p className="truncate font-display text-lg font-medium uppercase tracking-wide text-bone sm:text-xl">{caseData.title}</p>
           <p className="hidden font-mono text-xs uppercase tracking-[0.18em] text-bone-dim sm:block">
             {caseData.caseNumber} · Active investigation
           </p>

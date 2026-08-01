@@ -15,7 +15,7 @@ function Panel({ icon: Icon, label, children, delay }) {
       <h3 className="flex items-center gap-2 font-display text-xs font-semibold uppercase tracking-[0.2em] text-gold-bright">
         <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> {label}
       </h3>
-      <div className="mt-3 text-base leading-7 text-bone-muted">{children}</div>
+      <div className="mt-3 typo-body text-base text-bone-muted">{children}</div>
     </motion.section>
   );
 }
@@ -55,12 +55,12 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
 
           <motion.h2
             {...reveal(0.15)}
-            className="mt-5 text-center font-display text-6xl font-bold uppercase leading-none tracking-tight text-bone sm:text-8xl"
+            className="mt-5 text-center font-display text-6xl font-medium uppercase leading-none tracking-tight text-bone sm:text-8xl"
           >
             Case Closed
           </motion.h2>
 
-          <motion.p {...reveal(0.3)} className="mt-6 text-center text-lg leading-8 text-bone-muted">
+          <motion.p {...reveal(0.3)} className="mt-6 text-center typo-body text-lg text-bone-muted">
             The case against <span className="font-semibold text-bone">{verdict?.suspect}</span> is proven.
           </motion.p>
 
@@ -68,7 +68,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
             <p className="flex items-center justify-center gap-2 font-mono text-xs uppercase tracking-[0.24em] text-crimson-glow">
               <Gavel size={14} strokeWidth={2.4} aria-hidden="true" /> Identity
             </p>
-            <p className="mt-4 font-display text-4xl font-bold uppercase tracking-wide text-bone sm:text-5xl">
+            <p className="mt-4 font-display text-4xl font-medium uppercase tracking-wide text-bone sm:text-5xl">
               {killer?.name ?? verdict?.suspect}
             </p>
             {killer?.occupation && <p className="mt-3 text-lg text-bone-muted">{killer.occupation}</p>}
@@ -115,7 +115,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
               ].map(([label, value]) => (
                 <div key={label}>
                   <dt className="text-xs uppercase tracking-[0.14em] text-bone-dim">{label}</dt>
-                  <dd className="mt-1 font-display text-2xl font-bold text-bone">{value}</dd>
+                  <dd className="mt-1 font-display text-2xl font-medium text-bone">{value}</dd>
                 </div>
               ))}
             </dl>
@@ -136,7 +136,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
                     </span>
                   ))}
                 </div>
-                <p className="mt-2.5 text-sm leading-6 text-bone-dim">
+                <p className="mt-2.5 typo-body-secondary text-sm text-bone-dim">
                   You proved the case without them. They are worth a look on a replay.
                 </p>
               </div>

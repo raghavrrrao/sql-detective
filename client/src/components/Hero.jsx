@@ -20,7 +20,7 @@ export function Hero() {
       {/* Classified stamp watermark */}
       <div aria-hidden="true" className="pointer-events-none absolute right-4 top-28 hidden select-none lg:block">
         <div className="rotate-[9deg] border-[3px] border-crimson/25 px-8 py-3">
-          <p className="font-display text-4xl font-bold uppercase tracking-[0.3em] text-crimson/20">Classified</p>
+          <p className="font-display text-4xl font-medium uppercase tracking-[0.3em] text-crimson/20">Classified</p>
         </div>
       </div>
 
@@ -33,7 +33,7 @@ export function Hero() {
             </p>
           </motion.div>
 
-          <motion.h1 variants={rise} custom={0.12} className="text-balance font-display text-6xl font-bold uppercase leading-[0.92] tracking-tight text-bone sm:text-8xl lg:text-[7rem]">
+          <motion.h1 variants={rise} custom={0.12} className="text-balance font-display text-6xl font-medium uppercase leading-[0.92] tracking-tight text-bone sm:text-8xl lg:text-[7rem]">
             SQL Detective
           </motion.h1>
           <motion.p variants={rise} custom={0.18} className="mt-4 font-display text-xl font-medium uppercase tracking-[0.34em] text-gold-bright sm:text-3xl">
@@ -59,7 +59,7 @@ export function Hero() {
           <motion.dl variants={rise} custom={0.44} className="mt-16 flex flex-wrap gap-x-12 gap-y-6 border-t border-white/10 pt-8">
             {stats.map((stat) => (
               <div key={stat.label}>
-                <dt className="font-display text-4xl font-bold text-bone">{stat.value}</dt>
+                <dt className="font-display text-4xl font-medium text-bone">{stat.value}</dt>
                 <dd className="mt-1 text-sm uppercase tracking-[0.2em] text-bone-dim">{stat.label}</dd>
               </div>
             ))}

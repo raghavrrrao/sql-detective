@@ -12,7 +12,7 @@ export function NotebookPersonalNotes() {
   return (
     <div>
       <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Working theory</h3>
-      <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+      <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
         Who cannot account for themselves, and what proves it? Write it out — the argument is usually where the hole shows up.
       </p>
 
@@ -23,7 +23,7 @@ export function NotebookPersonalNotes() {
           onChange={(event) => setDraft(event.target.value)}
           onBlur={flush}
           placeholder={'22:13 — lights go out\n22:14 — ?\n\nWho is missing from the cameras?'}
-          className="clip-corner-sm min-h-[18rem] w-full resize-y border border-white/10 bg-black/40 p-4 text-base leading-7 text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
+          className="clip-corner-sm min-h-[18rem] w-full resize-y border border-white/10 bg-black/40 p-4 typo-body text-base text-bone outline-none transition-colors placeholder:text-bone-dim focus:border-gold/50"
         />
       </label>
 

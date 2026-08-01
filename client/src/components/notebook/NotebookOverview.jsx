@@ -25,8 +25,8 @@ export function NotebookOverview({ caseData, caseFacts }) {
   return (
     <div className="space-y-6">
       <section className="clip-corner-sm panel-surface-raised p-5">
-        <p className="font-mono text-xs uppercase tracking-[0.2em] text-crimson-glow">{caseData.caseNumber} · {caseData.difficulty}</p>
-        <h3 className="mt-2 font-display text-2xl font-bold uppercase leading-tight text-bone">{caseData.title}</h3>
+        <p className="font-mono text-xs uppercase tracking-[0.2em] text-crimson-glow">{caseData.caseNumber} · {caseFacts?.tier ?? caseData.difficulty}</p>
+        <h3 className="mt-2 font-display text-2xl font-medium uppercase leading-tight text-bone">{caseData.title}</h3>
         <p className="mt-3 flex items-center gap-2 text-base text-bone-muted">
           <UserX size={16} className="shrink-0 text-crimson-glow" strokeWidth={2.2} aria-hidden="true" />
           Victim: <span className="font-semibold text-bone">{caseData.victim}</span>
@@ -36,10 +36,10 @@ export function NotebookOverview({ caseData, caseFacts }) {
           <dl className="mt-5 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
             {facts.map(({ key, label, icon: Icon }) => (
               <div key={key}>
-                <dt className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.16em] text-bone-dim">
+                <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">
                   <Icon size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> {label}
                 </dt>
-                <dd className="mt-1.5 text-sm leading-6 text-bone">{caseFacts[key]}</dd>
+                <dd className="mt-1.5 typo-body-secondary text-sm text-bone">{caseFacts[key]}</dd>
               </div>
             ))}
           </dl>
@@ -48,7 +48,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
 
       <section>
         <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Investigation ledger</h3>
-        <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+        <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
           Counts what you have recovered. A total only appears once you have read that table in full.
         </p>
 
@@ -74,7 +74,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
           <h3 className="flex items-center gap-2 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">
             <Lightbulb size={15} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> Observations
           </h3>
-          <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+          <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
             Notes on where your file is thin. These react to what you have collected — they never tell you what it means.
           </p>
 
@@ -85,7 +85,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: Math.min(index * 0.05, 0.3) }}
-                className="clip-corner-sm border border-gold/25 bg-gold/[0.06] p-4 text-base leading-7 text-bone-muted"
+                className="clip-corner-sm border border-gold/25 bg-gold/[0.06] p-4 typo-body text-base text-bone-muted"
               >
                 {insight.text}
               </motion.li>
@@ -101,7 +101,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
           { label: 'Queries run', value: reach.successes + reach.failures },
         ].map((stat) => (
           <div key={stat.label} className="bg-charcoal px-4 py-4 text-center">
-            <p className="font-display text-2xl font-bold text-gold-bright">{stat.value}</p>
+            <p className="font-display text-2xl font-medium text-gold-bright">{stat.value}</p>
             <p className="mt-1 text-xs uppercase tracking-[0.14em] text-bone-dim">{stat.label}</p>
           </div>
         ))}

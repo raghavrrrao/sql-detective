@@ -24,7 +24,7 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
       <span aria-hidden="true" className={`absolute left-0 top-0 h-full w-[3px] ${rails[rank] ?? rails[2]}`} />
 
       <div className="flex items-start justify-between gap-4">
-        <h3 className="font-display text-3xl font-bold uppercase text-bone">{difficulty}</h3>
+        <h3 className="font-display text-3xl font-medium uppercase text-bone">{difficulty}</h3>
         <DifficultyBadge difficulty={difficulty} rank={rank} />
       </div>
 
@@ -49,7 +49,7 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
         </div>
       </dl>
 
-      <p className="mt-7 border-t border-white/10 pt-6 text-base leading-7 text-bone-muted">{story}</p>
+      <p className="mt-7 border-t border-white/10 pt-6 typo-body text-base text-bone-muted">{story}</p>
     </motion.article>
   );
 }

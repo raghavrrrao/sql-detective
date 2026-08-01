@@ -30,7 +30,7 @@ export function NotebookSuspects() {
   return (
     <div>
       <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Suspect files</h3>
-      <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+      <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
         A file grows as your queries turn up records naming that person. Nothing here reads their alibi.
       </p>
 
@@ -68,7 +68,7 @@ export function NotebookSuspects() {
                   <div className="flex flex-wrap items-center gap-2 sm:hidden">
                     <StatusBadge tone={profile.status} size="sm" />
                   </div>
-                  <p className="text-sm leading-6 text-bone-muted sm:mt-0">{suspectStatuses[profile.status].blurb}</p>
+                  <p className="typo-body-secondary text-sm text-bone-muted sm:mt-0">{suspectStatuses[profile.status].blurb}</p>
 
                   {profile.sources.length > 0 && (
                     <div className="mt-3.5">
@@ -84,7 +84,7 @@ export function NotebookSuspects() {
                   )}
 
                   {profile.earnedStatus === 'investigated' && profile.toInterest > 0 && (
-                    <p className="mt-3.5 text-sm leading-6 text-bone-dim">
+                    <p className="mt-3.5 typo-body-secondary text-sm text-bone-dim">
                       {profile.toInterest} more {profile.toInterest === 1 ? 'record' : 'records'} across at least three sources would make this a substantial file.
                     </p>
                   )}
@@ -131,7 +131,7 @@ export function NotebookSuspects() {
         })}
       </ul>
 
-      <p className="clip-corner-sm mt-6 flex items-start gap-2.5 border border-white/10 bg-white/[0.03] p-3.5 text-sm leading-6 text-bone-dim">
+      <p className="clip-corner-sm mt-6 flex items-start gap-2.5 border border-white/10 bg-white/[0.03] p-3.5 typo-body-secondary text-sm text-bone-dim">
         <Info size={15} className="mt-0.5 shrink-0 text-gold-bright" strokeWidth={2} aria-hidden="true" />
         Flagging and clearing are organisational only. Neither is checked against the case, and neither moves you closer to or further from the answer.
       </p>

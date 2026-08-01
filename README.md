@@ -1,59 +1,101 @@
 # SQL Detective: Countdown to Justice
 
-Production-oriented project scaffold for a browser game where players solve murder mysteries by writing SQL queries.
+SQL Detective is a browser-based SQL investigation game where players solve murder mysteries by writing read-only SQL queries against case databases.
 
-## Prerequisites
+## Features
 
-- Node.js 20 or later
-- npm 10 or later
+- Interactive case selection and progression flow
+- Investigation notebook and evidence tracking
+- Read-only SQL execution against SQLite case databases
+- Timer, scoring, festival and personal mode progression
+- Production-ready Express and Vite deployment setup for Render
 
-## Installation
+## Tech stack
+
+- Frontend: React, Vite, Tailwind CSS, Framer Motion
+- Backend: Express, SQLite, Node.js
+- Deployment: Render, Node.js web service
+
+## Repository structure
+
+- client/ — Vite/React single-page application
+- server/ — Express API and SQLite access layer
+- database/ — case databases and schema files
+- docs/ — design and API documentation
+- assets/ — shared static assets
+- render.yaml — Render service configuration
+
+## Local development
+
+### Prerequisites
+
+- Node.js 20+
+- npm 10+
+
+### Installation
 
 ```bash
 npm install
-Copy-Item server/.env.example server/.env
-Copy-Item client/.env.example client/.env
+cp .env.example .env
+cp client/.env.example client/.env
+cp server/.env.example server/.env
 ```
 
-On macOS or Linux, replace `Copy-Item` with `cp`.
-
-## Run locally
+### Run locally
 
 ```bash
-# Run the React client and Express API together
 npm run dev
-
-# Or run either workspace independently
-npm run dev:client
-npm run dev:server
 ```
 
-The client starts at `http://localhost:5173`. The health endpoint is available at `http://localhost:4000/api/health`.
+The app is served locally at http://localhost:5173 and the API is available at http://localhost:4000/api/health.
 
-## Investigation data
-
-Seed the three case databases before starting the API:
+### Seed case databases
 
 ```bash
 npm run seed --workspace server
 ```
 
-The API exposes `GET /api/case/:difficulty` and `POST /api/query`. Query execution is limited to one read-only `SELECT`, `WITH`, or `EXPLAIN` statement against the selected case database.
-
-## Build and start
+## Production build
 
 ```bash
 npm run build
-npm run start
+npm start
 ```
 
-## Structure
+## Environment variables
 
-- `client/` — Vite/React single-page application.
-- `server/` — Express API and SQLite access layer.
-- `database/` — local runtime database location and schema source.
-- `docs/` — architecture documentation.
-- `assets/` — repository-level art and media assets.
+| Variable | Required | Description |
+| --- | --- | --- |
+| PORT | Yes | Web server port (Render sets this automatically) |
+| CLIENT_ORIGIN | Yes | Allowed frontend origin for CORS |
+| DATABASE_PATH | Yes | Path to the SQLite database file |
+| NODE_ENV | No | Set to production for deployment |
+| QUERY_TIMEOUT_MS | No | Query execution timeout in milliseconds |
+| QUERY_ROW_LIMIT | No | Maximum rows returned per query |
+| VITE_API_BASE_URL | No | Browser-side API base URL; defaults to /api |
 
-Game screens and gameplay are intentionally not implemented in this setup-only commit.
-"# sql-detective" 
+## Render deployment
+
+1. Push this repository to GitHub.
+2. Create a new Web Service on Render and connect the repository.
+3. Use the following settings:
+   - Build Command: npm install && npm run build
+   - Start Command: npm start
+   - Health Check Path: /api/health
+4. Add the environment variables from the examples as needed.
+
+A render.yaml file is included for Render-based deployment guidance.
+
+## Screenshots
+
+- Placeholder: add screenshots to docs or the repository wiki.
+
+## License
+
+This project is provided as-is for educational and portfolio purposes.
+
+## Future roadmap
+
+- Expand case content and progression systems
+- Improve observability and deployment automation
+- Add CI checks for build and smoke tests

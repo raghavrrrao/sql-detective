@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
-    "seed": "node scripts/seedCaseDatabases.js"
+    "seed": "node scripts/seedCaseDatabases.js",
+    "prestart": "node scripts/ensureProductionDatabase.js"
   },
   "dependencies": {
     "cors": "^2.8.5",

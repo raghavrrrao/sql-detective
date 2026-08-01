@@ -9,10 +9,10 @@ import { ReusableModal } from './ReusableModal';
 export function ConfirmDialog({ isOpen, onClose, onConfirm, title, description, keeps, confirmLabel = 'Confirm' }) {
   return (
     <ReusableModal isOpen={isOpen} onClose={onClose} title={title} icon={AlertTriangle} size="md">
-      <p className="text-base leading-7 text-bone-muted">{description}</p>
+      <p className="typo-body text-base text-bone-muted">{description}</p>
 
       {keeps && (
-        <p className="clip-corner-sm mt-4 border border-white/10 bg-white/[0.03] p-3.5 text-sm leading-6 text-bone-dim">
+        <p className="clip-corner-sm mt-4 border border-white/10 bg-white/[0.03] p-3.5 typo-body-secondary text-sm text-bone-dim">
           This keeps: {keeps}
         </p>
       )}

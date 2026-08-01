@@ -20,7 +20,7 @@ export function DetectiveCareer({ completion, className = '' }) {
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div>
-          <p className="font-display text-3xl font-bold uppercase leading-none text-bone">{rank}</p>
+          <p className="font-display text-3xl font-medium uppercase leading-none text-bone">{rank}</p>
           <p className="mt-2 text-base text-bone-muted">
             {completion.solved} of {completion.total} cases solved
           </p>
@@ -42,7 +42,7 @@ export function DetectiveCareer({ completion, className = '' }) {
       </div>
 
       {completion.allPlayableSolved && (
-        <p className="mt-4 border-t border-white/10 pt-4 text-sm leading-6 text-gold-bright">
+        <p className="mt-4 border-t border-white/10 pt-4 typo-body-secondary text-sm text-gold-bright">
           Every case file currently on the shelf is closed. New files are being prepared.
         </p>
       )}

@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: sql-detective
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: CLIENT_ORIGIN
+        value: https://__REPLACE_WITH_RENDER_URL__
+      - key: DATABASE_PATH
+        value: ../database/sql-detective.sqlite
+      - key: QUERY_TIMEOUT_MS
+        value: 2000
+      - key: QUERY_ROW_LIMIT
+        value: 200
+    healthCheckPath: /api/health
+    autoDeploy: true

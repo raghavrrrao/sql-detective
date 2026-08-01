@@ -12,8 +12,8 @@ function formatDate(iso) {
 function Field({ label, value }) {
   return (
     <div>
-      <dt className="text-xs font-bold uppercase tracking-[0.16em] text-bone-dim">{label}</dt>
-      <dd className="mt-1.5 text-base leading-7 text-bone">{value ?? '—'}</dd>
+      <dt className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">{label}</dt>
+      <dd className="mt-1.5 typo-body text-base text-bone">{value ?? '—'}</dd>
     </div>
   );
 }
@@ -62,7 +62,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
       <article className="print-report">
         <header className="border-b-2 border-crimson/50 pb-5">
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-crimson-glow">{report.caseNumber} · Closed</p>
-          <h2 className="mt-2 font-display text-4xl font-bold uppercase leading-tight text-bone">{report.title}</h2>
+          <h2 className="mt-2 font-display text-4xl font-medium uppercase leading-tight text-bone">{report.title}</h2>
         </header>
 
         <dl className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -95,7 +95,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
         <Section title="Investigation coverage">
           <ul className="grid gap-2.5 sm:grid-cols-2">
             {(report.ledger ?? []).map((row) => (
-              <li key={row.id} className="flex items-center justify-between gap-3 border-b border-white/10 pb-2 text-base text-bone-muted">
+              <li key={row.id} className="flex items-center justify-between gap-3 border-b border-white/10 pb-2 typo-body text-base text-bone-muted">
                 <span>{row.label}</span>
                 <span className="font-mono text-sm text-bone">{row.value}</span>
               </li>
@@ -108,7 +108,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
             <ol className="space-y-2.5">
               {report.citedEvidence.map((record) => (
                 <li key={record.key} className="border-l-2 border-gold/50 pl-3.5">
-                  <p className="text-base leading-6 text-bone">{record.title}</p>
+                  <p className="typo-body text-base text-bone">{record.title}</p>
                   <p className="mt-0.5 font-mono text-xs text-bone-dim">
                     {record.table.replace(/_/g, ' ')}
                     {record.occurredAt ? ` · ${record.occurredAt}` : ''}
@@ -124,7 +124,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
 
         <Section title="Your reasoning">
           {report.reasoning?.trim() ? (
-            <p className="whitespace-pre-wrap text-base leading-7 text-bone-muted">{report.reasoning}</p>
+            <p className="whitespace-pre-wrap typo-body text-base text-bone-muted">{report.reasoning}</p>
           ) : (
             <p className="text-base text-bone-dim">No reasoning was entered.</p>
           )}
@@ -134,9 +134,9 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           {report.timeline?.length ? (
             <ol className="space-y-1.5">
               {report.timeline.map((event) => (
-                <li key={event.id} className="flex gap-3 text-base leading-6 text-bone-muted">
+                <li key={event.id} className="flex gap-3 typo-body text-base text-bone-muted">
                   <span className="w-14 shrink-0 font-mono text-sm text-gold-bright">{event.clock}</span>
-                  <span>{event.title}{event.location ? ` · ${event.location}` : ''}</span>
+                  <span className="typo-body">{event.title}{event.location ? ` · ${event.location}` : ''}</span>
                 </li>
               ))}
             </ol>
@@ -149,7 +149,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           {witnesses.length ? (
             <ul className="space-y-1.5">
               {witnesses.map((record) => (
-                <li key={record.key} className="text-base leading-6 text-bone-muted">{record.title}</li>
+                <li key={record.key} className="typo-body text-base text-bone-muted">{record.title}</li>
               ))}
             </ul>
           ) : (
@@ -161,7 +161,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           {evidenceRecords.length ? (
             <ul className="space-y-1.5">
               {evidenceRecords.map((record) => (
-                <li key={record.key} className="text-base leading-6 text-bone-muted">{record.title}</li>
+                <li key={record.key} className="typo-body text-base text-bone-muted">{record.title}</li>
               ))}
             </ul>
           ) : (
@@ -172,9 +172,9 @@ export function CaseDebrief({ isOpen, onClose, report }) {
         <Section title="Suspect roster at close" count={report.suspects?.length ?? 0}>
           <ul className="space-y-1.5">
             {(report.suspects ?? []).map((profile) => (
-              <li key={profile.name} className="flex flex-wrap items-baseline gap-x-3 text-base leading-6 text-bone-muted">
+              <li key={profile.name} className="flex flex-wrap items-baseline gap-x-3 typo-body text-base text-bone-muted">
                 <span className="font-semibold text-bone">{profile.name}</span>
-                <span className="text-sm">{profile.occupation}</span>
+                <span className="typo-body text-sm">{profile.occupation}</span>
                 <span className="font-mono text-xs text-bone-dim">{profile.recordCount} records</span>
               </li>
             ))}

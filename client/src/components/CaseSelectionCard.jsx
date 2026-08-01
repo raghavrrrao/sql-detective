@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowUpRight, BadgeCheck, CircleDot, Clock3, Database, Fingerprint, GraduationCap, Lock, RotateCcw, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
+import { getCaseRoutePath } from '../catalog/caseCatalog';
 import { resetInvestigation } from '../utils/caseProgress';
 
 const statusChips = {
@@ -17,7 +18,7 @@ function SkillRow({ icon: Icon, label, items }) {
   if (!items || items.length === 0) return null;
   return (
     <div>
-      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-bone-dim">
+      <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.2em] text-bone-dim">
         <Icon size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> {label}
       </p>
       <div className="mt-3 flex flex-wrap gap-2">
@@ -44,7 +45,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
   const handleReplay = () => {
     if (!confirmReplay) { setConfirmReplay(true); return; }
     resetInvestigation(caseKey);
-    navigate(`/investigation/${caseKey}`);
+    navigate(getCaseRoutePath(caseKey, 'investigation'));
   };
 
   const body = (
@@ -54,7 +55,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <span className="font-mono text-sm text-bone-dim">{caseData.caseNumber}</span>
       </div>
 
-      <h2 className="mt-7 font-display text-3xl font-bold uppercase leading-tight text-bone">{caseData.title}</h2>
+      <h2 className="mt-7 font-display text-3xl font-medium uppercase leading-tight text-bone">{caseData.title}</h2>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
         <span className="flex items-center gap-2 text-base text-bone-muted">
@@ -75,7 +76,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <SkillRow icon={Fingerprint} label="Detective skills" items={caseData.detectiveSkills} />
       </div>
 
-      <p className="mt-6 flex-1 text-base leading-7 text-bone-muted">{caseData.preview}</p>
+      <p className="mt-6 flex-1 typo-body text-base text-bone-muted">{caseData.preview}</p>
     </>
   );
 
@@ -95,7 +96,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
         {body}
         <div className="mt-8 border-t border-white/10 pt-5 text-center">
-          <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-gold-bright">Classified</p>
+          <p className="font-display text-sm font-medium uppercase tracking-[0.3em] text-gold-bright">Classified</p>
           <p className="mt-2 flex items-center justify-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-bone">
             <Lock size={16} strokeWidth={2.2} aria-hidden="true" /> Investigation file sealed
           </p>
@@ -124,7 +125,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
           <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-ink/72 px-6 text-center backdrop-blur-[3px] transition-colors duration-300 group-hover:bg-ink/60">
             <Lock size={30} className="text-gold-bright" strokeWidth={1.8} />
             <p className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">Case sealed</p>
-            <p className="max-w-[17rem] text-sm leading-6 text-bone-muted">
+            <p className="max-w-[17rem] typo-body-secondary text-sm text-bone-muted">
               {requirement ? `Complete ${requirement.tier} to unlock` : 'Not yet available'}
             </p>
             <p className="mt-1 text-xs uppercase tracking-[0.16em] text-bone-dim">Select for details</p>
@@ -164,7 +165,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
           </p>
           <div className="mt-4 flex flex-wrap gap-2.5">
             <Link
-              to={`/investigation/${caseKey}`}
+              to={getCaseRoutePath(caseKey, 'investigation')}
               className="clip-corner-sm inline-flex items-center gap-2 border border-white/12 bg-white/[0.04] px-3.5 py-2.5 text-sm font-semibold text-bone-muted transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
               Review the case file
@@ -183,13 +184,13 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
               {confirmReplay ? 'Clear progress and replay?' : 'Replay investigation'}
             </button>
           </div>
-          <p className="mt-3 text-sm leading-6 text-bone-dim">
+          <p className="mt-3 typo-body-secondary text-sm text-bone-dim">
             Replaying clears your notes, discoveries and journal for this case. The report you earned is kept, and it never relocks what you have opened.
           </p>
         </div>
       ) : (
         <Link
-          to={`/case/${caseKey}`}
+          to={getCaseRoutePath(caseKey, 'case')}
           className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-base font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:text-gold-bright"
         >
           <span>Open case file</span>

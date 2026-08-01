@@ -12,8 +12,8 @@ import { useInvestigationSession } from '../state/investigationSession';
 function Stat({ label, value, tone = 'bone' }) {
   return (
     <div className="clip-corner-sm border border-white/10 bg-white/[0.035] px-4 py-4">
-      <p className="text-xs font-bold uppercase tracking-[0.16em] text-bone-dim">{label}</p>
-      <p className={`mt-1.5 font-display text-2xl font-bold ${tone === 'gold' ? 'text-gold-bright' : 'text-bone'}`}>{value}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">{label}</p>
+      <p className={`mt-1.5 font-display text-2xl font-medium ${tone === 'gold' ? 'text-gold-bright' : 'text-bone'}`}>{value}</p>
     </div>
   );
 }
@@ -89,7 +89,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
 
       <div className="relative mx-auto max-w-4xl px-6 py-14 sm:px-10">
         <p className="text-center font-mono text-sm uppercase tracking-[0.3em] text-crimson-glow">Case closed</p>
-        <h2 className="mt-4 text-center font-display text-5xl font-bold uppercase leading-none text-bone sm:text-6xl">
+        <h2 className="mt-4 text-center font-display text-5xl font-medium uppercase leading-none text-bone sm:text-6xl">
           Detective {entry.entry.name}
         </h2>
         <p className="mt-4 text-center text-lg leading-8 text-bone-muted">
@@ -98,7 +98,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
 
         <div className="clip-corner mt-10 border border-gold/40 bg-gold/[0.07] p-8 text-center">
           <p className="font-mono text-xs uppercase tracking-[0.24em] text-gold-bright">Final score</p>
-          <p className="mt-3 font-display text-7xl font-bold leading-none text-gold-bright">{entry.entry.score}</p>
+          <p className="mt-3 font-display text-7xl font-medium leading-none text-gold-bright">{entry.entry.score}</p>
           <p className="mt-4 flex items-center justify-center gap-2 text-base text-bone-muted">
             <Trophy size={17} strokeWidth={2.2} aria-hidden="true" />
             Rank today: {entry.rankToday} of {entry.totalToday} · All time: {entry.rank} of {entry.total}
@@ -114,7 +114,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
           <Stat label="Hints used" value={entry.entry.hintsUsed} />
         </div>
 
-        <p className="mt-4 text-center text-sm leading-6 text-bone-dim">
+        <p className="mt-4 text-center typo-body-secondary text-sm text-bone-dim">
           Base {entry.breakdown.baseScore} · accuracy {entry.breakdown.accuracy}%
           {entry.breakdown.coverageBonus > 0 ? ` · coverage +${entry.breakdown.coverageBonus}%` : ''}
           {entry.breakdown.speedBonus > 0 ? ` · speed +${entry.breakdown.speedBonus}%` : ''}
@@ -143,7 +143,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
           </button>
         </div>
 
-        <p className="mt-4 text-center text-sm leading-6 text-bone-dim">
+        <p className="mt-4 text-center typo-body-secondary text-sm text-bone-dim">
           Next detective clears this investigation and returns to the start. The leaderboard is kept.
         </p>
       </div>

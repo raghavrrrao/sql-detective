@@ -26,7 +26,7 @@ export function NotebookHints({ difficulty }) {
         <h3 className="font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone">Hints</h3>
         <p className="font-mono text-sm text-gold-bright">{hintsRevealed} of {hints.length} taken</p>
       </div>
-      <p className="mt-1.5 text-sm leading-6 text-bone-dim">
+      <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
         Each hint points a little further than the last. None of them names anybody, and each one you take costs score.
       </p>
 
@@ -53,7 +53,7 @@ export function NotebookHints({ difficulty }) {
                 </span>
 
                 {isRevealed ? (
-                  <p className="flex-1 text-base leading-7 text-bone-muted">{hint}</p>
+                  <p className="flex-1 typo-body text-base text-bone-muted">{hint}</p>
                 ) : (
                   <div className="flex flex-1 flex-wrap items-center justify-between gap-3">
                     <p className="flex items-center gap-2 text-base text-bone-dim">
@@ -77,7 +77,7 @@ export function NotebookHints({ difficulty }) {
         })}
       </ol>
 
-      <p className="mt-5 text-sm leading-6 text-bone-dim">
+      <p className="mt-5 typo-body-secondary text-sm text-bone-dim">
         {remaining > 0
           ? `${remaining} ${remaining === 1 ? 'hint' : 'hints'} still sealed. You can close the case without any of them.`
           : 'Every hint has been taken. What is left is the reading.'}

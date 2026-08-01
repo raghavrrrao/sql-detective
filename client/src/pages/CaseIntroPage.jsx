@@ -8,7 +8,7 @@ import { CaseFile } from '../components/CaseFile';
 import { CaseHeader } from '../components/CaseHeader';
 import { MissionCard } from '../components/MissionCard';
 import { TypewriterText } from '../components/TypewriterText';
-import { getCase, isPlayable } from '../catalog/caseCatalog';
+import { getCase, getCaseRoutePath, isPlayable, resolveCaseRouteParam } from '../catalog/caseCatalog';
 import { getProgress, isCaseLocked, markCaseOpened } from '../utils/caseProgress';
 
 const facts = [
@@ -18,7 +18,8 @@ const facts = [
 ];
 
 export function CaseIntroPage() {
-  const { difficulty } = useParams();
+  const { difficulty: routeDifficulty } = useParams();
+  const difficulty = resolveCaseRouteParam(routeDifficulty) ?? routeDifficulty;
   const caseData = getCase(difficulty);
   // A sealed slot has no database, and a locked one has not been earned yet.
   // Either way the board is the only honest place to send a direct link.
@@ -38,7 +39,7 @@ export function CaseIntroPage() {
       <main className="relative z-10 mx-auto max-w-5xl px-6 py-14 sm:px-10 lg:py-20">
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.55, delay: 0.15 }} className="text-center">
           <p className="font-mono text-sm font-semibold uppercase tracking-[0.28em] text-crimson-glow">Investigation briefing</p>
-          <h1 className="mt-6 min-h-[5.5rem] font-display text-5xl font-bold uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-7xl">
+          <h1 className="mt-6 min-h-[5.5rem] font-display text-5xl font-medium uppercase leading-[1.05] text-bone sm:min-h-[7rem] sm:text-7xl">
             <TypewriterText text={caseData.title} delay={350} speed={32} />
           </h1>
         </motion.div>
@@ -57,20 +58,20 @@ export function CaseIntroPage() {
             <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(115deg,transparent_25%,rgba(255,255,255,0.05)_45%,transparent_55%)]" />
             <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.06] mix-blend-overlay" />
             <div className="relative">
-              <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.24em] text-crimson-glow">
+              <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">
                 <UserX size={15} strokeWidth={2.4} /> Victim
               </p>
-              <h2 className="mt-3 font-display text-4xl font-bold uppercase text-bone sm:text-5xl">{caseData.victim}</h2>
+              <h2 className="mt-3 font-display text-4xl font-medium uppercase text-bone sm:text-5xl">{caseData.victim}</h2>
             </div>
           </div>
 
           <dl className="grid gap-6 border-t border-white/10 bg-white/[0.02] p-6 sm:grid-cols-3 sm:p-7">
             {facts.map(({ key, label, icon: Icon }) => (
               <div key={key}>
-                <dt className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-bone-dim">
+                <dt className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.18em] text-bone-dim">
                   <Icon size={14} className="text-gold-bright" strokeWidth={2.2} /> {label}
                 </dt>
-                <dd className="mt-2 text-base leading-6 text-bone">{caseData[key]}</dd>
+                <dd className="mt-2 typo-body text-base text-bone">{caseData[key]}</dd>
               </div>
             ))}
           </dl>
@@ -88,7 +89,7 @@ export function CaseIntroPage() {
           className="mx-auto mt-10 flex max-w-3xl flex-col-reverse gap-4 sm:flex-row sm:justify-between"
         >
           <ActionButton as="link" to="/difficulty" variant="ghost" icon={ArrowLeft}>Back</ActionButton>
-          <ActionButton as="link" to={`/investigation/${difficulty}`} variant="primary" size="lg" iconRight={ArrowRight}>
+          <ActionButton as="link" to={getCaseRoutePath(difficulty, 'investigation')} variant="primary" size="lg" iconRight={ArrowRight}>
             Enter investigation
           </ActionButton>
         </motion.div>

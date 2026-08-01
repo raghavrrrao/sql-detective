@@ -22,7 +22,7 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
         aria-expanded={isOpen}
         className="w-full p-4 text-left"
       >
-        <span className="block text-base font-semibold leading-6 text-bone">{record.title}</span>
+        <span className="block typo-body text-base font-semibold text-bone">{record.title}</span>
         <span className="mt-2 flex flex-wrap items-center gap-2">
           <span className="clip-corner-sm border border-white/12 bg-white/[0.05] px-2 py-0.5 font-mono text-xs text-bone-muted">
             {record.table.replace(/_/g, ' ')}
@@ -57,14 +57,14 @@ function DiscoveryRow({ record, all, isOpen, onToggle }) {
             <Link2 size={13} strokeWidth={2.2} aria-hidden="true" /> Related records you hold
           </p>
           {links.length === 0 ? (
-            <p className="mt-2 text-sm leading-6 text-bone-dim">
+            <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
               Nothing else in your file shares a person, a place or a moment with this record yet.
             </p>
           ) : (
             <ul className="mt-2 space-y-2">
               {links.map(({ record: related, reasons }) => (
                 <li key={related.key} className="clip-corner-sm border border-white/10 bg-black/25 px-3.5 py-2.5">
-                  <p className="text-sm leading-6 text-bone-muted">{related.title}</p>
+                  <p className="typo-body-secondary text-sm text-bone-muted">{related.title}</p>
                   <p className="mt-1 flex flex-wrap gap-1.5">
                     {reasons.map((reason) => (
                       <span key={reason} className="clip-corner-sm border border-gold/30 bg-gold/[0.07] px-1.5 py-0.5 text-xs font-semibold uppercase tracking-[0.1em] text-gold-bright">
@@ -112,7 +112,7 @@ export function NotebookDiscoveries() {
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <Telescope size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
         <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">Nothing discovered yet</p>
-        <p className="max-w-sm text-base leading-7 text-bone-muted">
+        <p className="max-w-sm typo-body text-base text-bone-muted">
           Every row a successful query returns is filed here, with the statement that recovered it.
         </p>
       </div>

@@ -39,7 +39,7 @@ export function NotebookJournal() {
       <div className="flex flex-col items-center gap-3 py-14 text-center">
         <BookMarked size={30} className="text-bone-dim" strokeWidth={1.8} aria-hidden="true" />
         <p className="font-display text-lg font-semibold uppercase tracking-[0.16em] text-bone">The journal is empty</p>
-        <p className="max-w-sm text-base leading-7 text-bone-muted">
+        <p className="max-w-sm typo-body text-base text-bone-muted">
           Every record you recover, every source you open and every objective you finish is written up here.
         </p>
       </div>
@@ -80,7 +80,7 @@ export function NotebookJournal() {
                 <Icon size={16} className={style.tone} strokeWidth={2} aria-hidden="true" />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="text-base font-semibold leading-6 text-bone">{entry.title}</p>
+                <p className="typo-body text-base font-semibold text-bone">{entry.title}</p>
                 {entry.detail && (
                   <pre className="mt-1.5 overflow-x-auto font-mono text-xs leading-6 text-bone-dim">{entry.detail}</pre>
                 )}

@@ -78,6 +78,7 @@ export const caseCatalog = [
     id: 'beginner',
     order: 1,
     slug: 'locked-office',
+    routeSlug: 'beginner',
     tier: 'Beginner',
     tierRank: 1,
     caseNumber: 'Case 01',
@@ -122,6 +123,7 @@ export const caseCatalog = [
     id: 'easy',
     order: 2,
     slug: 'dormitory-murder',
+    routeSlug: 'easy',
     tier: 'Easy',
     tierRank: 2,
     caseNumber: 'Case 02',
@@ -164,6 +166,7 @@ export const caseCatalog = [
     id: 'intermediate',
     order: 3,
     slug: 'gallery-theft',
+    routeSlug: 'intermediate',
     tier: 'Intermediate',
     tierRank: 3,
     caseNumber: 'Case 03',
@@ -206,6 +209,7 @@ export const caseCatalog = [
     id: 'medium',
     order: 4,
     slug: 'blackwood-hill',
+    routeSlug: 'hard',
     tier: 'Hard',
     tierRank: 4,
     caseNumber: 'Case 04',
@@ -247,6 +251,7 @@ export const caseCatalog = [
     id: 'expert',
     order: 5,
     slug: 'aurelian-job',
+    routeSlug: 'expert',
     tier: 'Expert',
     tierRank: 5,
     caseNumber: 'Case 05',
@@ -301,6 +306,23 @@ const byId = new Map(caseCatalog.map((entry) => [entry.id, entry]));
 /** @returns {CaseEntry|null} */
 export function getCase(id) {
   return byId.get(id) ?? null;
+}
+
+export function resolveCaseRouteParam(value) {
+  if (!value) return null;
+  const exact = getCase(value);
+  if (exact) return exact.id;
+  const entry = caseCatalog.find((candidate) => candidate.routeSlug === value);
+  return entry?.id ?? null;
+}
+
+export function getCaseRouteSlug(id) {
+  const entry = getCase(id);
+  return entry?.routeSlug ?? id;
+}
+
+export function getCaseRoutePath(id, prefix = 'case') {
+  return `/${prefix}/${getCaseRouteSlug(id)}`;
 }
 
 export function getCaseThresholds(id) {

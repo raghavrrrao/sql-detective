@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight, BadgeCheck, FolderSearch } from 'lucide-react';
 import { ActionButton } from './ActionButton';
 import { DetectiveCareer } from './DetectiveCareer';
-import { displayCases } from '../catalog/caseCatalog';
+import { displayCases, getCaseRoutePath } from '../catalog/caseCatalog';
 import { getCompletion, getCurrentCase, getProgress } from '../utils/caseProgress';
 
 /**
@@ -38,10 +38,10 @@ export function CareerSummary() {
 
           {completion.allPlayableSolved ? (
             <>
-              <h2 className="mt-4 font-display text-3xl font-bold uppercase leading-tight text-bone">
+              <h2 className="mt-4 font-display text-3xl font-medium uppercase leading-tight text-bone">
                 Awaiting new case files
               </h2>
-              <p className="mt-4 max-w-xl text-base leading-7 text-bone-muted">
+              <p className="mt-4 max-w-xl typo-body text-base text-bone-muted">
                 You have closed every file currently on the shelf. The next investigation is still being prepared.
               </p>
               <ActionButton as="link" to="/difficulty" variant="ghost" className="mt-7" iconRight={ArrowRight}>
@@ -50,14 +50,14 @@ export function CareerSummary() {
             </>
           ) : current ? (
             <>
-              <h2 className="mt-4 font-display text-3xl font-bold uppercase leading-tight text-bone">{current.title}</h2>
+              <h2 className="mt-4 font-display text-3xl font-medium uppercase leading-tight text-bone">{current.title}</h2>
               <p className="mt-2 font-mono text-sm text-bone-dim">
                 {current.caseNumber} · {current.tier} · {current.estimatedTime}
               </p>
-              <p className="mt-4 max-w-xl text-base leading-7 text-bone-muted">{current.preview}</p>
+              <p className="mt-4 max-w-xl typo-body text-base text-bone-muted">{current.preview}</p>
               <ActionButton
                 as="link"
-                to={isInProgress ? `/investigation/${current.id}` : `/case/${current.id}`}
+                to={isInProgress ? getCaseRoutePath(current.id, 'investigation') : getCaseRoutePath(current.id, 'case')}
                 variant="primary"
                 className="mt-7"
                 iconRight={ArrowRight}
@@ -66,12 +66,12 @@ export function CareerSummary() {
               </ActionButton>
             </>
           ) : (
-            <p className="mt-4 text-base leading-7 text-bone-muted">No case file is open.</p>
+            <p className="mt-4 typo-body text-base text-bone-muted">No case file is open.</p>
           )}
 
           {solved.length > 0 && (
             <div className="mt-8 border-t border-white/10 pt-5">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-bone-dim">Completed cases</p>
+              <p className="text-xs font-medium uppercase tracking-[0.2em] text-bone-dim">Completed cases</p>
               <ul className="mt-3 flex flex-wrap gap-2">
                 {solved.map((entry) => (
                   <li

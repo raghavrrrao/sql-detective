@@ -15,7 +15,7 @@ export function FeatureCard({ icon: Icon, title, description, index }) {
         <Icon size={24} strokeWidth={1.8} />
       </div>
       <h3 className="font-display text-2xl font-semibold uppercase tracking-wide text-bone">{title}</h3>
-      <p className="mt-4 text-base leading-7 text-bone-muted">{description}</p>
+      <p className="mt-4 typo-body text-base text-bone-muted">{description}</p>
     </motion.article>
   );
 }

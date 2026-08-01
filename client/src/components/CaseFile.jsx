@@ -20,8 +20,8 @@ export function CaseFile({ caseData }) {
 
       <div className="relative flex flex-wrap items-center gap-3 border-b border-gold/20 pb-5">
         <FileWarning size={20} className="text-gold-bright" strokeWidth={2} />
-        <h2 className="font-display text-2xl font-bold uppercase tracking-wide text-bone">Classified case file</h2>
-        <span className="clip-tag ml-auto border border-crimson/40 bg-crimson-deep/30 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.2em] text-crimson-glow">
+        <h2 className="font-display text-2xl font-medium uppercase tracking-wide text-bone">Classified case file</h2>
+        <span className="clip-tag ml-auto border border-crimson/40 bg-crimson-deep/30 px-3 py-1.5 text-xs font-medium uppercase tracking-[0.2em] text-crimson-glow">
           Eyes only
         </span>
       </div>
@@ -29,10 +29,10 @@ export function CaseFile({ caseData }) {
       <dl className="relative mt-8 grid gap-8 sm:grid-cols-2">
         {entries.map(({ key, label, icon: Icon }) => (
           <div key={key}>
-            <dt className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.2em] text-gold">
+            <dt className="flex items-center gap-2.5 text-xs font-medium uppercase tracking-[0.2em] text-gold">
               <Icon size={15} strokeWidth={2.2} /> {label}
             </dt>
-            <dd className="mt-3 text-base leading-7 text-bone-muted">{caseData[key]}</dd>
+            <dd className="mt-3 typo-body text-base text-bone-muted">{caseData[key]}</dd>
           </div>
         ))}
       </dl>

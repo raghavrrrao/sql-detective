@@ -76,8 +76,8 @@ export function GlobalSearchModal({ isOpen, onClose, briefing, onOpenSection }) 
             <ul className="mt-2.5 space-y-2">
               {group.items.map((item) => (
                 <li key={`${group.id}:${item.id}`} className="clip-corner-sm border border-white/10 bg-white/[0.035] px-4 py-3">
-                  <p className="text-base leading-6 text-bone">{item.title}</p>
-                  {item.detail && <p className="mt-1 text-sm leading-6 text-bone-dim">{item.detail}</p>}
+                  <p className="typo-body text-base text-bone">{item.title}</p>
+                  {item.detail && <p className="mt-1 typo-body-secondary text-sm text-bone-dim">{item.detail}</p>}
                 </li>
               ))}
             </ul>
