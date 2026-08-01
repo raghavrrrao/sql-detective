@@ -62,8 +62,14 @@ export function assessReadiness(state) {
 
   // After a failed accusation the player has to turn something new up before
   // trying again — otherwise the roster can simply be worked through in order.
+  //
+  // The tutorial opts out. Its database is small enough that a thorough player
+  // can recover every row, and a wrong first guess would then leave them with
+  // nothing new to find and no way to accuse again.
+  const limits = getCaseThresholds(state.caseId).readiness;
   const needsNewEvidence = Boolean(
-    state.lastAccusationDiscoveryCount !== null
+    !limits.allowRepeatAccusation
+    && state.lastAccusationDiscoveryCount !== null
     && state.lastAccusationDiscoveryCount !== undefined
     && state.discoveries.length <= state.lastAccusationDiscoveryCount,
   );

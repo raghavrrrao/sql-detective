@@ -3,7 +3,7 @@ import path from 'node:path';
 import sqlite3 from 'sqlite3';
 import { env } from '../config/env.js';
 
-const caseFiles = Object.freeze({ easy: 'easy.db', medium: 'medium.db', expert: 'expert.db' });
+const caseFiles = Object.freeze({ beginner: 'beginner.db', easy: 'easy.db', medium: 'medium.db', expert: 'expert.db' });
 
 export function resolveCaseDatabase(difficulty) {
   const fileName = caseFiles[difficulty];

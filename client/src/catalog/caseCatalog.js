@@ -50,7 +50,7 @@ const defaults = {
   starterQuery: 'SELECT name, occupation FROM suspects;',
   thresholds: {
     // What the file has to look like before an accusation may be filed.
-    readiness: { discoveries: 15, sources: 4, suspects: 3, requireVictim: true },
+    readiness: { discoveries: 15, sources: 4, suspects: 3, requireVictim: true, allowRepeatAccusation: false },
     // What a proven case needs on top of naming the right person.
     verdict: { citations: 3, discoveries: 20, sources: 5, timeline: 6 },
   },
@@ -71,12 +71,49 @@ export function defineCase(entry) {
 
 export const caseCatalog = [
   defineCase({
-    id: 'easy',
+    id: 'beginner',
     order: 1,
+    slug: 'locked-office',
+    tier: 'Beginner',
+    tierRank: 1,
+    caseNumber: 'Case 01',
+    title: 'The Locked Office',
+    database: 'beginner.db',
+    estimatedTime: '10 Minutes',
+    recommendedExperience: 'Never written SQL',
+    sqlConcepts: ['SELECT', 'WHERE', 'LIMIT'],
+    detectiveConcept: 'Reading a record',
+    learningGoals: [
+      'Run a query and read what comes back.',
+      'Narrow a table down with a single WHERE.',
+      'Take one fact from a statement and use it to rule someone out.',
+    ],
+    preview: 'Confidential research papers were copied from a locked university office. Nothing was forced and nothing was carried away. Three people were in the building, and every door keeps a record.',
+    victim: 'Professor Sarah Collins',
+    date: 'September 15, 2026',
+    time: '6:52 PM',
+    location: 'Hawthorne University · North Wing, Office N-118',
+    witnesses: 'Professor Collins herself, a research assistant, and the night porter.',
+    crimeScene: 'An undamaged card-controlled door, a locked drawer with nothing missing from it, and a photocopier still warm two doors along.',
+    evidence: 'The door reader logged every card presented to it that evening, and the copy room machine counted the pages.',
+    // A theft has no victim record to pull, and the tutorial should not ask for
+    // constructs it never teaches, so the ladder is five one-query steps.
+    objectives: ['suspects', 'witnesses', 'evidence', 'access', 'accusation'],
+    starterQuery: '-- Case 01 · Three people were in the North Wing. Start with the roster.\nSELECT * FROM suspects;',
+    theme: { accent: 'gold', icon: 'GraduationCap' },
+    thresholds: {
+      readiness: { discoveries: 8, sources: 3, suspects: 2, requireVictim: false, allowRepeatAccusation: true },
+      verdict: { citations: 1, discoveries: 8, sources: 3, timeline: 2 },
+    },
+  }),
+
+  defineCase({
+    id: 'easy',
+    order: 2,
     slug: 'dormitory-murder',
     tier: 'Easy',
     tierRank: 2,
-    caseNumber: 'Case 01',
+    caseNumber: 'Case 02',
     title: 'The Dormitory Murder',
     database: 'easy.db',
     estimatedTime: '20 Minutes',
@@ -96,7 +133,7 @@ export const caseCatalog = [
     witnesses: 'A research assistant, a lab technician, a graduate student, a security officer, and the department secretary.',
     crimeScene: 'An unlocked office with no forced entry, a wiped knife handle, and a monitor cable pulled at 10:18 PM.',
     evidence: 'Camera footage, badge records, and a fingerprint on a window that one suspect swears he never touched.',
-    starterQuery: '-- Case 01 · Five people were in North Hall. Start with the roster.\nSELECT name, occupation FROM suspects;',
+    starterQuery: '-- Case 02 · Five people were in North Hall. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'gold', icon: 'GraduationCap' },
     thresholds: {
       readiness: { discoveries: 15, sources: 4, suspects: 3 },
@@ -106,11 +143,11 @@ export const caseCatalog = [
 
   defineCase({
     id: 'medium',
-    order: 2,
+    order: 3,
     slug: 'blackwood-hill',
     tier: 'Hard',
     tierRank: 4,
-    caseNumber: 'Case 02',
+    caseNumber: 'Case 03',
     title: 'The Mansion at Blackwood Hill',
     database: 'medium.db',
     estimatedTime: '35 Minutes',
@@ -130,7 +167,7 @@ export const caseCatalog = [
     witnesses: 'The widow, the son, the daughter, the family solicitor, the butler, the estate manager, and the business partner.',
     crimeScene: 'A fob-controlled study with no camera inside. An open safe behind a portrait, and a mantel clock stopped at 9:47.',
     evidence: 'One page of the new will is printed on different paper. Work out who benefits from that page and you have your motive.',
-    starterQuery: '-- Case 02 · Seven suspects, one fob-controlled study. Start with the roster.\nSELECT name, occupation FROM suspects;',
+    starterQuery: '-- Case 03 · Seven suspects, one fob-controlled study. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'crimson', icon: 'Landmark' },
     thresholds: {
       readiness: { discoveries: 20, sources: 5, suspects: 4 },
@@ -140,11 +177,11 @@ export const caseCatalog = [
 
   defineCase({
     id: 'expert',
-    order: 3,
+    order: 4,
     slug: 'aurelian-job',
     tier: 'Expert',
     tierRank: 5,
-    caseNumber: 'Case 03',
+    caseNumber: 'Case 04',
     title: 'The Aurelian Job',
     database: 'expert.db',
     estimatedTime: '60 Minutes',
@@ -164,7 +201,7 @@ export const caseCatalog = [
     witnesses: 'Her husband, four executives, an investor, and three of the ship\'s crew.',
     crimeScene: 'A suite with no camera and no forced entry, an open safe with only one document missing, and an access panel found hanging open two decks below.',
     evidence: 'The badge log and the camera disagree about when people were on Deck 7. Only one of them was tampered with, and only three accounts could have done it.',
-    starterQuery: '-- Case 03 · Nine suspects, one ship, nobody went ashore. Start with the roster.\nSELECT name, occupation FROM suspects;',
+    starterQuery: '-- Case 04 · Nine suspects, one ship, nobody went ashore. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'crimson', icon: 'Ship' },
     thresholds: {
       readiness: { discoveries: 25, sources: 6, suspects: 5 },

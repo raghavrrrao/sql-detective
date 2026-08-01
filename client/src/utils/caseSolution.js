@@ -14,6 +14,9 @@
  * system, exactly as it would be on paper.
  */
 const solutions = {
+  // `killer` is the field name the verdict engine has always used. In a theft
+  // case it means the person responsible; the UI never prints the field name.
+  beginner: { killer: 'Daniel Okafor' },
   easy: { killer: 'Daniel Reed' },
   medium: { killer: 'Marcus Vane' },
   expert: { killer: 'Renata Silva' },
