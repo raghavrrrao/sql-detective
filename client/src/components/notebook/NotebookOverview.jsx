@@ -105,7 +105,7 @@ export function NotebookOverview({ caseData, caseFacts }) {
           { label: 'Queries run', value: reach.successes + reach.failures },
         ].map((stat) => (
           <div key={stat.label} className="flex items-center justify-between gap-3 bg-charcoal px-4 py-3 text-left sm:block sm:py-4 sm:text-center">
-            <p className="order-2 font-display text-2xl font-medium text-gold-bright sm:order-none">{stat.value}</p>
+            <p className="order-2 typo-numeric text-2xl font-semibold text-gold-bright sm:order-none">{stat.value}</p>
             <p className="text-xs uppercase tracking-[0.14em] text-bone-dim sm:mt-1">{stat.label}</p>
           </div>
         ))}

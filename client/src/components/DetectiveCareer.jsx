@@ -20,7 +20,7 @@ export function DetectiveCareer({ completion, className = '' }) {
 
       <div className="mt-4 flex flex-wrap items-end justify-between gap-x-8 gap-y-4">
         <div>
-          <p className="font-display text-3xl font-medium uppercase leading-none text-bone">{rank}</p>
+          <p className="typo-heading text-3xl leading-none text-bone">{rank}</p>
           <p className="mt-2 text-base text-bone-muted">
             {completion.solved} of {completion.total} cases solved
           </p>

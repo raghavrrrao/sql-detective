@@ -230,7 +230,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
       <button
         type="button"
         onClick={openNotebook}
-        className="clip-corner-sm fixed bottom-4 left-4 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-4 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 sm:bottom-6 sm:left-6 sm:px-5 sm:py-3.5 xl:left-auto xl:right-[13rem]"
+        className="clip-corner-sm fixed bottom-4 left-4 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-4 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone shadow-crimson transition-transform hover:-translate-y-0.5 sm:bottom-6 sm:left-6 sm:px-5 sm:py-3.5 xl:left-auto xl:right-[13rem]"
       >
         <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" /> Notebook
       </button>

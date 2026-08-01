@@ -35,7 +35,7 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
         </Link>
 
         <div className="min-w-0">
-          <p className="line-clamp-2 font-display text-sm font-medium uppercase leading-tight tracking-wide text-bone sm:truncate sm:text-lg sm:leading-normal md:text-xl">{caseData.title}</p>
+          <p className="line-clamp-2 typo-heading text-sm leading-tight text-bone sm:text-base md:text-lg xl:truncate xl:text-xl xl:leading-normal">{caseData.title}</p>
           <p className="hidden font-mono text-xs uppercase tracking-[0.18em] text-bone-dim sm:block">
             {caseData.caseNumber} · Active investigation
           </p>
@@ -53,14 +53,14 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
           <DifficultyBadge difficulty={entry?.tier ?? caseData.difficulty} rank={entry?.tierRank} />
         </div>
 
-        <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone md:flex">
+        <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 typo-numeric text-sm text-bone md:flex">
           <Timer size={15} className={isRunning ? 'text-crimson-glow' : 'text-bone-dim'} strokeWidth={2.2} aria-hidden="true" />
           <span aria-label={`Elapsed time ${formatClock(elapsedMs)}${isRunning ? '' : ', paused'}`}>{formatClock(elapsedMs)}</span>
           <span className="text-bone-dim">/ {caseData.timer}</span>
         </div>
         <div
           title={`Base score for this case: ${caseData.score}`}
-          className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone xl:flex"
+          className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 typo-numeric text-sm text-bone xl:flex"
         >
           <Star size={15} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" />
           <span aria-label={`Base score for this case, ${caseData.score} points`}>{caseData.score}</span>

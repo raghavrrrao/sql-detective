@@ -43,15 +43,15 @@ export function LeaderboardPanel({ entries, highlightId = null, limit = TOP_ENTR
                     entry.id === highlightId ? 'bg-gold/[0.1]' : 'hover:bg-white/[0.03]'
                   }`}
                 >
-                  <td className="px-4 py-3 font-mono text-bone-dim">{index + 1}</td>
+                  <td className="px-4 py-3 typo-numeric text-bone-dim">{index + 1}</td>
                   <td className="px-4 py-3 font-medium text-bone">{entry.name}</td>
                   <td className="px-4 py-3 text-bone-muted">
                     {entry.caseTitle}
                     <span className="ml-2 font-mono text-xs text-bone-dim">{entry.tier}</span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 font-mono text-bone-muted">{formatDuration(entry.timeMs)}</td>
-                  <td className="px-4 py-3 font-mono text-bone-muted">{entry.hintsUsed}</td>
-                  <td className="px-4 py-3 font-mono font-medium text-gold-bright">{entry.score}</td>
+                  <td className="whitespace-nowrap px-4 py-3 typo-numeric text-bone-muted">{formatDuration(entry.timeMs)}</td>
+                  <td className="px-4 py-3 typo-numeric text-bone-muted">{entry.hintsUsed}</td>
+                  <td className="px-4 py-3 typo-numeric font-semibold text-gold-bright">{entry.score}</td>
                 </tr>
               ))}
             </tbody>

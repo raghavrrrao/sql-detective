@@ -50,7 +50,7 @@ export function CareerSummary() {
             </>
           ) : current ? (
             <>
-              <h2 className="mt-4 font-display text-3xl font-medium uppercase leading-tight text-bone">{current.title}</h2>
+              <h2 className="mt-4 typo-heading text-3xl leading-tight text-bone">{current.title}</h2>
               <p className="mt-2 font-mono text-sm text-bone-dim">
                 {current.caseNumber} · {current.tier} · {current.estimatedTime}
               </p>

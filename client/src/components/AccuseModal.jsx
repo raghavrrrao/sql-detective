@@ -135,7 +135,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
           role="alert"
         >
           <AlertTriangle size={40} className="text-verdict-watch" strokeWidth={1.8} aria-hidden="true" />
-          <h3 className="font-display text-3xl font-medium uppercase tracking-[0.14em] text-bone">Case not proven</h3>
+          <h3 className="typo-heading text-2xl text-bone sm:text-3xl">Case not proven</h3>
           <p className="max-w-xl text-lg leading-8 text-bone-muted">{NOT_PROVEN_MESSAGE}</p>
           <button
             type="button"
@@ -176,7 +176,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               type="button"
               onClick={handleConfirm}
               disabled={isSubmitting}
-              className="clip-corner-sm border border-crimson-bright/60 bg-crimson px-6 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
+              className="clip-corner-sm border border-crimson-bright/60 bg-crimson px-6 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
             >
               {isSubmitting ? 'Filing…' : 'Confirm accusation'}
             </button>
@@ -345,7 +345,7 @@ export function AccuseModal({ isOpen, onClose, onProven }) {
               <button
                 type="button"
                 onClick={() => setStep('confirm')}
-                className="clip-corner-sm inline-flex items-center gap-2 border border-crimson-bright/60 bg-crimson px-5 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
+                className="clip-corner-sm inline-flex items-center gap-2 border border-crimson-bright/60 bg-crimson px-5 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-bone shadow-crimson transition-colors hover:bg-crimson-bright"
               >
                 <Gavel size={15} strokeWidth={2.2} aria-hidden="true" /> File the accusation
               </button>

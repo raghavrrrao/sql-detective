@@ -5,11 +5,15 @@ export default {
     extend: {
       fontFamily: {
         display: ['Oswald', 'Impact', 'ui-sans-serif', 'system-ui', 'sans-serif'],
-        // The wordmark and the title screens only.
+        // Major game headings: case titles, difficulty, verdicts, ranks.
+        heading: ['"Rubik Dirt"', 'Impact', 'ui-sans-serif', 'sans-serif'],
+        // Scores, timers, standings.
+        numeric: ['Oxanium', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+        // The wordmark only.
         logo: ['"IM Fell English SC"', 'Georgia', 'ui-serif', 'serif'],
         // Anything that is meant to read as a document out of the case file.
         document: ['"Special Elite"', '"Courier New"', 'ui-monospace', 'monospace'],
-        sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        sans: ['Rajdhani', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
       colors: {
@@ -17,7 +21,7 @@ export default {
         charcoal: { DEFAULT: '#131318', light: '#1B1B21', line: '#26262E' },
         crimson: { DEFAULT: '#C4132E', bright: '#E5233F', deep: '#7A0A1C', glow: '#FF3B57' },
         gold: { DEFAULT: '#C9A227', bright: '#E8C766', deep: '#7A6215' },
-        bone: { DEFAULT: '#F3F2EE', muted: '#B9B8C2', dim: '#8B8A96' },
+        bone: { DEFAULT: '#F3F0E8', muted: '#B9B8C2', dim: '#8B8A96' },
         verdict: { clear: '#3FBF7F', watch: '#E0A22B', alert: '#E5384F' },
       },
       boxShadow: {

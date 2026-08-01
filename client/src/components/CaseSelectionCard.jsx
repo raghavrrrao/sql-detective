@@ -55,7 +55,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         <span className="font-mono text-sm text-bone-dim">{caseData.caseNumber}</span>
       </div>
 
-      <h2 className="mt-7 font-display text-3xl font-medium uppercase leading-tight text-bone">{caseData.title}</h2>
+      <h2 className="mt-7 typo-heading text-3xl leading-tight text-bone">{caseData.title}</h2>
 
       <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
         <span className="flex items-center gap-2 text-base text-bone-muted">

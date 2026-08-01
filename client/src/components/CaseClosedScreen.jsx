@@ -55,7 +55,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
 
           <motion.h2
             {...reveal(0.15)}
-            className="mt-5 text-center typo-logo text-6xl leading-tight text-bone sm:text-8xl"
+            className="mt-5 text-center typo-heading text-6xl leading-tight text-bone sm:text-8xl"
           >
             Case Closed
           </motion.h2>

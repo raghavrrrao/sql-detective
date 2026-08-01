@@ -96,7 +96,7 @@ export function ModeSelectionGate() {
 
               <button
                 type="submit"
-                className="clip-corner-sm mt-7 inline-flex w-full items-center justify-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-4 font-display text-base font-medium uppercase tracking-[0.16em] text-white shadow-crimson transition-colors hover:bg-crimson-bright"
+                className="clip-corner-sm mt-7 inline-flex w-full items-center justify-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-4 font-display text-base font-medium uppercase tracking-[0.16em] text-bone shadow-crimson transition-colors hover:bg-crimson-bright"
               >
                 <UserRound size={18} strokeWidth={2.2} aria-hidden="true" /> Begin investigation
               </button>

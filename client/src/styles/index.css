@@ -1,6 +1,51 @@
 /* Self-hosted so the game keeps its typography with no network — it is played
-   offline on a festival laptop as often as it is played from Render. Latin
-   subset only; Inter, Oswald and JetBrains Mono are variable faces. */
+   offline on a festival laptop as often as it is played from Render.
+
+   Latin subset only. Oswald, Oxanium and JetBrains Mono are variable faces;
+   Rajdhani ships one file per weight. Rubik Dirt is subsetted further, to
+   uppercase glyphs alone, because its grunge outlines cost 302 KB unsubsetted
+   for the handful of headings that use it. `.typo-heading` therefore forces
+   text-transform: uppercase — lowercase would fall back mid-word. */
+@font-face {
+  font-family: 'Rubik Dirt';
+  src: url('/fonts/rubikdirt.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  src: url('/fonts/rajdhani-400.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  src: url('/fonts/rajdhani-500.woff2') format('woff2');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Rajdhani';
+  src: url('/fonts/rajdhani-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oxanium';
+  src: url('/fonts/oxanium.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @font-face {
   font-family: 'IM Fell English SC';
   src: url('/fonts/imfellenglishsc.woff2') format('woff2');
@@ -13,14 +58,6 @@
   font-family: 'Special Elite';
   src: url('/fonts/specialelite.woff2') format('woff2');
   font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Inter';
-  src: url('/fonts/inter.woff2') format('woff2');
-  font-weight: 400 600;
   font-style: normal;
   font-display: swap;
 }
@@ -48,7 +85,7 @@
 @layer base {
   :root {
     color-scheme: dark;
-    font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+    font-family: Rajdhani, Inter, ui-sans-serif, system-ui, sans-serif;
     font-size: 16px;
     background: #08070a;
     /* Investigation board texture, shared by every screen. */
@@ -61,7 +98,7 @@
     min-width: 320px;
     min-height: 100vh;
     background: #08070a;
-    color: #f3f2ee;
+    color: #f3f0e8;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
@@ -92,7 +129,7 @@
 
   ::selection {
     background: rgba(196, 19, 46, 0.4);
-    color: #fff;
+    color: #f3f0e8;
   }
 
   *:focus-visible {
@@ -141,6 +178,24 @@
      per line. The nudge is deliberately partial: correcting the full 11% would
      cost a word a line on a 320px screen. Single weight, so never pair it with
      a weight utility. */
+  /* Major game headings only: case titles, difficulty titles, verdicts, ranks.
+     The webfont is subsetted to uppercase glyphs alone (156 KB even then — the
+     grunge outlines carry a huge point count), so the transform lives in the
+     token and cannot be forgotten at a call site. */
+  .typo-heading {
+    font-family: 'Rubik Dirt', Impact, ui-sans-serif, sans-serif;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  /* Scores, timers and standings. */
+  .typo-numeric {
+    font-family: Oxanium, ui-monospace, SFMono-Regular, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+  }
+
   .typo-document {
     font-family: 'Special Elite', 'Courier New', ui-monospace, monospace;
     font-weight: 400;

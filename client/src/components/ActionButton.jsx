@@ -2,11 +2,11 @@ import { Link } from 'react-router-dom';
 
 const variants = {
   primary:
-    'bg-crimson text-white border border-crimson-bright/60 hover:bg-crimson-bright shadow-crimson disabled:bg-charcoal-light disabled:text-bone-dim disabled:border-white/10 disabled:shadow-none',
+    'bg-crimson text-bone border border-crimson-bright/60 hover:bg-crimson-bright shadow-crimson disabled:bg-charcoal-light disabled:text-bone-dim disabled:border-white/10 disabled:shadow-none',
   gold:
     'bg-gold text-ink border border-gold-bright/70 hover:bg-gold-bright shadow-glow disabled:bg-charcoal-light disabled:text-bone-dim disabled:border-white/10 disabled:shadow-none',
   ghost:
-    'bg-white/[0.04] text-bone border border-white/12 hover:border-gold/50 hover:bg-white/[0.08] hover:text-white disabled:text-bone-dim disabled:hover:border-white/12',
+    'bg-white/[0.04] text-bone border border-white/12 hover:border-gold/50 hover:bg-white/[0.08] hover:text-bone disabled:text-bone-dim disabled:hover:border-white/12',
 };
 
 const sizes = {
