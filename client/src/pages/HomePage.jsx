@@ -7,7 +7,8 @@ import { Footer } from '../components/Footer';
 import { Hero } from '../components/Hero';
 import { HowItWorks } from '../components/HowItWorks';
 import { SectionHeading } from '../components/SectionHeading';
-import { availableCases } from '../catalog/caseCatalog';
+import { CareerSummary } from '../components/CareerSummary';
+import { availableCases, displayCases } from '../catalog/caseCatalog';
 
 const features = [
   { title: 'Real SQL, real database', description: 'Every query runs against a live read-only SQLite case file. Nothing is faked or scripted.', icon: DatabaseZap },
@@ -31,6 +32,7 @@ export function HomePage() {
       <AnimatedBackground />
       <main className="relative z-10">
         <Hero />
+        <CareerSummary />
 
         <section className="px-6 py-24 sm:px-10 lg:px-16 lg:py-32">
           <div className="mx-auto max-w-6xl">
@@ -49,8 +51,8 @@ export function HomePage() {
           <div className="mx-auto max-w-6xl">
             <SectionHeading
               eyebrow="Case clearance"
-              title={`${availableCases.length} cases. One killer each.`}
-              description="Difficulty comes from the SQL you need, not from a more confusing story. Start at the top and work down."
+              title={`${displayCases.length} cases. One case file each.`}
+              description="Difficulty comes from the SQL you need, not from a more confusing story. Each file opens once the one before it is closed."
             />
             <div className="grid gap-6 lg:grid-cols-3">
               {difficulties.map((difficulty, index) => <DifficultyCard key={difficulty.difficulty} {...difficulty} index={index} />)}

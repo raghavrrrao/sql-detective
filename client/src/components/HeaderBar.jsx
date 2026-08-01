@@ -1,13 +1,18 @@
-import { ArrowLeft, BookOpen, LayoutPanelLeft, Search, Star, Timer } from 'lucide-react';
+import { ArrowLeft, BookOpen, LayoutPanelLeft, Search, Star, Timer, UserRound } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
 import { getCase } from '../catalog/caseCatalog';
+import { useGameMode } from '../state/gameMode';
+import { useInvestigationTimer } from '../state/investigationSession';
+import { formatClock } from '../utils/clock';
 import { SoundToggle } from './SoundToggle';
 
 export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearch, difficulty }) {
   // Tier and rank are presentation and come from the catalog; the target time
   // and score already ride along on the briefing payload.
   const entry = getCase(difficulty);
+  const { isFestival, detectiveName } = useGameMode();
+  const { elapsedMs, isRunning } = useInvestigationTimer();
 
   return (
     <header className="relative z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-white/10 bg-ink/85 px-4 py-3 backdrop-blur-xl sm:px-6">
@@ -38,10 +43,18 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
       </div>
 
       <div className="flex items-center gap-2 sm:gap-2.5">
+        {isFestival && detectiveName && (
+          <div className="clip-corner-sm hidden items-center gap-2 border border-gold/40 bg-gold/10 px-3 py-2 font-mono text-sm text-gold-bright sm:flex">
+            <UserRound size={15} strokeWidth={2.2} aria-hidden="true" /> Detective: {detectiveName}
+          </div>
+        )}
+
         <DifficultyBadge difficulty={entry?.tier ?? caseData.difficulty} rank={entry?.tierRank} />
 
         <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone md:flex">
-          <Timer size={15} className="text-crimson-glow" strokeWidth={2.2} /> {caseData.timer}
+          <Timer size={15} className={isRunning ? 'text-crimson-glow' : 'text-bone-dim'} strokeWidth={2.2} aria-hidden="true" />
+          <span aria-label={`Elapsed time ${formatClock(elapsedMs)}${isRunning ? '' : ', paused'}`}>{formatClock(elapsedMs)}</span>
+          <span className="text-bone-dim">/ {caseData.timer}</span>
         </div>
         <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone xl:flex">
           <Star size={15} className="text-gold-bright" strokeWidth={2.2} /> {caseData.score}

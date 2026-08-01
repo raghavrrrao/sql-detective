@@ -8,8 +8,8 @@ import { CaseFile } from '../components/CaseFile';
 import { CaseHeader } from '../components/CaseHeader';
 import { MissionCard } from '../components/MissionCard';
 import { TypewriterText } from '../components/TypewriterText';
-import { getCase } from '../catalog/caseCatalog';
-import { markCaseOpened } from '../utils/caseProgress';
+import { getCase, isPlayable } from '../catalog/caseCatalog';
+import { getProgress, isCaseLocked, markCaseOpened } from '../utils/caseProgress';
 
 const facts = [
   { key: 'date', label: 'Date', icon: CalendarDays },
@@ -20,13 +20,15 @@ const facts = [
 export function CaseIntroPage() {
   const { difficulty } = useParams();
   const caseData = getCase(difficulty);
+  // A sealed slot has no database, and a locked one has not been earned yet.
+  // Either way the board is the only honest place to send a direct link.
+  const isOpen = isPlayable(caseData) && !isCaseLocked(difficulty, getProgress());
 
-  // Reading the briefing is what unlocks the next case file.
   useEffect(() => {
-    if (caseData) markCaseOpened(difficulty);
-  }, [caseData, difficulty]);
+    if (isOpen) markCaseOpened(difficulty);
+  }, [isOpen, difficulty]);
 
-  if (!caseData) return <Navigate to="/difficulty" replace />;
+  if (!isOpen) return <Navigate to="/difficulty" replace />;
 
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.45 }} className="relative min-h-screen overflow-hidden text-bone">

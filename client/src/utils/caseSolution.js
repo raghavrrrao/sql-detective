@@ -18,6 +18,7 @@ const solutions = {
   // case it means the person responsible; the UI never prints the field name.
   beginner: { killer: 'Daniel Okafor' },
   easy: { killer: 'Daniel Reed' },
+  intermediate: { killer: 'Ruben Castellanos' },
   medium: { killer: 'Marcus Vane' },
   expert: { killer: 'Renata Silva' },
 };

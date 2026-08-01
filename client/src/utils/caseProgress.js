@@ -1,4 +1,5 @@
-import { availableCases, caseOrder, getPreviousCase } from '../catalog/caseCatalog';
+import { availableCases, caseOrder, displayCases, getUnlockGate } from '../catalog/caseCatalog';
+import { GAME_MODES, readSettings } from './gameSettings';
 import { readJson, removeKey, writeJson } from './storage';
 
 const STORAGE_KEY = 'progress';
@@ -19,6 +20,8 @@ const blankEntry = {
   solved: false,
   solvedAt: null,
   report: null,
+  bestTimeMs: null,
+  bestScore: 0,
   // Set only by the migration below, for cases a player had already reached
   // under the old "unlock on briefing opened" rule.
   unlockedLegacy: false,
@@ -44,7 +47,7 @@ function readStore() {
     if (legacy[id] && typeof legacy[id] === 'object') cases[id] = { ...blankEntry, ...legacy[id] };
   }
   for (const entry of availableCases) {
-    const previous = getPreviousCase(entry.id);
+    const previous = getUnlockGate(entry.id);
     const wasReachable = !previous || cases[previous.id]?.opened === true;
     const isSolvedNow = !previous || cases[previous.id]?.solved === true;
     if (wasReachable && !isSolvedNow) {
@@ -91,7 +94,14 @@ export function recordQueryRun(caseKey) {
  * investigation without losing the debrief that was earned.
  */
 export function markCaseSolved(caseKey, report) {
-  update(caseKey, { opened: true, solved: true, solvedAt: report.solvedAt, report });
+  const previous = readStore().cases[caseKey] ?? {};
+  // A replay only ever improves the record; a slower run does not overwrite it.
+  const bestTimeMs = Number.isFinite(previous.bestTimeMs)
+    ? Math.min(previous.bestTimeMs, report.elapsedMs ?? previous.bestTimeMs)
+    : report.elapsedMs ?? null;
+  const bestScore = Math.max(previous.bestScore ?? 0, report.score ?? 0);
+
+  update(caseKey, { opened: true, solved: true, solvedAt: report.solvedAt, report, bestTimeMs, bestScore });
 }
 
 export function getCaseReport(caseKey) {
@@ -110,10 +120,22 @@ export function resetInvestigation(caseKey) {
  */
 export function isCaseLocked(caseKey, progress) {
   if (!ENFORCE_PROGRESSION) return false;
-  const previous = getPreviousCase(caseKey);
-  if (!previous) return false;
+  // Festival play is a demonstration: a participant with ten minutes should be
+  // able to pick the tutorial and a confident one should be able to pick
+  // Expert, so the chain is not enforced on a shared machine.
+  if (readSettings().mode === GAME_MODES.festival) return false;
+  // A sealed slot has no content to solve, so it is skipped when working out
+  // what gates this case. Authoring it later inserts it into the chain with no
+  // change here.
+  const gate = getUnlockGate(caseKey);
+  if (!gate) return false;
   if (progress[caseKey]?.unlockedLegacy) return false;
-  return !progress[previous.id]?.solved;
+  return !progress[gate.id]?.solved;
+}
+
+/** The case whose completion opens this one, for the message on a locked card. */
+export function getUnlockRequirement(caseKey) {
+  return getUnlockGate(caseKey);
 }
 
 export function getCaseStatus(caseKey, progress) {
@@ -123,8 +145,32 @@ export function getCaseStatus(caseKey, progress) {
   return entry.queries > 0 ? 'in-progress' : 'opened';
 }
 
-/** How much of the whole game is closed — used by the selection screen. */
+/**
+ * Career standing. `total` counts every slot in the career, sealed ones
+ * included, so the board reads "2 / 5" from the day the fifth slot appears.
+ * `playable` is how many can actually be closed right now.
+ */
 export function getCompletion(progress) {
   const solved = caseOrder.filter((id) => progress[id]?.solved).length;
-  return { solved, total: caseOrder.length };
+  const playable = availableCases.length;
+  return {
+    solved,
+    total: displayCases.length,
+    playable,
+    allPlayableSolved: playable > 0 && availableCases.every((entry) => progress[entry.id]?.solved),
+  };
+}
+
+/** Cosmetic only — a title that grows with the number of closed cases. */
+const ranks = ['Cadet Detective', 'Junior Detective', 'Detective', 'Senior Detective', 'Master Detective'];
+
+export function getRank(solvedCount) {
+  return ranks[Math.min(solvedCount, ranks.length - 1)];
+}
+
+export { ranks };
+
+/** The case the player should open next, or null when everything is closed. */
+export function getCurrentCase(progress) {
+  return availableCases.find((entry) => !progress[entry.id]?.solved && !isCaseLocked(entry.id, progress)) ?? null;
 }

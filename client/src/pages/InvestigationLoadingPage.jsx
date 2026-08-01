@@ -5,14 +5,18 @@ import { InvestigationLayout } from '../components/InvestigationLayout';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ActionButton } from '../components/ActionButton';
 import { useInvestigationCase } from '../hooks/useInvestigationCase';
-import { getCase } from '../catalog/caseCatalog';
+import { getCase, isPlayable } from '../catalog/caseCatalog';
+import { getProgress, isCaseLocked } from '../utils/caseProgress';
 
 export function InvestigationLoadingPage() {
   const { difficulty } = useParams();
   const caseData = getCase(difficulty);
   const { briefing, isLoading, error, retry } = useInvestigationCase(difficulty);
 
-  if (!caseData) return <Navigate to="/difficulty" replace />;
+  // Sealed and locked cases are not reachable by URL either.
+  if (!isPlayable(caseData) || isCaseLocked(difficulty, getProgress())) {
+    return <Navigate to="/difficulty" replace />;
+  }
 
   if (isLoading) {
     return (

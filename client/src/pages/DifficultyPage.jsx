@@ -1,17 +1,20 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { CaseSelectionCard } from '../components/CaseSelectionCard';
+import { DetectiveCareer } from '../components/DetectiveCareer';
+import { LockedCaseDialog } from '../components/LockedCaseDialog';
 import { SectionHeading } from '../components/SectionHeading';
-import { availableCases, getPreviousCase } from '../catalog/caseCatalog';
-import { getCaseStatus, getCompletion, getProgress, isCaseLocked } from '../utils/caseProgress';
+import { displayCases, isPlayable } from '../catalog/caseCatalog';
+import { getCaseStatus, getCompletion, getProgress, getUnlockRequirement, isCaseLocked } from '../utils/caseProgress';
 
 export function DifficultyPage() {
   // Read once per mount; progression only changes on navigation.
   const progress = useMemo(() => getProgress(), []);
   const completion = useMemo(() => getCompletion(progress), [progress]);
+  const [lockedCase, setLockedCase] = useState(null);
 
   return (
     <motion.main
@@ -31,15 +34,17 @@ export function DifficultyPage() {
 
         <div className="pt-16">
           <SectionHeading
-            eyebrow={`Case selection · ${completion.solved} of ${completion.total} solved`}
+            eyebrow="Case selection"
             title="Choose your case"
-            description="Each investigation is a sealed dossier with its own database. Work through them in order — every case teaches the SQL the next one expects."
+            description="Five sealed dossiers, each with its own database. They open in order — every case teaches the SQL the next one expects."
           />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-3">
-          {availableCases.map((entry, index) => {
-            const previous = getPreviousCase(entry.id);
+        <DetectiveCareer completion={completion} className="mb-10" />
+
+        <div className="grid gap-6 lg:grid-cols-2 xl:grid-cols-3">
+          {displayCases.map((entry, index) => {
+            const sealed = !isPlayable(entry);
             return (
               <CaseSelectionCard
                 key={entry.id}
@@ -47,13 +52,22 @@ export function DifficultyPage() {
                 caseData={entry}
                 index={index}
                 status={getCaseStatus(entry.id, progress)}
-                isLocked={isCaseLocked(entry.id, progress)}
-                lockHint={previous ? `Close ${previous.caseNumber} — ${previous.title} — to unlock this file.` : undefined}
+                isSealed={sealed}
+                isLocked={!sealed && isCaseLocked(entry.id, progress)}
+                requirement={getUnlockRequirement(entry.id)}
+                onShowLocked={setLockedCase}
               />
             );
           })}
         </div>
       </div>
+
+      <LockedCaseDialog
+        isOpen={Boolean(lockedCase)}
+        onClose={() => setLockedCase(null)}
+        caseData={lockedCase}
+        requirement={lockedCase ? getUnlockRequirement(lockedCase.id) : null}
+      />
     </motion.main>
   );
 }

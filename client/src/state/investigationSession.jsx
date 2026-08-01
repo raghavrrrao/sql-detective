@@ -1,8 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { executeCaseQuery } from '../services/caseService';
 import { assessReadiness, evaluateAccusation } from '../utils/accusation';
 import { getSolution } from '../utils/caseSolution';
 import { markCaseSolved, recordQueryRun } from '../utils/caseProgress';
+import { computeScore } from '../utils/scoring';
+import { getCase, getCaseThresholds } from '../catalog/caseCatalog';
 import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
 import { buildInsights } from '../utils/insights';
 import { buildProgressLedger } from '../utils/investigationProgress';
@@ -13,7 +15,7 @@ import { applyDiscoveriesToFiles, buildSuspectIntel } from '../utils/suspectInte
 import { inspectStatement } from '../utils/sqlInsights';
 import { readJson, writeJson } from '../utils/storage';
 
-const SESSION_VERSION = 3;
+const SESSION_VERSION = 4;
 const HISTORY_LIMIT = 50;
 const JOURNAL_LIMIT = 200;
 const PERSIST_DELAY = 350;
@@ -30,6 +32,9 @@ const SCAN_ROW_LIMIT = 250;
 const SessionDataContext = createContext(null);
 const SessionActionsContext = createContext(null);
 const SqlDraftContext = createContext(null);
+// The clock ticks once a second. It gets its own context so the notebook, the
+// roster and the case board are not re-rendered sixty times a minute.
+const SessionTimerContext = createContext(null);
 
 const emptyReach = () => ({ tables: [], features: [], successes: 0, failures: 0 });
 
@@ -247,13 +252,43 @@ function reducer(state, action) {
         ? state
         : { ...state, scrollPositions: { ...state.scrollPositions, [action.key]: action.offset } };
 
+    case 'startTimer':
+      return state.runningSince !== null ? state : { ...state, runningSince: action.at };
+
+    case 'pauseTimer': {
+      if (state.runningSince === null) return state;
+      return {
+        ...state,
+        elapsedMs: state.elapsedMs + Math.max(0, action.at - state.runningSince),
+        runningSince: null,
+      };
+    }
+
+    case 'revealHint':
+      return state.hintsRevealed >= action.total
+        ? state
+        : {
+          ...state,
+          hintsRevealed: state.hintsRevealed + 1,
+          journal: pushJournal(state.journal, [
+            journalEntry(action.at, 'hint', `Took hint ${state.hintsRevealed + 1}`),
+          ]),
+        };
+
     case 'setReasoning':
       return state.reasoning === action.reasoning ? state : { ...state, reasoning: action.reasoning };
 
     case 'recordAccusation': {
       const { at, suspect, evidenceKeys, reasoning, proven } = action;
+      const settled = proven && state.runningSince !== null
+        ? state.elapsedMs + Math.max(0, at - state.runningSince)
+        : state.elapsedMs;
+
       return {
         ...state,
+        elapsedMs: settled,
+        runningSince: proven ? null : state.runningSince,
+        completionMs: proven ? settled : state.completionMs,
         accusations: [{ id: `${at}`, at, suspect, evidenceKeys, reasoning, proven }, ...state.accusations],
         verdict: { proven, at, suspect, evidenceKeys, reasoning },
         // A fresh accusation needs fresh evidence, so remember where the file
@@ -282,6 +317,16 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     // Kept in state so the reducer can resolve catalog-driven objectives
     // without every action having to carry the case id.
     caseId: difficulty,
+    // When this investigation was first opened. Used only to report how long a
+    // case took; there is no countdown and nothing expires.
+    startedAt: Date.now(),
+    // The clock. `runningSince` is null whenever it is paused, and is never
+    // restored from storage — a session reopened after a crash resumes from the
+    // accumulated total rather than counting the hours in between.
+    elapsedMs: 0,
+    runningSince: null,
+    completionMs: null,
+    hintsRevealed: 0,
     sql: starterSql,
     history: [],
     journal: [],
@@ -339,6 +384,10 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
       successes: Number.isFinite(reach.successes) ? reach.successes : 0,
       failures: Number.isFinite(reach.failures) ? reach.failures : 0,
     },
+    startedAt: Number.isFinite(stored.startedAt) ? stored.startedAt : fresh.startedAt,
+    elapsedMs: Number.isFinite(stored.elapsedMs) ? stored.elapsedMs : 0,
+    completionMs: Number.isFinite(stored.completionMs) ? stored.completionMs : null,
+    hintsRevealed: Number.isFinite(stored.hintsRevealed) ? stored.hintsRevealed : 0,
     accusations: asArray(stored.accusations).filter((entry) => entry && typeof entry.suspect === 'string'),
     verdict: stored.verdict && typeof stored.verdict.suspect === 'string' ? stored.verdict : null,
     reveal: stored.reveal && typeof stored.reveal === 'object' ? stored.reveal : null,
@@ -383,6 +432,10 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       expanded: state.expanded,
       scrollPositions: state.scrollPositions,
       reach: state.reach,
+      startedAt: state.startedAt,
+      elapsedMs: state.elapsedMs,
+      completionMs: state.completionMs,
+      hintsRevealed: state.hintsRevealed,
       accusations: state.accusations,
       verdict: state.verdict,
       reveal: state.reveal,
@@ -393,8 +446,8 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       state.sql, state.history, state.journal, state.discoveries, state.suspectFiles,
       state.tableTotals, state.cleared, state.primeSuspect, state.notes, state.evidenceNotes,
       state.bookmarks, state.leadsDone, state.notebookSection, state.boardFolder,
-      state.expanded, state.scrollPositions, state.reach,
-      state.accusations, state.verdict, state.reveal, state.reasoning, state.lastAccusationDiscoveryCount,
+      state.expanded, state.scrollPositions, state.reach, state.startedAt,
+      state.elapsedMs, state.completionMs, state.hintsRevealed, state.accusations, state.verdict, state.reveal, state.reasoning, state.lastAccusationDiscoveryCount,
     ],
   );
 
@@ -419,6 +472,34 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       if (readJson(storageKey, null) !== null) flush();
     };
   }, [storageKey]);
+
+  /* ------------------------------------------------------------------ timer */
+
+  // The clock runs while the board is mounted and the case is unsolved. It is
+  // banked on unmount so navigating away — to Settings, or anywhere else —
+  // stops it rather than losing the time.
+  const isTimerRunning = state.runningSince !== null;
+  const [tick, setTick] = useState(0);
+
+  useEffect(() => {
+    if (!isTimerRunning) return undefined;
+    const id = window.setInterval(() => setTick((value) => value + 1), 1000);
+    return () => window.clearInterval(id);
+  }, [isTimerRunning]);
+
+  useEffect(() => {
+    if (stateRef.current.verdict?.proven) return undefined;
+    dispatch({ type: 'startTimer', at: Date.now() });
+    return () => dispatch({ type: 'pauseTimer', at: Date.now() });
+  }, []);
+
+  const liveElapsedMs = state.elapsedMs + (state.runningSince === null ? 0 : Date.now() - state.runningSince);
+  const timerValue = useMemo(
+    () => ({ elapsedMs: liveElapsedMs, isRunning: isTimerRunning, completionMs: state.completionMs }),
+    // `tick` is the heartbeat: it is what makes the displayed value advance.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [tick, isTimerRunning, state.elapsedMs, state.completionMs],
+  );
 
   /* ----------------------------------------------------------- query running */
 
@@ -497,8 +578,8 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
 
   /* ------------------------------------------------------------- accusation */
 
-  const selectorsRef = useRef({ timeline, intel, ledger });
-  selectorsRef.current = { timeline, intel, ledger };
+  const selectorsRef = useRef({ timeline, intel, ledger, tally });
+  selectorsRef.current = { timeline, intel, ledger, tally };
 
   /**
    * Grades an accusation and, only when it is proven, pulls the reveal out of
@@ -506,7 +587,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
    */
   const submitAccusation = useCallback(async ({ suspect, evidenceKeys, reasoning }) => {
     const current = stateRef.current;
-    const { timeline: currentTimeline, intel: currentIntel, ledger: currentLedger } = selectorsRef.current;
+    const { timeline: currentTimeline, intel: currentIntel, ledger: currentLedger, tally: currentTally } = selectorsRef.current;
     const at = Date.now();
 
     const { proven, coverage } = evaluateAccusation({
@@ -538,6 +619,22 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       reveal = null;
     }
 
+    // One engine grades both modes, so a solved case and a leaderboard entry
+    // mean the same thing. The clock is already banked by the reducer.
+    const elapsedMs = current.runningSince === null
+      ? current.elapsedMs
+      : current.elapsedMs + Math.max(0, at - current.runningSince);
+    const { score, breakdown } = computeScore({
+      baseScore: briefing.case.score ?? 1000,
+      attempts: current.accusations.length + 1,
+      hintsUsed: current.hintsRevealed,
+      elapsedMs,
+      estimate: getCase(difficulty)?.estimatedTime,
+      coverage: { ...coverage, queries: current.reach.successes + current.reach.failures },
+      thresholds: getCaseThresholds(difficulty).verdict,
+      objectives: currentTally,
+    });
+
     const cited = current.discoveries.filter((record) => evidenceKeys.includes(record.key));
     markCaseSolved(difficulty, {
       caseNumber: briefing.case.caseNumber,
@@ -550,6 +647,11 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       attempts: current.accusations.length + 1,
       reasoning,
       coverage,
+      elapsedMs,
+      hintsUsed: current.hintsRevealed,
+      score,
+      scoreBreakdown: breakdown,
+      objectives: currentTally,
       ledger: currentLedger,
       citedEvidence: cited.map(({ key, title, table, occurredAt, location, confidence, sql }) => ({ key, title, table, occurredAt, location, confidence, sql })),
       discoveries: current.discoveries.map(({ key, title, table, occurredAt, location, confidence }) => ({ key, title, table, occurredAt, location, confidence })),
@@ -571,6 +673,9 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     runQuery,
     submitAccusation,
     setReasoning: (reasoning) => dispatch({ type: 'setReasoning', reasoning }),
+    startTimer: () => dispatch({ type: 'startTimer', at: Date.now() }),
+    pauseTimer: () => dispatch({ type: 'pauseTimer', at: Date.now() }),
+    revealHint: (total) => dispatch({ type: 'revealHint', total, at: Date.now() }),
     deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
     clearHistory: () => dispatch({ type: 'clearHistory' }),
     setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),
@@ -602,6 +707,11 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     expanded: state.expanded,
     scrollPositions: state.scrollPositions,
     reach: state.reach,
+    startedAt: state.startedAt,
+    elapsedMs: state.elapsedMs,
+    runningSince: state.runningSince,
+    completionMs: state.completionMs,
+    hintsRevealed: state.hintsRevealed,
     accusations: state.accusations,
     verdict: state.verdict,
     reveal: state.reveal,
@@ -619,7 +729,8 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     state.result, state.history, state.journal, state.discoveries, state.tableTotals,
     state.primeSuspect, state.cleared, state.notes, state.evidenceNotes, state.bookmarks,
     state.leadsDone, state.notebookSection, state.boardFolder, state.expanded,
-    state.scrollPositions, state.reach,
+    state.scrollPositions, state.reach, state.startedAt,
+    state.elapsedMs, state.runningSince, state.completionMs, state.hintsRevealed,
     state.accusations, state.verdict, state.reveal, state.reasoning,
     objectives, tally, timeline, intel, ledger, insights, readiness, starterSql,
   ]);
@@ -629,7 +740,9 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
   return (
     <SessionActionsContext.Provider value={actions}>
       <SessionDataContext.Provider value={data}>
-        <SqlDraftContext.Provider value={sqlDraft}>{children}</SqlDraftContext.Provider>
+        <SqlDraftContext.Provider value={sqlDraft}>
+          <SessionTimerContext.Provider value={timerValue}>{children}</SessionTimerContext.Provider>
+        </SqlDraftContext.Provider>
       </SessionDataContext.Provider>
     </SessionActionsContext.Provider>
   );
@@ -656,4 +769,9 @@ export function useInvestigationActions() {
 /** The editor text. Only the terminal should subscribe here. */
 export function useSqlDraft() {
   return useRequiredContext(SqlDraftContext, 'useSqlDraft');
+}
+
+/** The running clock. Only the header should subscribe here. */
+export function useInvestigationTimer() {
+  return useRequiredContext(SessionTimerContext, 'useInvestigationTimer');
 }

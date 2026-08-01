@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useRef } from 'react';
-import { BookOpen, ClipboardCheck, Clock, FileText, History, NotebookPen, ScrollText, Telescope, UsersRound } from 'lucide-react';
+import { BookOpen, ClipboardCheck, Clock, FileText, History, Lightbulb, NotebookPen, ScrollText, Telescope, UsersRound } from 'lucide-react';
 import { ReusableModal } from './ReusableModal';
 import { NotebookDiscoveries } from './notebook/NotebookDiscoveries';
 import { NotebookEvidenceNotes } from './notebook/NotebookEvidenceNotes';
+import { NotebookHints } from './notebook/NotebookHints';
 import { NotebookJournal } from './notebook/NotebookJournal';
 import { NotebookObjectives } from './notebook/NotebookObjectives';
 import { NotebookOverview } from './notebook/NotebookOverview';
@@ -19,6 +20,7 @@ const sections = [
   { id: 'discoveries', label: 'Discoveries', icon: Telescope },
   { id: 'timeline', label: 'Timeline', icon: Clock },
   { id: 'suspects', label: 'Suspects', icon: UsersRound },
+  { id: 'hints', label: 'Hints', icon: Lightbulb },
   { id: 'evidence', label: 'Case file', icon: FileText },
   { id: 'history', label: 'History', icon: History },
   { id: 'notes', label: 'Notes', icon: NotebookPen },
@@ -31,10 +33,10 @@ export const notebookSections = sections;
  * section is open, how far each one was scrolled, which panels were expanded
  * and everything typed into it all survive a refresh.
  */
-export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, leads = [] }) {
+export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, difficulty, leads = [] }) {
   const {
     notebookSection, setNotebookSection, scrollPositions, rememberScroll,
-    tally, discoveries, timeline, journal,
+    tally, discoveries, timeline, journal, hintsRevealed,
   } = useInvestigationSession();
 
   const bodyRef = useRef(null);
@@ -52,6 +54,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
     discoveries: discoveries.length || null,
     timeline: timeline.length || null,
     journal: journal.length || null,
+    hints: hintsRevealed || null,
   };
 
   const commitScroll = useCallback(() => {
@@ -148,6 +151,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
         {active.id === 'discoveries' && <NotebookDiscoveries />}
         {active.id === 'timeline' && <NotebookTimeline />}
         {active.id === 'suspects' && <NotebookSuspects />}
+        {active.id === 'hints' && <NotebookHints difficulty={difficulty} />}
         {active.id === 'evidence' && <NotebookEvidenceNotes evidence={briefing.evidence} />}
         {active.id === 'history' && <NotebookQueryHistory onClose={handleClose} />}
         {active.id === 'notes' && <NotebookPersonalNotes />}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowUpRight, BadgeCheck, CircleDot, Clock3, GraduationCap, Lock, RotateCcw, Sparkles } from 'lucide-react';
+import { ArrowUpRight, BadgeCheck, CircleDot, Clock3, Database, Fingerprint, GraduationCap, Lock, RotateCcw, Sparkles } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
 import { resetInvestigation } from '../utils/caseProgress';
@@ -10,10 +10,29 @@ const statusChips = {
   opened: { label: 'Briefing read', icon: CircleDot, className: 'border-white/20 bg-white/[0.06] text-bone-muted' },
   'in-progress': { label: 'In progress', icon: CircleDot, className: 'border-verdict-clear/45 bg-verdict-clear/10 text-verdict-clear' },
   solved: { label: 'Solved', icon: BadgeCheck, className: 'border-verdict-clear/60 bg-verdict-clear/15 text-verdict-clear' },
+  sealed: { label: 'Coming soon', icon: Lock, className: 'border-white/20 bg-white/[0.06] text-bone-muted' },
 };
 
-export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', isLocked = false, lockHint }) {
-  const chip = statusChips[status] ?? statusChips.new;
+function SkillRow({ icon: Icon, label, items }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <div>
+      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-bone-dim">
+        <Icon size={13} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> {label}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {items.map((item) => (
+          <span key={item} className="clip-corner-sm border border-white/10 bg-white/[0.06] px-2.5 py-1 font-mono text-xs text-bone">
+            {item}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', isLocked = false, isSealed = false, requirement, onShowLocked }) {
+  const chip = statusChips[isSealed ? 'sealed' : status] ?? statusChips.new;
   const ChipIcon = chip.icon;
   const isSolved = status === 'solved';
   const [confirmReplay, setConfirmReplay] = useState(false);
@@ -51,41 +70,75 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
         Recommended: {caseData.recommendedExperience}
       </p>
 
-      <div className="mt-6 border-y border-white/10 py-5">
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-bone-dim">Skills required</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {caseData.sqlConcepts.map((concept) => (
-            <span key={concept} className="clip-corner-sm border border-white/10 bg-white/[0.06] px-2.5 py-1 font-mono text-xs text-bone">{concept}</span>
-          ))}
-        </div>
+      <div className="mt-6 space-y-5 border-y border-white/10 py-5">
+        <SkillRow icon={Database} label="SQL skills" items={caseData.sqlConcepts} />
+        <SkillRow icon={Fingerprint} label="Detective skills" items={caseData.detectiveSkills} />
       </div>
 
       <p className="mt-6 flex-1 text-base leading-7 text-bone-muted">{caseData.preview}</p>
     </>
   );
 
-  if (isLocked) {
+  /* ------------------------------------------------------------ sealed slot */
+  // A slot with no content yet. It is shown in full so the career reads as five
+  // cases from the start, and it says plainly that the file is being prepared.
+  if (isSealed) {
     return (
       <motion.article
         initial={{ opacity: 0, y: 28 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: index * 0.1 }}
-        aria-disabled="true"
-        className="clip-corner relative flex h-full flex-col panel-surface p-7 opacity-70 shadow-panel"
+        whileHover={{ y: -4 }}
+        aria-label={`${caseData.caseNumber}, ${caseData.tier}, file sealed`}
+        className="clip-corner relative flex h-full flex-col panel-surface p-7 shadow-panel transition-colors duration-300 hover:border-gold/35"
       >
-        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-ink/72 px-6 text-center backdrop-blur-[3px]">
-          <Lock size={30} className="text-gold-bright" strokeWidth={1.8} />
-          <p className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">Case sealed</p>
-          <p className="max-w-[16rem] text-sm leading-6 text-bone-muted">{lockHint}</p>
+        <span aria-hidden="true" className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-transparent via-gold/60 to-transparent" />
+        {body}
+        <div className="mt-8 border-t border-white/10 pt-5 text-center">
+          <p className="font-display text-sm font-bold uppercase tracking-[0.3em] text-gold-bright">Classified</p>
+          <p className="mt-2 flex items-center justify-center gap-2 font-display text-base font-semibold uppercase tracking-[0.16em] text-bone">
+            <Lock size={16} strokeWidth={2.2} aria-hidden="true" /> Investigation file sealed
+          </p>
+          <p className="mt-2 text-sm text-bone-dim">Coming soon</p>
         </div>
-        <div className="grayscale">{body}</div>
-        <span className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone-dim">
-          Locked <Lock size={17} />
-        </span>
       </motion.article>
     );
   }
 
+  /* ----------------------------------------------------------- locked case */
+  if (isLocked) {
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 28 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: index * 0.1 }}
+        whileHover={{ y: -4 }}
+        className="h-full"
+      >
+        <button
+          type="button"
+          onClick={() => onShowLocked?.(caseData)}
+          aria-label={`${caseData.caseNumber}, ${caseData.title}, locked. ${requirement ? `Close ${requirement.title} to unlock.` : ''}`}
+          className="clip-corner group relative flex h-full w-full flex-col p-7 text-left panel-surface shadow-panel transition-colors duration-300 hover:border-gold/40"
+        >
+          <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center gap-3 bg-ink/72 px-6 text-center backdrop-blur-[3px] transition-colors duration-300 group-hover:bg-ink/60">
+            <Lock size={30} className="text-gold-bright" strokeWidth={1.8} />
+            <p className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">Case sealed</p>
+            <p className="max-w-[17rem] text-sm leading-6 text-bone-muted">
+              {requirement ? `Complete ${requirement.tier} to unlock` : 'Not yet available'}
+            </p>
+            <p className="mt-1 text-xs uppercase tracking-[0.16em] text-bone-dim">Select for details</p>
+          </div>
+          <div className="opacity-70 grayscale">{body}</div>
+          <span className="mt-8 flex items-center justify-between border-t border-white/10 pt-5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone-dim">
+            Locked <Lock size={17} />
+          </span>
+        </button>
+      </motion.div>
+    );
+  }
+
+  /* ------------------------------------------------------------- available */
   return (
     <motion.article
       initial={{ opacity: 0, y: 28 }}
@@ -131,7 +184,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
             </button>
           </div>
           <p className="mt-3 text-sm leading-6 text-bone-dim">
-            Replaying clears your notes, discoveries and journal for this case. The report you earned is kept.
+            Replaying clears your notes, discoveries and journal for this case. The report you earned is kept, and it never relocks what you have opened.
           </p>
         </div>
       ) : (

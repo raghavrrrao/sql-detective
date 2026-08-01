@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { FileText, Printer } from 'lucide-react';
+import { formatClock } from '../utils/clock';
 import { ReusableModal } from './ReusableModal';
 
 function formatDate(iso) {
@@ -74,6 +75,10 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           <Field label="Formal accusations filed" value={report.attempts} />
           <Field label="Records recovered" value={report.coverage?.discoveries} />
           <Field label="Queries executed" value={report.coverage?.queries} />
+          <Field label="Time taken" value={report.elapsedMs === undefined ? '—' : formatClock(report.elapsedMs)} />
+          <Field label="Hints taken" value={report.hintsUsed ?? 0} />
+          <Field label="Objectives" value={report.objectives ? `${report.objectives.done} / ${report.objectives.total}` : '—'} />
+          <Field label="Final score" value={report.score ?? '—'} />
         </dl>
 
         {report.reveal?.killer && (

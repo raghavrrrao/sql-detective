@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, Gavel, KeyRound, Scale, ScrollText, Skull, Target } from 'lucide-react';
+import { FileText, Gavel, KeyRound, Scale, ScrollText, Skull, Target, Trophy } from 'lucide-react';
 import { caseTables } from '../utils/sqlInsights';
 import { useInvestigationSession } from '../state/investigationSession';
 
@@ -25,7 +25,7 @@ function Panel({ icon: Icon, label, children, delay }) {
  * say who did it. Everything shown here comes from the case database, fetched
  * after the verdict was proven.
  */
-export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onLeave }) {
+export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = null, onLeave }) {
   const { reveal: revealed, verdict, discoveries, timeline, reach, accusations } = useInvestigationSession();
 
   if (!isOpen) return null;
@@ -154,10 +154,19 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onLeave }) {
             <button
               type="button"
               onClick={onOpenReport}
-              className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5"
+              className="clip-corner-sm inline-flex items-center gap-2.5 border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
               <FileText size={17} strokeWidth={2.2} aria-hidden="true" /> Open the investigation report
             </button>
+            {onContinue && (
+              <button
+                type="button"
+                onClick={onContinue}
+                className="clip-corner-sm inline-flex items-center gap-2.5 border border-gold-bright/70 bg-gold px-6 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-ink shadow-glow transition-transform hover:-translate-y-0.5"
+              >
+                <Trophy size={17} strokeWidth={2.2} aria-hidden="true" /> See your score
+              </button>
+            )}
           </motion.div>
         </div>
       </motion.div>

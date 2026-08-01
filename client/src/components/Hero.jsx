@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
-import { ArrowRight, Fingerprint, PlayCircle } from 'lucide-react';
+import { ArrowRight, Fingerprint, PlayCircle, SlidersHorizontal } from 'lucide-react';
 import { ActionButton } from './ActionButton';
-import { availableCases } from '../catalog/caseCatalog';
+import { displayCases } from '../catalog/caseCatalog';
 
 const rise = {
   hidden: { opacity: 0, y: 26 },
@@ -9,7 +9,7 @@ const rise = {
 };
 
 const stats = [
-  { value: String(availableCases.length).padStart(2, '0'), label: 'Sealed cases' },
+  { value: String(displayCases.length).padStart(2, '0'), label: 'Case files' },
   { value: '16', label: 'Evidence tables' },
   { value: '318', label: 'Case records' },
 ];
@@ -41,7 +41,7 @@ export function Hero() {
           </motion.p>
 
           <motion.p variants={rise} custom={0.26} className="mt-9 max-w-2xl text-balance text-lg leading-8 text-bone-muted sm:text-xl">
-            Three murders. One interrogation tool. Query the evidence database, break every alibi, and name the killer before the clock runs out.
+            One interrogation tool and a career of sealed case files. Query the evidence database, break every alibi, and close each investigation before the clock runs out.
           </motion.p>
 
           <motion.div variants={rise} custom={0.34} className="mt-11 flex flex-col gap-4 sm:flex-row">
@@ -50,6 +50,9 @@ export function Hero() {
             </ActionButton>
             <ActionButton as="a" href="#how-it-works" variant="ghost" size="lg" icon={PlayCircle}>
               How to Play
+            </ActionButton>
+            <ActionButton as="link" to="/settings" variant="ghost" size="lg" icon={SlidersHorizontal}>
+              Settings
             </ActionButton>
           </motion.div>
 

@@ -7,6 +7,7 @@ import { AccuseModal } from './AccuseModal';
 import { AnimatedBackground } from './AnimatedBackground';
 import { CaseClosedScreen } from './CaseClosedScreen';
 import { CaseDebrief } from './CaseDebrief';
+import { FestivalScoreSummary } from './FestivalScoreSummary';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { HeaderBar } from './HeaderBar';
 import { InventoryPanel } from './InventoryPanel';
@@ -23,6 +24,7 @@ import {
 } from '../state/investigationSession';
 import { getCase, getStarterQuery } from '../catalog/caseCatalog';
 import { getCaseReport } from '../utils/caseProgress';
+import { useGameMode } from '../state/gameMode';
 
 /**
  * The terminal is deliberately its own component: it subscribes to the editor
@@ -59,7 +61,9 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
   const [isAccuseOpen, setIsAccuseOpen] = useState(false);
   const [isCaseClosedOpen, setIsCaseClosedOpen] = useState(false);
   const [isReportOpen, setIsReportOpen] = useState(false);
-  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql, setNotebookSection, isSolved } = useInvestigationSession();
+  const [isScoreOpen, setIsScoreOpen] = useState(false);
+  const { isFestival } = useGameMode();
+  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql, setNotebookSection, isSolved, pauseTimer, startTimer } = useInvestigationSession();
   const navigate = useNavigate();
 
   const editorRef = useRef(null);
@@ -93,12 +97,24 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
     setIsAccuseOpen(true);
   }, []);
 
-  // A proven verdict hands straight over to the Case Closed sequence.
-  const handleProven = useCallback(() => setIsCaseClosedOpen(true), []);
+  // A proven verdict hands straight over to the Case Closed sequence. The
+  // clock is already stopped by the verdict itself; this keeps it stopped while
+  // the reveal, the score and the leaderboard are on screen.
+  const handleProven = useCallback(() => {
+    pauseTimer();
+    setIsCaseClosedOpen(true);
+  }, [pauseTimer]);
 
   const openReport = useCallback(() => {
     setIsCaseClosedOpen(false);
     setIsReportOpen(true);
+  }, []);
+
+  // Festival play continues past the reveal into the score and the leaderboard.
+  const openScore = useCallback(() => {
+    setIsCaseClosedOpen(false);
+    setIsReportOpen(false);
+    setIsScoreOpen(true);
   }, []);
 
   // Loads a starter query for a suspect instead of revealing their file for free.
@@ -234,8 +250,19 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         isOpen={isCaseClosedOpen}
         caseData={caseData}
         onOpenReport={openReport}
-        onLeave={() => { setIsCaseClosedOpen(false); navigate('/difficulty'); }}
+        onContinue={isFestival ? openScore : null}
+        onLeave={() => { setIsCaseClosedOpen(false); navigate(isFestival ? '/' : '/difficulty'); }}
       />
+
+      {isFestival && (
+        <FestivalScoreSummary
+          isOpen={isScoreOpen}
+          caseData={caseData}
+          difficulty={difficulty}
+          onOpenReport={() => setIsReportOpen(true)}
+          onNextDetective={() => { setIsScoreOpen(false); navigate('/'); }}
+        />
+      )}
 
       <CaseDebrief
         isOpen={isReportOpen}
@@ -249,6 +276,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         caseData={caseData}
         caseFacts={caseFacts}
         briefing={briefing}
+        difficulty={difficulty}
         leads={leads}
       />
 
