@@ -1,12 +1,14 @@
 import { ArrowLeft, BookOpen, LayoutPanelLeft, Search, Star, Timer } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
+import { getCase } from '../catalog/caseCatalog';
 import { SoundToggle } from './SoundToggle';
 
-const timingByDifficulty = { Easy: '20:00', Medium: '35:00', Expert: '60:00' };
-const scoreByDifficulty = { Easy: '1000', Medium: '2000', Expert: '3000' };
-
 export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearch, difficulty }) {
+  // Tier and rank are presentation and come from the catalog; the target time
+  // and score already ride along on the briefing payload.
+  const entry = getCase(difficulty);
+
   return (
     <header className="relative z-30 flex min-h-[4.5rem] items-center justify-between gap-3 border-b border-white/10 bg-ink/85 px-4 py-3 backdrop-blur-xl sm:px-6">
       <div className="flex min-w-0 items-center gap-3">
@@ -36,13 +38,13 @@ export function HeaderBar({ caseData, onOpenSidebar, onOpenNotebook, onOpenSearc
       </div>
 
       <div className="flex items-center gap-2 sm:gap-2.5">
-        <DifficultyBadge difficulty={caseData.difficulty} />
+        <DifficultyBadge difficulty={entry?.tier ?? caseData.difficulty} rank={entry?.tierRank} />
 
         <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone md:flex">
-          <Timer size={15} className="text-crimson-glow" strokeWidth={2.2} /> {timingByDifficulty[caseData.difficulty]}
+          <Timer size={15} className="text-crimson-glow" strokeWidth={2.2} /> {caseData.timer}
         </div>
         <div className="clip-corner-sm hidden items-center gap-2 border border-white/12 bg-white/[0.04] px-3 py-2 font-mono text-sm text-bone xl:flex">
-          <Star size={15} className="text-gold-bright" strokeWidth={2.2} /> {scoreByDifficulty[caseData.difficulty]}
+          <Star size={15} className="text-gold-bright" strokeWidth={2.2} /> {caseData.score}
         </div>
 
         <SoundToggle />

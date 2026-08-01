@@ -26,9 +26,9 @@ export function CaseHeader({ caseData }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <DifficultyBadge difficulty={caseData.difficulty} />
+          <DifficultyBadge difficulty={caseData.tier} rank={caseData.tierRank} />
           <span className="hidden items-center gap-2 text-sm text-bone-muted sm:flex">
-            <Clock3 size={16} className="text-gold-bright" strokeWidth={2} /> {caseData.timeLimit}
+            <Clock3 size={16} className="text-gold-bright" strokeWidth={2} /> {caseData.estimatedTime}
           </span>
           <SoundToggle />
         </div>

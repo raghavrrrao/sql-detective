@@ -2,13 +2,16 @@ import { motion } from 'framer-motion';
 import { Clock3, Database } from 'lucide-react';
 import { DifficultyBadge } from './DifficultyBadge';
 
+/** Rail colour follows the tier's rank, matching DifficultyBadge. */
 const rails = {
-  Easy: 'bg-verdict-clear',
-  Medium: 'bg-gold',
-  Expert: 'bg-crimson-bright',
+  1: 'bg-sky-400',
+  2: 'bg-verdict-clear',
+  3: 'bg-gold',
+  4: 'bg-orange-400',
+  5: 'bg-crimson-bright',
 };
 
-export function DifficultyCard({ difficulty, time, concepts, story, index }) {
+export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, index }) {
   return (
     <motion.article
       initial={{ opacity: 0, y: 28 }}
@@ -18,11 +21,11 @@ export function DifficultyCard({ difficulty, time, concepts, story, index }) {
       transition={{ duration: 0.45, delay: index * 0.1 }}
       className="clip-corner relative panel-surface p-7 shadow-panel"
     >
-      <span aria-hidden="true" className={`absolute left-0 top-0 h-full w-[3px] ${rails[difficulty]}`} />
+      <span aria-hidden="true" className={`absolute left-0 top-0 h-full w-[3px] ${rails[rank] ?? rails[2]}`} />
 
       <div className="flex items-start justify-between gap-4">
         <h3 className="font-display text-3xl font-bold uppercase text-bone">{difficulty}</h3>
-        <DifficultyBadge difficulty={difficulty} />
+        <DifficultyBadge difficulty={difficulty} rank={rank} />
       </div>
 
       <dl className="mt-8 space-y-6">

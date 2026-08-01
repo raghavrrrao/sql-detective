@@ -5,12 +5,13 @@ import { Link } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { CaseSelectionCard } from '../components/CaseSelectionCard';
 import { SectionHeading } from '../components/SectionHeading';
-import { cases } from '../utils/cases';
-import { caseOrder, getCaseStatus, getProgress, isCaseLocked } from '../utils/caseProgress';
+import { availableCases, getPreviousCase } from '../catalog/caseCatalog';
+import { getCaseStatus, getCompletion, getProgress, isCaseLocked } from '../utils/caseProgress';
 
 export function DifficultyPage() {
   // Read once per mount; progression only changes on navigation.
   const progress = useMemo(() => getProgress(), []);
+  const completion = useMemo(() => getCompletion(progress), [progress]);
 
   return (
     <motion.main
@@ -30,25 +31,24 @@ export function DifficultyPage() {
 
         <div className="pt-16">
           <SectionHeading
-            eyebrow="Case selection"
+            eyebrow={`Case selection · ${completion.solved} of ${completion.total} solved`}
             title="Choose your case"
             description="Each investigation is a sealed dossier with its own database. Work through them in order — every case teaches the SQL the next one expects."
           />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-3">
-          {Object.entries(cases).map(([caseKey, caseData], index) => {
-            const locked = isCaseLocked(caseKey, progress);
-            const previousKey = caseOrder[caseOrder.indexOf(caseKey) - 1];
+          {availableCases.map((entry, index) => {
+            const previous = getPreviousCase(entry.id);
             return (
               <CaseSelectionCard
-                key={caseKey}
-                caseKey={caseKey}
-                caseData={caseData}
+                key={entry.id}
+                caseKey={entry.id}
+                caseData={entry}
                 index={index}
-                status={getCaseStatus(caseKey, progress)}
-                isLocked={locked}
-                lockHint={previousKey ? `Open ${cases[previousKey].caseNumber} — ${cases[previousKey].title} — to unlock this file.` : undefined}
+                status={getCaseStatus(entry.id, progress)}
+                isLocked={isCaseLocked(entry.id, progress)}
+                lockHint={previous ? `Close ${previous.caseNumber} — ${previous.title} — to unlock this file.` : undefined}
               />
             );
           })}

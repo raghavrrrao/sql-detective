@@ -1,14 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { AccuseButton } from './AccuseButton';
+import { AccuseModal } from './AccuseModal';
 import { AnimatedBackground } from './AnimatedBackground';
+import { CaseClosedScreen } from './CaseClosedScreen';
+import { CaseDebrief } from './CaseDebrief';
 import { GlobalSearchModal } from './GlobalSearchModal';
 import { HeaderBar } from './HeaderBar';
 import { InventoryPanel } from './InventoryPanel';
 import { NotebookModal } from './NotebookModal';
 import { QueryResultsTable } from './QueryResultsTable';
 import { Sidebar } from './Sidebar';
-import { SQLEditor, starterQueryFor } from './SQLEditor';
+import { SQLEditor } from './SQLEditor';
 import { SuspectPanel } from './SuspectPanel';
 import {
   InvestigationSessionProvider,
@@ -16,7 +21,8 @@ import {
   useInvestigationSession,
   useSqlDraft,
 } from '../state/investigationSession';
-import { getCase } from '../utils/cases';
+import { getCase, getStarterQuery } from '../catalog/caseCatalog';
+import { getCaseReport } from '../utils/caseProgress';
 
 /**
  * The terminal is deliberately its own component: it subscribes to the editor
@@ -50,7 +56,11 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNotebookOpen, setIsNotebookOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql, setNotebookSection } = useInvestigationSession();
+  const [isAccuseOpen, setIsAccuseOpen] = useState(false);
+  const [isCaseClosedOpen, setIsCaseClosedOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
+  const { boardFolder, setBoardFolder, setSql, runQuery, clearSql, setNotebookSection, isSolved } = useInvestigationSession();
+  const navigate = useNavigate();
 
   const editorRef = useRef(null);
   const handleEditorReady = useCallback((editor) => { editorRef.current = editor; }, []);
@@ -76,6 +86,20 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
     setIsSearchOpen(false);
     setIsNotebookOpen(true);
   }, [setNotebookSection]);
+
+  const openAccuse = useCallback(() => {
+    setIsNotebookOpen(false);
+    setIsSearchOpen(false);
+    setIsAccuseOpen(true);
+  }, []);
+
+  // A proven verdict hands straight over to the Case Closed sequence.
+  const handleProven = useCallback(() => setIsCaseClosedOpen(true), []);
+
+  const openReport = useCallback(() => {
+    setIsCaseClosedOpen(false);
+    setIsReportOpen(true);
+  }, []);
 
   // Loads a starter query for a suspect instead of revealing their file for free.
   const inspectSuspect = useCallback((suspect) => {
@@ -183,10 +207,41 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
       <button
         type="button"
         onClick={openNotebook}
-        className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5"
+        className="clip-corner-sm fixed bottom-6 left-6 z-20 inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-white shadow-crimson transition-transform hover:-translate-y-0.5 xl:left-auto xl:right-[13rem]"
       >
         <BookOpen size={17} strokeWidth={2.2} aria-hidden="true" /> Notebook
       </button>
+
+      {isSolved ? (
+        <button
+          type="button"
+          onClick={() => setIsReportOpen(true)}
+          className="clip-corner-sm fixed bottom-6 right-6 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-5 py-3.5 font-display text-sm font-semibold uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5"
+        >
+          Case closed · Report
+        </button>
+      ) : (
+        <AccuseButton onOpen={openAccuse} />
+      )}
+
+      <AccuseModal
+        isOpen={isAccuseOpen}
+        onClose={() => setIsAccuseOpen(false)}
+        onProven={handleProven}
+      />
+
+      <CaseClosedScreen
+        isOpen={isCaseClosedOpen}
+        caseData={caseData}
+        onOpenReport={openReport}
+        onLeave={() => { setIsCaseClosedOpen(false); navigate('/difficulty'); }}
+      />
+
+      <CaseDebrief
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        report={getCaseReport(difficulty)}
+      />
 
       <NotebookModal
         isOpen={isNotebookOpen}
@@ -213,7 +268,7 @@ export function InvestigationLayout({ caseData, briefing, difficulty }) {
       key={difficulty}
       difficulty={difficulty}
       briefing={briefing}
-      starterSql={starterQueryFor(difficulty)}
+      starterSql={getStarterQuery(difficulty)}
     >
       <InvestigationBoard caseData={caseData} briefing={briefing} difficulty={difficulty} />
     </InvestigationSessionProvider>

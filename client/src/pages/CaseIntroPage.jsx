@@ -8,7 +8,7 @@ import { CaseFile } from '../components/CaseFile';
 import { CaseHeader } from '../components/CaseHeader';
 import { MissionCard } from '../components/MissionCard';
 import { TypewriterText } from '../components/TypewriterText';
-import { getCase } from '../utils/cases';
+import { getCase } from '../catalog/caseCatalog';
 import { markCaseOpened } from '../utils/caseProgress';
 
 const facts = [

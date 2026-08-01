@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useRef } from 'react';
 import { executeCaseQuery } from '../services/caseService';
-import { recordQueryRun } from '../utils/caseProgress';
+import { assessReadiness, evaluateAccusation } from '../utils/accusation';
+import { getSolution } from '../utils/caseSolution';
+import { markCaseSolved, recordQueryRun } from '../utils/caseProgress';
 import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
 import { buildInsights } from '../utils/insights';
 import { buildProgressLedger } from '../utils/investigationProgress';
@@ -11,7 +13,7 @@ import { applyDiscoveriesToFiles, buildSuspectIntel } from '../utils/suspectInte
 import { inspectStatement } from '../utils/sqlInsights';
 import { readJson, writeJson } from '../utils/storage';
 
-const SESSION_VERSION = 2;
+const SESSION_VERSION = 3;
 const HISTORY_LIMIT = 50;
 const JOURNAL_LIMIT = 200;
 const PERSIST_DELAY = 350;
@@ -129,8 +131,9 @@ function reducer(state, action) {
       });
 
       // Objectives tick off gameplay, so the log has to be written where they change.
-      const before = evaluateObjectives(state.reach);
-      const after = evaluateObjectives(reach);
+      const isSolved = state.verdict?.proven === true;
+      const before = evaluateObjectives(state.caseId, { ...state.reach, isSolved });
+      const after = evaluateObjectives(state.caseId, { ...reach, isSolved });
       after.forEach((objective, index) => {
         if (objective.isDone && !before[index].isDone) {
           entries.push(journalEntry(startedAt, 'objective', `Objective complete — ${objective.label}`));
@@ -244,6 +247,29 @@ function reducer(state, action) {
         ? state
         : { ...state, scrollPositions: { ...state.scrollPositions, [action.key]: action.offset } };
 
+    case 'setReasoning':
+      return state.reasoning === action.reasoning ? state : { ...state, reasoning: action.reasoning };
+
+    case 'recordAccusation': {
+      const { at, suspect, evidenceKeys, reasoning, proven } = action;
+      return {
+        ...state,
+        accusations: [{ id: `${at}`, at, suspect, evidenceKeys, reasoning, proven }, ...state.accusations],
+        verdict: { proven, at, suspect, evidenceKeys, reasoning },
+        // A fresh accusation needs fresh evidence, so remember where the file
+        // stood when this one was made.
+        lastAccusationDiscoveryCount: proven ? null : state.discoveries.length,
+        journal: pushJournal(state.journal, [
+          journalEntry(at, proven ? 'verdict' : 'accusation',
+            proven ? `Case proven against ${suspect}` : `Accusation against ${suspect} was not proven`),
+        ]),
+      };
+    }
+
+    // The reveal is fetched from the case database only after a proven verdict.
+    case 'setReveal':
+      return { ...state, reveal: action.reveal };
+
     default:
       return state;
   }
@@ -253,6 +279,9 @@ function reducer(state, action) {
 function initialise({ difficulty, starterSql, defaultFolder }) {
   const fresh = {
     version: SESSION_VERSION,
+    // Kept in state so the reducer can resolve catalog-driven objectives
+    // without every action having to carry the case id.
+    caseId: difficulty,
     sql: starterSql,
     history: [],
     journal: [],
@@ -271,6 +300,11 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     scrollPositions: {},
     reach: emptyReach(),
     result: emptyResult,
+    accusations: [],
+    verdict: null,
+    reveal: null,
+    reasoning: '',
+    lastAccusationDiscoveryCount: null,
   };
 
   const stored = readJson(`session:${difficulty}`, null);
@@ -305,6 +339,13 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
       successes: Number.isFinite(reach.successes) ? reach.successes : 0,
       failures: Number.isFinite(reach.failures) ? reach.failures : 0,
     },
+    accusations: asArray(stored.accusations).filter((entry) => entry && typeof entry.suspect === 'string'),
+    verdict: stored.verdict && typeof stored.verdict.suspect === 'string' ? stored.verdict : null,
+    reveal: stored.reveal && typeof stored.reveal === 'object' ? stored.reveal : null,
+    reasoning: asString(stored.reasoning),
+    lastAccusationDiscoveryCount: Number.isFinite(stored.lastAccusationDiscoveryCount)
+      ? stored.lastAccusationDiscoveryCount
+      : null,
   };
 }
 
@@ -342,12 +383,18 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       expanded: state.expanded,
       scrollPositions: state.scrollPositions,
       reach: state.reach,
+      accusations: state.accusations,
+      verdict: state.verdict,
+      reveal: state.reveal,
+      reasoning: state.reasoning,
+      lastAccusationDiscoveryCount: state.lastAccusationDiscoveryCount,
     }),
     [
       state.sql, state.history, state.journal, state.discoveries, state.suspectFiles,
       state.tableTotals, state.cleared, state.primeSuspect, state.notes, state.evidenceNotes,
       state.bookmarks, state.leadsDone, state.notebookSection, state.boardFolder,
       state.expanded, state.scrollPositions, state.reach,
+      state.accusations, state.verdict, state.reveal, state.reasoning, state.lastAccusationDiscoveryCount,
     ],
   );
 
@@ -367,7 +414,9 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     window.addEventListener('pagehide', flush);
     return () => {
       window.removeEventListener('pagehide', flush);
-      flush();
+      // If the stored session has gone while this board was mounted, a replay
+      // cleared it — writing the in-memory copy back would silently undo that.
+      if (readJson(storageKey, null) !== null) flush();
     };
   }, [storageKey]);
 
@@ -403,30 +452,13 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     }
   }, [difficulty, rosterNames]);
 
-  /* ---------------------------------------------------------------- actions */
-
-  const actions = useMemo(() => ({
-    setSql: (sql) => dispatch({ type: 'setSql', sql }),
-    resetSql: () => dispatch({ type: 'setSql', sql: starterSql }),
-    clearSql: () => dispatch({ type: 'setSql', sql: '' }),
-    runQuery,
-    deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
-    clearHistory: () => dispatch({ type: 'clearHistory' }),
-    setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),
-    toggleCleared: (name) => dispatch({ type: 'toggleCleared', name, at: Date.now() }),
-    setNotes: (notes) => dispatch({ type: 'setNotes', notes }),
-    setEvidenceNote: (key, note) => dispatch({ type: 'setEvidenceNote', key, note }),
-    toggleBookmark: (value) => dispatch({ type: 'toggleBookmark', value }),
-    toggleLead: (value) => dispatch({ type: 'toggleLead', value }),
-    setNotebookSection: (section) => dispatch({ type: 'setNotebookSection', section }),
-    setBoardFolder: (folder) => dispatch({ type: 'setBoardFolder', folder }),
-    toggleExpanded: (key) => dispatch({ type: 'toggleExpanded', key }),
-    rememberScroll: (key, offset) => dispatch({ type: 'rememberScroll', key, offset }),
-  }), [runQuery, starterSql]);
-
   /* -------------------------------------------------------------- selectors */
 
-  const objectives = useMemo(() => evaluateObjectives(state.reach), [state.reach]);
+  const isSolved = state.verdict?.proven === true;
+  const objectives = useMemo(
+    () => evaluateObjectives(difficulty, { ...state.reach, isSolved }),
+    [difficulty, state.reach, isSolved],
+  );
   const tally = useMemo(() => objectiveTally(objectives), [objectives]);
   const timeline = useMemo(() => buildTimeline(state.discoveries), [state.discoveries]);
   const intel = useMemo(
@@ -452,6 +484,107 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     [state.reach.tables, state.discoveries, timeline, intel, state.primeSuspect],
   );
 
+  const readiness = useMemo(
+    () => assessReadiness({
+      caseId: difficulty,
+      discoveries: state.discoveries,
+      reach: state.reach,
+      intel,
+      lastAccusationDiscoveryCount: state.lastAccusationDiscoveryCount,
+    }),
+    [difficulty, state.discoveries, state.reach, intel, state.lastAccusationDiscoveryCount],
+  );
+
+  /* ------------------------------------------------------------- accusation */
+
+  const selectorsRef = useRef({ timeline, intel, ledger });
+  selectorsRef.current = { timeline, intel, ledger };
+
+  /**
+   * Grades an accusation and, only when it is proven, pulls the reveal out of
+   * the case database through the ordinary read-only API and files the report.
+   */
+  const submitAccusation = useCallback(async ({ suspect, evidenceKeys, reasoning }) => {
+    const current = stateRef.current;
+    const { timeline: currentTimeline, intel: currentIntel, ledger: currentLedger } = selectorsRef.current;
+    const at = Date.now();
+
+    const { proven, coverage } = evaluateAccusation({
+      difficulty,
+      suspect,
+      evidenceKeys,
+      discoveries: current.discoveries,
+      reach: current.reach,
+      timeline: currentTimeline,
+    });
+
+    dispatch({ type: 'recordAccusation', at, suspect, evidenceKeys, reasoning, proven });
+    if (!proven) return { proven: false };
+
+    // Everything below this line runs only once the case is proven.
+    const killer = getSolution(difficulty)?.killer ?? suspect;
+    const quoted = killer.replace(/'/g, "''");
+    let reveal = null;
+    try {
+      const [killerRows, victimRows] = await Promise.all([
+        executeCaseQuery(difficulty, `SELECT name, occupation, relationship_to_victim, motive, hidden_secret, timeline FROM suspects WHERE name = '${quoted}';`),
+        executeCaseQuery(difficulty, 'SELECT name, occupation, age, cause_of_death, date_of_death, time_of_death FROM victims;'),
+      ]);
+      reveal = { killer: killerRows.rows?.[0] ?? null, victim: victimRows.rows?.[0] ?? null };
+      dispatch({ type: 'setReveal', reveal });
+    } catch {
+      // The verdict stands even if the reveal cannot be fetched; the screen
+      // simply shows what the player already holds.
+      reveal = null;
+    }
+
+    const cited = current.discoveries.filter((record) => evidenceKeys.includes(record.key));
+    markCaseSolved(difficulty, {
+      caseNumber: briefing.case.caseNumber,
+      title: briefing.case.title,
+      difficulty: briefing.case.difficulty,
+      victim: briefing.case.victim,
+      solvedAt: new Date(at).toISOString(),
+      accused: suspect,
+      primeSuspect: current.primeSuspect,
+      attempts: current.accusations.length + 1,
+      reasoning,
+      coverage,
+      ledger: currentLedger,
+      citedEvidence: cited.map(({ key, title, table, occurredAt, location, confidence, sql }) => ({ key, title, table, occurredAt, location, confidence, sql })),
+      discoveries: current.discoveries.map(({ key, title, table, occurredAt, location, confidence }) => ({ key, title, table, occurredAt, location, confidence })),
+      timeline: currentTimeline.map(({ id, clock, title, source, location }) => ({ id, clock, title, source, location })),
+      suspects: currentIntel.map(({ name, occupation, status, recordCount, sources }) => ({ name, occupation, status, recordCount, sources })),
+      queries: current.history.map(({ sql, at: ranAt, ok, rowCount }) => ({ sql, at: ranAt, ok, rowCount })),
+      reveal,
+    });
+
+    return { proven: true };
+  }, [briefing.case, difficulty]);
+
+  /* ---------------------------------------------------------------- actions */
+
+  const actions = useMemo(() => ({
+    setSql: (sql) => dispatch({ type: 'setSql', sql }),
+    resetSql: () => dispatch({ type: 'setSql', sql: starterSql }),
+    clearSql: () => dispatch({ type: 'setSql', sql: '' }),
+    runQuery,
+    submitAccusation,
+    setReasoning: (reasoning) => dispatch({ type: 'setReasoning', reasoning }),
+    deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
+    clearHistory: () => dispatch({ type: 'clearHistory' }),
+    setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),
+    toggleCleared: (name) => dispatch({ type: 'toggleCleared', name, at: Date.now() }),
+    setNotes: (notes) => dispatch({ type: 'setNotes', notes }),
+    setEvidenceNote: (key, note) => dispatch({ type: 'setEvidenceNote', key, note }),
+    toggleBookmark: (value) => dispatch({ type: 'toggleBookmark', value }),
+    toggleLead: (value) => dispatch({ type: 'toggleLead', value }),
+    setNotebookSection: (section) => dispatch({ type: 'setNotebookSection', section }),
+    setBoardFolder: (folder) => dispatch({ type: 'setBoardFolder', folder }),
+    toggleExpanded: (key) => dispatch({ type: 'toggleExpanded', key }),
+    rememberScroll: (key, offset) => dispatch({ type: 'rememberScroll', key, offset }),
+  }), [runQuery, submitAccusation, starterSql]);
+
   const data = useMemo(() => ({
     result: state.result,
     history: state.history,
@@ -469,19 +602,26 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     expanded: state.expanded,
     scrollPositions: state.scrollPositions,
     reach: state.reach,
+    accusations: state.accusations,
+    verdict: state.verdict,
+    reveal: state.reveal,
+    reasoning: state.reasoning,
+    isSolved,
     objectives,
     tally,
     timeline,
     intel,
     ledger,
     insights,
+    readiness,
     starterSql,
   }), [
     state.result, state.history, state.journal, state.discoveries, state.tableTotals,
     state.primeSuspect, state.cleared, state.notes, state.evidenceNotes, state.bookmarks,
     state.leadsDone, state.notebookSection, state.boardFolder, state.expanded,
     state.scrollPositions, state.reach,
-    objectives, tally, timeline, intel, ledger, insights, starterSql,
+    state.accusations, state.verdict, state.reveal, state.reasoning,
+    objectives, tally, timeline, intel, ledger, insights, readiness, starterSql,
   ]);
 
   const sqlDraft = useMemo(() => ({ sql: state.sql, isDirty: state.sql !== starterSql }), [state.sql, starterSql]);

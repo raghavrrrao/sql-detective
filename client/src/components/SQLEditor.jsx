@@ -3,26 +3,6 @@ import Editor from '@monaco-editor/react';
 import { Database, TerminalSquare } from 'lucide-react';
 import { QueryToolbar } from './QueryToolbar';
 
-const defaultQuery = 'SELECT name, occupation FROM suspects;';
-
-/**
- * Each case opens on its own first move, so Reset always puts the player back
- * at a sensible starting point for the mystery they are actually working.
- *
- * These name their columns rather than opening on SELECT *, so the first thing
- * on screen is the roster and not a wall of every field the table happens to
- * carry. Widening the projection is the player's call to make.
- */
-const starterQueries = {
-  easy: '-- Case 01 · Five people were in North Hall. Start with the roster.\nSELECT name, occupation FROM suspects;',
-  medium: '-- Case 02 · Seven suspects, one fob-controlled study. Start with the roster.\nSELECT name, occupation FROM suspects;',
-  expert: '-- Case 03 · Nine suspects, one ship, nobody went ashore. Start with the roster.\nSELECT name, occupation FROM suspects;',
-};
-
-export function starterQueryFor(difficulty) {
-  return starterQueries[difficulty] ?? defaultQuery;
-}
-
 /** Noir syntax theme so the terminal reads as part of the game, not an IDE. */
 function defineTheme(monaco) {
   monaco.editor.defineTheme('detective-noir', {

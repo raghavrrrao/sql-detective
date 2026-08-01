@@ -7,7 +7,7 @@ import { Footer } from '../components/Footer';
 import { Hero } from '../components/Hero';
 import { HowItWorks } from '../components/HowItWorks';
 import { SectionHeading } from '../components/SectionHeading';
-import { cases } from '../utils/cases';
+import { availableCases } from '../catalog/caseCatalog';
 
 const features = [
   { title: 'Real SQL, real database', description: 'Every query runs against a live read-only SQLite case file. Nothing is faked or scripted.', icon: DatabaseZap },
@@ -17,11 +17,12 @@ const features = [
 ];
 
 /** Landing-page previews stay in sync with the real case dossiers. */
-const difficulties = Object.values(cases).map((caseData) => ({
-  difficulty: caseData.difficulty,
-  time: caseData.timeLimit,
-  concepts: caseData.concepts,
-  story: caseData.preview,
+const difficulties = availableCases.map((entry) => ({
+  difficulty: entry.tier,
+  rank: entry.tierRank,
+  time: entry.estimatedTime,
+  concepts: entry.sqlConcepts,
+  story: entry.preview,
 }));
 
 export function HomePage() {
@@ -48,7 +49,7 @@ export function HomePage() {
           <div className="mx-auto max-w-6xl">
             <SectionHeading
               eyebrow="Case clearance"
-              title="Three cases. One killer each."
+              title={`${availableCases.length} cases. One killer each.`}
               description="Difficulty comes from the SQL you need, not from a more confusing story. Start at the top and work down."
             />
             <div className="grid gap-6 lg:grid-cols-3">

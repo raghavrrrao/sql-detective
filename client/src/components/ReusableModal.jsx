@@ -4,7 +4,12 @@ import { X } from 'lucide-react';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
-export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md', bodyRef, children }) {
+/**
+ * `dismissible: false` removes every casual way out — Escape, the overlay and
+ * the close button — for the one dialog that must be answered rather than
+ * waved away: the final accusation confirmation.
+ */
+export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md', dismissible = true, bodyRef, children }) {
   const titleId = useId();
   const dialogRef = useRef(null);
   // Whatever opened the dialog gets the caret back when it closes.
@@ -16,10 +21,11 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
    * before Escape from disappearing with the dialog.
    */
   const requestClose = useCallback(() => {
+    if (!dismissible) return;
     const active = document.activeElement;
     if (active && typeof active.blur === 'function' && dialogRef.current?.contains(active)) active.blur();
     onClose();
-  }, [onClose]);
+  }, [onClose, dismissible]);
 
   const handleKeyDown = useCallback((event) => {
     if (event.key === 'Escape') {
@@ -65,7 +71,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
     };
   }, [isOpen]);
 
-  const widths = { md: 'max-w-xl', lg: 'max-w-3xl' };
+  const widths = { md: 'max-w-xl', lg: 'max-w-3xl', full: 'max-w-6xl h-[92vh]' };
 
   return (
     <AnimatePresence>
@@ -94,14 +100,16 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
             <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-6 py-4">
               {Icon && <Icon size={19} className="text-gold-bright" strokeWidth={2} aria-hidden="true" />}
               <h2 id={titleId} className="font-display text-xl font-semibold uppercase tracking-[0.16em] text-bone">{title}</h2>
-              <button
-                type="button"
-                onClick={requestClose}
-                aria-label={`Close ${title}`}
-                className="clip-corner-sm ml-auto p-2 text-bone-dim transition-colors hover:text-bone"
-              >
-                <X size={19} aria-hidden="true" />
-              </button>
+              {dismissible && (
+                <button
+                  type="button"
+                  onClick={requestClose}
+                  aria-label={`Close ${title}`}
+                  className="clip-corner-sm ml-auto p-2 text-bone-dim transition-colors hover:text-bone"
+                >
+                  <X size={19} aria-hidden="true" />
+                </button>
+              )}
             </header>
             <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto p-6">{children}</div>
           </motion.section>

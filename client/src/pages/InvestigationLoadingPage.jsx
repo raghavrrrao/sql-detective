@@ -5,7 +5,7 @@ import { InvestigationLayout } from '../components/InvestigationLayout';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ActionButton } from '../components/ActionButton';
 import { useInvestigationCase } from '../hooks/useInvestigationCase';
-import { getCase } from '../utils/cases';
+import { getCase } from '../catalog/caseCatalog';
 
 export function InvestigationLoadingPage() {
   const { difficulty } = useParams();

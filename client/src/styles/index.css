@@ -159,3 +159,33 @@
     transition-duration: 0.001ms !important;
   }
 }
+
+/* The investigation report is the one thing worth putting on paper. Everything
+   else is hidden, and the noir palette is inverted so it does not eat toner. */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+
+  .print-report,
+  .print-report * {
+    visibility: visible;
+    color: #14141a !important;
+    background: transparent !important;
+    border-color: #c9c9d1 !important;
+    box-shadow: none !important;
+  }
+
+  .print-report {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .print-report section {
+    break-inside: avoid;
+  }
+}

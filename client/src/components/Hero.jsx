@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Fingerprint, PlayCircle } from 'lucide-react';
 import { ActionButton } from './ActionButton';
+import { availableCases } from '../catalog/caseCatalog';
 
 const rise = {
   hidden: { opacity: 0, y: 26 },
@@ -8,7 +9,7 @@ const rise = {
 };
 
 const stats = [
-  { value: '03', label: 'Sealed cases' },
+  { value: String(availableCases.length).padStart(2, '0'), label: 'Sealed cases' },
   { value: '16', label: 'Evidence tables' },
   { value: '318', label: 'Case records' },
 ];

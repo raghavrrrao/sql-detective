@@ -27,6 +27,16 @@ export function readJson(key, fallback) {
   }
 }
 
+export function removeKey(key) {
+  const store = getStore();
+  if (!store) return;
+  try {
+    store.removeItem(`${NAMESPACE}:${key}`);
+  } catch {
+    /* Nothing to recover from — the key is already unreachable. */
+  }
+}
+
 export function writeJson(key, value) {
   const store = getStore();
   if (!store) return false;
