@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useId, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X } from 'lucide-react';
+import { audio } from '../audio/audioManager';
 
 const FOCUSABLE = 'a[href],button:not([disabled]),textarea:not([disabled]),input:not([disabled]),select:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
@@ -52,6 +53,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
 
   useEffect(() => {
     if (!isOpen) return undefined;
+    audio.playSfx('modalOpen');
 
     restoreFocusRef.current = document.activeElement;
     const frame = window.requestAnimationFrame(() => {
@@ -66,6 +68,7 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
     return () => {
       window.cancelAnimationFrame(frame);
       document.body.style.overflow = previousOverflow;
+      audio.playSfx('modalClose');
       const restoreTo = restoreFocusRef.current;
       if (restoreTo && typeof restoreTo.focus === 'function' && document.contains(restoreTo)) restoreTo.focus();
     };

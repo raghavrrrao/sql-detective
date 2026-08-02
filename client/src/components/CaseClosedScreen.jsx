@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { FileText, Gavel, KeyRound, Scale, ScrollText, Skull, Target, Trophy, X } from 'lucide-react';
 import { caseTables } from '../utils/sqlInsights';
 import { useInvestigationSession } from '../state/investigationSession';
+import { audio } from '../audio/audioManager';
 
 const reveal = (delay) => ({
   initial: { opacity: 0, y: 18 },
@@ -29,6 +30,15 @@ function Panel({ icon: Icon, label, children, delay }) {
 export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = null, onLeave, onClose }) {
   const { reveal: revealed, verdict, discoveries, timeline, reach, accusations } = useInvestigationSession();
   const overlayRef = useRef(null);
+
+  /*
+   * The verdict is the one place the score changes without a route change, so
+   * it is fired here. It does not loop; leaving the board afterwards picks the
+   * menu bed back up on its own.
+   */
+  useEffect(() => {
+    if (isOpen) audio.playMusic('solved');
+  }, [isOpen]);
 
   // A keydown only reaches the overlay's handler if focus is inside it.
   useEffect(() => {

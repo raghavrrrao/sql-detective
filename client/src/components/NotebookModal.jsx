@@ -12,6 +12,7 @@ import { NotebookQueryHistory } from './notebook/NotebookQueryHistory';
 import { NotebookSuspects } from './notebook/NotebookSuspects';
 import { NotebookTimeline } from './notebook/NotebookTimeline';
 import { useInvestigationSession } from '../state/investigationSession';
+import { audio } from '../audio/audioManager';
 
 const sections = [
   { id: 'overview', label: 'Overview', icon: ScrollText },
@@ -86,6 +87,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
   }, [isOpen, active.id]);
 
   const selectSection = useCallback((id) => {
+    if (id !== sectionRef.current) audio.playSfx('pageTurn');
     commitScroll();
     setNotebookSection(id);
   }, [commitScroll, setNotebookSection]);

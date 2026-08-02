@@ -87,6 +87,13 @@ export function GameModeProvider({ children }) {
 
   const setMusic = useCallback((music) => apply({ music }), [apply]);
   const setSoundEffects = useCallback((soundEffects) => apply({ soundEffects }), [apply]);
+  const setAmbient = useCallback((ambient) => apply({ ambient }), [apply]);
+  // Volumes are stored 0–1 and clamped on the way in, so a bad value from an
+  // edited store can never push the mixer out of range.
+  const level = (value) => Math.min(1, Math.max(0, Number(value) || 0));
+  const setMasterVolume = useCallback((v) => apply({ masterVolume: level(v) }), [apply]);
+  const setMusicVolume = useCallback((v) => apply({ musicVolume: level(v) }), [apply]);
+  const setSfxVolume = useCallback((v) => apply({ sfxVolume: level(v) }), [apply]);
 
   const value = useMemo(() => ({
     ...settings,
@@ -104,9 +111,14 @@ export function GameModeProvider({ children }) {
     clearLeaderboard,
     setMusic,
     setSoundEffects,
+    setAmbient,
+    setMasterVolume,
+    setMusicVolume,
+    setSfxVolume,
   }), [
     settings, sessionNonce, chooseMode, registerDetective, startNextDetective,
     clearCurrentSession, resetPersonalProgress, clearLeaderboard, setMusic, setSoundEffects,
+    setAmbient, setMasterVolume, setMusicVolume, setSfxVolume,
   ]);
 
   return <GameModeContext.Provider value={value}>{children}</GameModeContext.Provider>;

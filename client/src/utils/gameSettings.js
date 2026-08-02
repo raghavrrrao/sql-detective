@@ -19,8 +19,17 @@ const defaults = {
   // null means the player has not chosen yet, which is what shows the welcome.
   mode: null,
   detectiveName: '',
+  // `music` and `soundEffects` predate the mixer and are kept as the two
+  // master switches so existing saves keep working untouched.
   music: true,
   soundEffects: true,
+  // The mixer. Stored 0–1; the UI shows whole percentages.
+  masterVolume: 0.8,
+  musicVolume: 0.7,
+  sfxVolume: 0.8,
+  // Ambience is separable from music: a stand may want the beds off while
+  // keeping the stings that confirm an action.
+  ambient: true,
 };
 
 export function readSettings() {
@@ -33,8 +42,17 @@ export function readSettings() {
     detectiveName: typeof stored.detectiveName === 'string' ? stored.detectiveName.slice(0, NAME_MAX_LENGTH) : '',
     music: stored.music !== false,
     soundEffects: stored.soundEffects !== false,
+    ambient: stored.ambient !== false,
+    masterVolume: level(stored.masterVolume, defaults.masterVolume),
+    musicVolume: level(stored.musicVolume, defaults.musicVolume),
+    sfxVolume: level(stored.sfxVolume, defaults.sfxVolume),
     version: SETTINGS_VERSION,
   };
+}
+
+/** A stored volume is only trusted if it is a real number inside 0–1. */
+function level(value, fallback) {
+  return Number.isFinite(value) ? Math.min(1, Math.max(0, value)) : fallback;
 }
 
 export function writeSettings(changes) {

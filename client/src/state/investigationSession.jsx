@@ -2,9 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { executeCaseQuery } from '../services/caseService';
 import { assessReadiness, evaluateAccusation } from '../utils/accusation';
 import { getSolution } from '../utils/caseSolution';
-import { markCaseSolved, recordQueryRun } from '../utils/caseProgress';
+import { getProgress, isCaseLocked, markCaseSolved, recordQueryRun } from '../utils/caseProgress';
 import { computeScore, starsFor } from '../utils/scoring';
-import { getCase, getCaseThresholds, getCaseWording } from '../catalog/caseCatalog';
+import { getCase, getCaseThresholds, getCaseWording, getNextCase } from '../catalog/caseCatalog';
 import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
 import { buildInsights } from '../utils/insights';
 import { buildProgressLedger } from '../utils/investigationProgress';
@@ -16,6 +16,7 @@ import { describeResult, nounFor } from '../utils/queryFeedback';
 import { applyDiscoveriesToFiles, buildSuspectIntel } from '../utils/suspectIntel';
 import { inspectStatement } from '../utils/sqlInsights';
 import { readJson, writeJson } from '../utils/storage';
+import { audio } from '../audio/audioManager';
 
 /*
  * 5 — discoveries now carry the columns they were recovered with, the notebook
@@ -609,6 +610,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     lastRunRef.current = { sql: statement, at: now };
 
     inFlightRef.current = true;
+    audio.playSfx('execute');
     dispatch({ type: 'queryStart' });
 
     try {
@@ -616,12 +618,31 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       dispatch({ type: 'querySuccess', statement, result, insights: inspectStatement(statement), rosterNames, startedAt: now });
       recordQueryRun(difficulty);
     } catch (error) {
+      audio.playSfx('queryError');
       dispatch({ type: 'queryFailure', statement, message: error.message, startedAt: now });
     } finally {
       inFlightRef.current = false;
       lastRunRef.current = { sql: statement, at: Date.now() };
     }
   }, [difficulty, rosterNames]);
+
+  /*
+   * Discovery audio.
+   *
+   * Driven off `lastDiscovery`, which the reducer already computes, so the
+   * reducer stays pure and the sound is a reaction to state rather than a side
+   * effect buried inside it. Exactly one sting per query: layering an
+   * objective chime over an evidence stamp over a success tone turns a good
+   * result into a slot machine.
+   */
+  useEffect(() => {
+    const event = state.lastDiscovery;
+    if (!event) return;
+    if (event.completedObjectives.length > 0) audio.playSfx('objectiveComplete');
+    else if (event.openedCategories.some((label) => /evidence/i.test(label))) audio.playSfx('evidenceFound');
+    else if (event.added > 0) audio.playSfx('discovery');
+    else audio.playSfx('querySuccess');
+  }, [state.lastDiscovery]);
 
   /* -------------------------------------------------------------- selectors */
 
@@ -713,6 +734,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     });
 
     dispatch({ type: 'recordAccusation', at, suspect, evidenceKeys, reasoning, proven });
+    audio.playSfx(proven ? 'accuse' : 'wrongAccusation');
     if (!proven) return { proven: false };
 
     // Everything below this line runs only once the case is proven.
@@ -786,6 +808,16 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       reveal,
     });
 
+    /*
+     * A solve usually opens the next case. That is a different event from
+     * winning this one, so it gets its own chime — held back a beat so it
+     * lands after the verdict rather than on top of it.
+     */
+    const next = getNextCase(difficulty);
+    if (next && isCaseLocked(next.id, getProgress()) === false) {
+      window.setTimeout(() => audio.playSfx('unlock'), 900);
+    }
+
     return { proven: true };
   }, [briefing.case, difficulty]);
 
@@ -800,7 +832,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     setReasoning: (reasoning) => dispatch({ type: 'setReasoning', reasoning }),
     startTimer: () => dispatch({ type: 'startTimer', at: Date.now() }),
     pauseTimer: () => dispatch({ type: 'pauseTimer', at: Date.now() }),
-    revealHint: () => dispatch({ type: 'revealHint', at: Date.now() }),
+    revealHint: () => { audio.playSfx('hint'); dispatch({ type: 'revealHint', at: Date.now() }); },
     deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
     clearHistory: () => dispatch({ type: 'clearHistory' }),
     setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),

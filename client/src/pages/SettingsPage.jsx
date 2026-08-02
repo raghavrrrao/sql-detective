@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowLeft, GraduationCap, House, Music, ShieldAlert, Volume2 } from 'lucide-react';
+import { ArrowLeft, GraduationCap, House, Music, Radio, ShieldAlert, Volume2 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ConfirmDialog } from '../components/ConfirmDialog';
@@ -9,6 +9,7 @@ import { SectionHeading } from '../components/SectionHeading';
 import { GAME_MODES } from '../utils/gameSettings';
 import { useGameMode } from '../state/gameMode';
 import { resetTraining } from '../utils/tutorialProgress';
+import { audio } from '../audio/audioManager';
 
 function Row({ title, description, children }) {
   return (
@@ -19,6 +20,32 @@ function Row({ title, description, children }) {
       </div>
       <div className="flex shrink-0 flex-wrap gap-2.5">{children}</div>
     </div>
+  );
+}
+
+/**
+ * A mixer level. The effects slider previews itself as it moves — a volume
+ * control you cannot hear while setting it is a guess, not a control.
+ */
+function VolumeSlider({ label, value, onChange, disabled = false }) {
+  const percent = Math.round(value * 100);
+  return (
+    <label className={`flex flex-wrap items-center gap-x-4 gap-y-2 py-2.5 ${disabled ? 'opacity-45' : ''}`}>
+      <span className="w-full text-sm font-medium text-bone sm:w-40">{label}</span>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        step="5"
+        value={percent}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.target.value) / 100)}
+        aria-label={label}
+        aria-valuetext={`${percent} percent`}
+        className="h-1.5 min-w-0 flex-1 cursor-pointer appearance-none rounded-full bg-bone/15 accent-gold-bright disabled:cursor-not-allowed"
+      />
+      <span className="w-12 shrink-0 text-right typo-numeric text-sm text-gold-bright">{percent}%</span>
+    </label>
   );
 }
 
@@ -46,7 +73,9 @@ const neutral = 'clip-corner-sm inline-flex items-center gap-2 border border-whi
 export function SettingsPage() {
   const {
     mode, isFestival, detectiveName, music, soundEffects, appVersion,
-    chooseMode, clearCurrentSession, resetPersonalProgress, clearLeaderboard, setMusic, setSoundEffects,
+    ambient, masterVolume, musicVolume, sfxVolume,
+    chooseMode, clearCurrentSession, resetPersonalProgress, clearLeaderboard,
+    setMusic, setSoundEffects, setAmbient, setMasterVolume, setMusicVolume, setSfxVolume,
   } = useGameMode();
   const navigate = useNavigate();
 
@@ -148,11 +177,24 @@ export function SettingsPage() {
         <section className="clip-corner mt-6 panel-surface p-7 shadow-panel">
           <h2 className="font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">Audio</h2>
           <p className="mt-2 typo-body-secondary text-sm text-bone-dim">
-            These switches are saved now and take effect once the audio pack ships. Nothing plays yet.
+            Saved with the machine, so a shared laptop keeps its mix between participants.
           </p>
+
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Toggle label="Music" icon={Music} isOn={music} onChange={setMusic} />
+            <Toggle label="Ambience" icon={Radio} isOn={ambient} onChange={setAmbient} />
             <Toggle label="Sound effects" icon={Volume2} isOn={soundEffects} onChange={setSoundEffects} />
+          </div>
+
+          <div className="mt-6 space-y-1 border-t border-bone/10 pt-5">
+            <VolumeSlider label="Master volume" value={masterVolume} onChange={setMasterVolume} />
+            <VolumeSlider label="Music volume" value={musicVolume} onChange={setMusicVolume} disabled={!music} />
+            <VolumeSlider
+              label="Effects volume"
+              value={sfxVolume}
+              disabled={!soundEffects}
+              onChange={(next) => { setSfxVolume(next); audio.playSfx('click'); }}
+            />
           </div>
         </section>
 

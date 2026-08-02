@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BadgeCheck, FileText, Trophy, UserRoundPlus, X } from 'lucide-react';
 import { LeaderboardPanel } from './LeaderboardPanel';
+import { audio } from '../audio/audioManager';
 import { getCase, getCaseThresholds } from '../catalog/caseCatalog';
 import { computeScore } from '../utils/scoring';
 import { formatClock } from '../utils/clock';
@@ -32,6 +33,8 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
   // A keydown only reaches the overlay's handler if focus is inside it.
   useEffect(() => {
     if (!isOpen) return undefined;
+    // The score reveal is the reward beat of a festival run.
+    audio.playSfx('stars');
     const frame = window.requestAnimationFrame(() => overlayRef.current?.focus());
     return () => window.cancelAnimationFrame(frame);
   }, [isOpen]);

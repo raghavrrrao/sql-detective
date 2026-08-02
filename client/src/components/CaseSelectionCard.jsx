@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { DifficultyBadge } from './DifficultyBadge';
 import { getCaseRoutePath } from '../catalog/caseCatalog';
 import { resetInvestigation } from '../utils/caseProgress';
+import { audio } from '../audio/audioManager';
 
 const statusChips = {
   new: { label: 'Unopened', icon: Sparkles, className: 'border-gold/40 bg-gold/10 text-gold-bright' },
@@ -43,7 +44,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
   // report that was earned with it are deliberately left alone, and the case
   // database is never touched.
   const handleReplay = () => {
-    if (!confirmReplay) { setConfirmReplay(true); return; }
+    if (!confirmReplay) { audio.playSfx('click'); setConfirmReplay(true); return; }
     resetInvestigation(caseKey);
     navigate(getCaseRoutePath(caseKey, 'investigation'));
   };
@@ -157,6 +158,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
+      onMouseEnter={() => audio.playSfx('hover')}
       className={`clip-corner group relative flex h-full flex-col panel-surface p-7 shadow-panel transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${
         isSolved ? 'border-verdict-clear/35 hover:border-verdict-clear/60' : 'hover:border-crimson/45'
       }`}

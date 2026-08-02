@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { audio } from '../audio/audioManager';
 
 /*
  * Each variant carries its own inset top-light so the face is never flat, and
@@ -29,7 +30,13 @@ const sizes = {
  * hover, and identical geometry whether it renders a <button>, an <a>, or a
  * router <Link>.
  */
-export function ActionButton({ as = 'button', to, href, variant = 'primary', size = 'md', icon: Icon, iconRight: IconRight, children, className = '', ...rest }) {
+export function ActionButton({ as = 'button', to, href, variant = 'primary', size = 'md', icon: Icon, iconRight: IconRight, children, className = '', onClick, ...rest }) {
+  // Every primary control in the game routes through this component, so the
+  // click lives here rather than being repeated at ~40 call sites.
+  const handleClick = (event) => {
+    audio.playSfx('click');
+    onClick?.(event);
+  };
   const classes = `group clip-corner-sm relative inline-flex items-center justify-center gap-2.5 overflow-hidden font-display font-medium uppercase tracking-[0.16em] disabled:cursor-not-allowed ${TACTILE} ${variants[variant]} ${sizes[size]} ${className}`;
 
   const inner = (
@@ -44,7 +51,7 @@ export function ActionButton({ as = 'button', to, href, variant = 'primary', siz
     </>
   );
 
-  if (as === 'link') return <Link to={to} className={classes} {...rest}>{inner}</Link>;
-  if (as === 'a') return <a href={href} className={classes} {...rest}>{inner}</a>;
-  return <button type="button" className={classes} {...rest}>{inner}</button>;
+  if (as === 'link') return <Link to={to} className={classes} onClick={handleClick} {...rest}>{inner}</Link>;
+  if (as === 'a') return <a href={href} className={classes} onClick={handleClick} {...rest}>{inner}</a>;
+  return <button type="button" className={classes} onClick={handleClick} {...rest}>{inner}</button>;
 }

@@ -4,6 +4,7 @@ import { TrainingInvitation } from '../components/TrainingInvitation';
 import { SoundProvider } from '../context/SoundContext';
 import { GameModeProvider, useGameMode } from '../state/gameMode';
 import { hasCompletedTraining } from '../utils/tutorialProgress';
+import { useRouteMusic } from '../audio/useRouteMusic';
 
 /**
  * Keying the outlet on the session nonce is what lets the app reset itself
@@ -14,6 +15,8 @@ import { hasCompletedTraining } from '../utils/tutorialProgress';
 function Routes() {
   const { sessionNonce, hasChosenMode, needsDetectiveName, isFestival } = useGameMode();
   const location = useLocation();
+  // The bed follows navigation; it never restarts for a route that shares one.
+  useRouteMusic();
   const isReady = hasChosenMode && !needsDetectiveName;
 
   /*
