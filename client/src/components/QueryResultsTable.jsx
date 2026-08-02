@@ -74,7 +74,7 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
 
   return (
     <section className="clip-corner flex min-h-[18rem] flex-col overflow-hidden panel-surface shadow-panel backdrop-blur-xl">
-      <header className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-5 py-4">
+      <header className="flex items-center gap-3 border-b border-bone/10 bg-gradient-to-b from-bone/[0.06] to-transparent px-5 py-4 shadow-[inset_0_-1px_0_rgba(169,29,43,0.45)]">
         <DatabaseZap size={18} className="text-crimson-glow" strokeWidth={2} aria-hidden="true" />
         <h2 className="font-display text-base font-medium uppercase tracking-[0.18em] text-bone">Recovered records</h2>
         {!isLoading && !error && rowCount > 0 && (
@@ -93,12 +93,12 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
       {!isLoading && !error && lastDiscovery && (lastDiscovery.added > 0 || lastDiscovery.completedObjectives.length > 0) && (
         <motion.div
           key={lastDiscovery.at}
-          initial={{ opacity: 0, y: -4 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.25 }}
+          initial={{ opacity: 0, y: -6, scale: 0.995 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
           role="status"
           aria-live="polite"
-          className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-gold/25 bg-gold/[0.06] px-5 py-2.5"
+          className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-gold/30 bg-gradient-to-b from-gold/[0.12] to-gold/[0.04] px-5 py-2.5 shadow-[inset_0_1px_0_rgba(217,180,95,0.25)]"
         >
           {lastDiscovery.added > 0 && (
             <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.12em] text-gold-bright">

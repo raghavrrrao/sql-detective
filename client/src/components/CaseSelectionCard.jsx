@@ -48,8 +48,19 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
     navigate(getCaseRoutePath(caseKey, 'investigation'));
   };
 
+  // A folder has a tab and a clip. Both are decoration: absolutely positioned,
+  // aria-hidden, and outside the flow, so nothing moves to make room for them.
+  const dossierFurniture = (
+    <>
+      <span aria-hidden="true" className="pointer-events-none absolute -top-px left-8 h-[3px] w-16 bg-gradient-to-r from-gold/70 to-gold/10" />
+      <span aria-hidden="true" className="pointer-events-none absolute right-7 top-0 h-7 w-6 -translate-y-1/2 border border-bone/25 bg-gradient-to-b from-bone/20 to-bone/5 shadow-[0_2px_6px_-2px_rgba(0,0,0,0.8)]" />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-bone/20 to-transparent" />
+    </>
+  );
+
   const body = (
     <>
+      {dossierFurniture}
       <div className="flex items-center justify-between gap-4">
         <DifficultyBadge difficulty={caseData.tier} rank={caseData.tierRank} />
         <span className="font-mono text-sm text-bone-dim">{caseData.caseNumber}</span>
@@ -146,7 +157,7 @@ export function CaseSelectionCard({ caseData, caseKey, index, status = 'new', is
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
       whileHover={{ y: -8 }}
-      className={`clip-corner group relative flex h-full flex-col panel-surface p-7 shadow-panel transition-colors duration-300 ${
+      className={`clip-corner group relative flex h-full flex-col panel-surface p-7 shadow-panel transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 ${
         isSolved ? 'border-verdict-clear/35 hover:border-verdict-clear/60' : 'hover:border-crimson/45'
       }`}
     >

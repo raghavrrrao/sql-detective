@@ -26,16 +26,21 @@ export function AnimatedBackground({ variant = 'default' }) {
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-ink" />
 
-      <div className={`absolute inset-0 board-grid ${isBoard ? 'opacity-50' : 'opacity-35'}`} />
-      <div className="absolute inset-0 board-grid-fine opacity-25" />
+      {/* The board is a desk: leather under the grid, and a lamp above it. */}
+      {isBoard && <div className="absolute inset-0 desk-surface" />}
 
-      <div className="absolute -left-[22%] -top-[18%] h-[42rem] w-[42rem] animate-drift rounded-full bg-crimson-deep/25 blur-[150px]" />
+      <div className={`absolute inset-0 board-grid ${isBoard ? 'opacity-40' : 'opacity-30'}`} />
+      <div className="absolute inset-0 board-grid-fine opacity-20" />
+
+      <div className={`absolute inset-x-0 top-0 h-[36rem] lamp-light ${isBoard ? 'animate-breathe opacity-100' : 'opacity-70'}`} />
+
+      <div className="absolute -left-[22%] -top-[18%] h-[42rem] w-[42rem] animate-drift rounded-full bg-crimson-deep/30 blur-[150px]" />
       <div
-        className="absolute -right-[18%] top-[28%] h-[36rem] w-[36rem] animate-drift rounded-full bg-slate-600/10 blur-[160px]"
+        className="absolute -right-[18%] top-[28%] h-[36rem] w-[36rem] animate-drift rounded-full bg-leather/40 blur-[160px]"
         style={{ animationDelay: '-9s', animationDuration: '31s' }}
       />
       <div
-        className="absolute bottom-[-18%] left-[22%] h-[26rem] w-[60%] animate-drift rounded-[100%] bg-gold-deep/10 blur-[130px]"
+        className="absolute bottom-[-18%] left-[22%] h-[26rem] w-[60%] animate-drift rounded-[100%] bg-gold-deep/20 blur-[130px]"
         style={{ animationDelay: '-15s', animationDuration: '38s' }}
       />
 
@@ -50,7 +55,7 @@ export function AnimatedBackground({ variant = 'default' }) {
       {dust.map((mote) => (
         <span
           key={mote.id}
-          className="absolute bottom-[-4%] animate-float rounded-full bg-bone/40"
+          className="absolute bottom-[-4%] animate-float rounded-full bg-gold-bright/35"
           style={{
             left: mote.left,
             height: `${mote.size}px`,
@@ -61,7 +66,7 @@ export function AnimatedBackground({ variant = 'default' }) {
         />
       ))}
 
-      <div className="absolute inset-0 film-grain opacity-[0.05] mix-blend-overlay" />
+      <div className="absolute inset-0 film-grain opacity-[0.035] mix-blend-overlay" />
       <div className="absolute inset-0 vignette" />
     </div>
   );

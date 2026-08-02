@@ -11,16 +11,16 @@ function Shortcut({ children }) {
 
 function QueryToolbarComponent({ onRun, onReset, onClear, isRunning, canReset, canClear = true }) {
   return (
-    <div className="flex flex-wrap items-center gap-2.5 border-t border-white/10 bg-black/35 p-3.5">
+    <div className="flex flex-wrap items-center gap-2.5 border-t border-bone/10 bg-gradient-to-b from-transparent to-black/30 p-3.5 shadow-[inset_0_1px_0_rgba(255,250,236,0.05)]">
       <button
         type="button"
         onClick={onRun}
         disabled={isRunning}
         aria-busy={isRunning}
         aria-keyshortcuts="Control+Enter Meta+Enter"
-        className="clip-corner-sm group relative inline-flex items-center gap-2 overflow-hidden border border-crimson-bright/60 bg-crimson px-4 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-bone shadow-crimson transition-colors hover:bg-crimson-bright disabled:cursor-wait disabled:border-white/10 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
+        className="clip-corner-sm group relative inline-flex items-center gap-2 overflow-hidden border border-crimson-bright/60 bg-crimson px-4 py-2.5 font-display text-sm font-medium uppercase tracking-[0.14em] text-bone shadow-crimson hover:-translate-y-px hover:shadow-lift active:translate-y-px active:shadow-press hover:bg-crimson-bright disabled:transform-none disabled:cursor-wait disabled:border-white/10 disabled:bg-charcoal-light disabled:text-bone-dim disabled:shadow-none"
       >
-        <span aria-hidden="true" className="absolute inset-y-0 -left-full w-1/3 skew-x-[-20deg] bg-white/20 transition-transform duration-500 group-hover:translate-x-[400%]" />
+        <span aria-hidden="true" className="absolute inset-y-0 -left-full w-1/3 skew-x-[-20deg] bg-gradient-to-r from-transparent via-bone/18 to-transparent transition-transform duration-[650ms] ease-out group-hover:translate-x-[400%]" />
         <span className="relative flex items-center gap-2">
           <Play size={15} strokeWidth={2.4} aria-hidden="true" /> {isRunning ? 'Executing…' : 'Run query'}
         </span>

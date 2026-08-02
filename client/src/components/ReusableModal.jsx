@@ -9,7 +9,7 @@ const FOCUSABLE = 'a[href],button:not([disabled]),textarea:not([disabled]),input
  * the close button — for the one dialog that must be answered rather than
  * waved away: the final accusation confirmation.
  */
-export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md', dismissible = true, bodyRef, children }) {
+export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md', surface = 'panel', dismissible = true, bodyRef, children }) {
   const titleId = useId();
   const dialogRef = useRef(null);
   // Whatever opened the dialog gets the caret back when it closes.
@@ -72,6 +72,9 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
   }, [isOpen]);
 
   const widths = { md: 'max-w-xl', lg: 'max-w-3xl', full: 'max-w-6xl h-[92dvh]' };
+  // The notebook and the case report are documents, so they get paper rather
+  // than the machined charcoal every other dialog uses.
+  const surfaces = { panel: 'panel-surface', paper: 'paper-surface' };
 
   return (
     <AnimatePresence>
@@ -80,24 +83,24 @@ export function ReusableModal({ isOpen, onClose, title, icon: Icon, size = 'md',
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-end bg-black/78 p-2 backdrop-blur-md sm:items-center sm:justify-center sm:p-4"
+          className="fixed inset-0 z-50 flex items-end bg-ink-deep/82 p-2 backdrop-blur-md sm:items-center sm:justify-center sm:p-4"
           onMouseDown={requestClose}
         >
           <motion.section
             ref={dialogRef}
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
+            initial={{ opacity: 0, y: 22, scale: 0.985 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.98 }}
-            transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+            exit={{ opacity: 0, y: 12, scale: 0.99 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
             tabIndex={-1}
             onKeyDown={handleKeyDown}
-            className={`clip-corner flex max-h-[92dvh] w-full flex-col panel-surface shadow-panel outline-none sm:max-h-[88vh] ${widths[size]}`}
+            className={`clip-corner flex max-h-[92dvh] w-full flex-col shadow-panel outline-none sm:max-h-[88vh] ${surfaces[surface] ?? surfaces.panel} ${widths[size]}`}
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <header className="flex items-center gap-2.5 border-b border-white/10 bg-white/[0.03] px-4 py-3.5 sm:gap-3 sm:px-6 sm:py-4">
+            <header className="flex items-center gap-2.5 border-b border-bone/10 bg-gradient-to-b from-bone/[0.06] to-transparent px-4 py-3.5 shadow-[inset_0_-1px_0_rgba(184,146,66,0.35)] sm:gap-3 sm:px-6 sm:py-4">
               {Icon && <Icon size={19} className="shrink-0 text-gold-bright" strokeWidth={2} aria-hidden="true" />}
               <h2 id={titleId} className="min-w-0 truncate font-display text-base font-medium uppercase tracking-[0.12em] text-bone sm:text-xl sm:tracking-[0.16em]">{title}</h2>
               {dismissible && (

@@ -7,9 +7,9 @@ const categoryStyles = {
   Weapon: { icon: Swords, tone: 'text-crimson-glow', ring: 'border-crimson/40 bg-crimson-deep/25' },
   Forensic: { icon: FlaskConical, tone: 'text-verdict-clear', ring: 'border-verdict-clear/35 bg-verdict-clear/10' },
   Document: { icon: FileText, tone: 'text-gold-bright', ring: 'border-gold/35 bg-gold-deep/20' },
-  Digital: { icon: HardDrive, tone: 'text-sky-300', ring: 'border-sky-400/30 bg-sky-500/10' },
+  Digital: { icon: HardDrive, tone: 'text-verdict-info', ring: 'border-verdict-info/30 bg-verdict-info/10' },
   Access: { icon: KeyRound, tone: 'text-violet-300', ring: 'border-violet-400/30 bg-violet-500/10' },
-  Medical: { icon: Pill, tone: 'text-emerald-300', ring: 'border-emerald-400/30 bg-emerald-500/10' },
+  Medical: { icon: Pill, tone: 'text-verdict-clear', ring: 'border-verdict-clear/30 bg-verdict-clear/10' },
   Physical: { icon: Package, tone: 'text-orange-300', ring: 'border-orange-400/30 bg-orange-500/10' },
 };
 

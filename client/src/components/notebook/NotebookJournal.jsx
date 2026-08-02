@@ -5,7 +5,7 @@ import { useInvestigationSession } from '../../state/investigationSession';
 
 const kinds = {
   discovery: { icon: BookMarked, tone: 'text-gold-bright', ring: 'border-gold/35 bg-gold-deep/20' },
-  source: { icon: FolderOpen, tone: 'text-sky-300', ring: 'border-sky-400/30 bg-sky-500/10' },
+  source: { icon: FolderOpen, tone: 'text-verdict-info', ring: 'border-verdict-info/30 bg-verdict-info/10' },
   objective: { icon: ClipboardCheck, tone: 'text-verdict-clear', ring: 'border-verdict-clear/35 bg-verdict-clear/10' },
   suspect: { icon: UserPlus, tone: 'text-violet-300', ring: 'border-violet-400/30 bg-violet-500/10' },
   prime: { icon: Target, tone: 'text-crimson-glow', ring: 'border-crimson/40 bg-crimson-deep/25' },

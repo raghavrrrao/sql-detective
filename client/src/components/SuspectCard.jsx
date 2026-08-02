@@ -9,16 +9,23 @@ function initialsOf(name) {
 }
 
 /** A stable portrait tint per suspect so the roster is visually distinguishable. */
+/*
+ * One tint per roster position, so two suspects never look like the same
+ * person at a glance. They were a rainbow — violet, teal, fuchsia — which read
+ * as a chart legend in a room lit by a brass lamp. These are all drawn from
+ * leather, mahogany, brass and ink instead: still nine distinguishable plates,
+ * all of them in key with the rest of the game.
+ */
 const tints = [
   'from-crimson-deep/70 to-charcoal',
-  'from-sky-950 to-charcoal',
-  'from-amber-950 to-charcoal',
-  'from-violet-950 to-charcoal',
-  'from-emerald-950 to-charcoal',
-  'from-rose-950 to-charcoal',
-  'from-slate-800 to-charcoal',
-  'from-teal-950 to-charcoal',
-  'from-fuchsia-950 to-charcoal',
+  'from-leather to-charcoal',
+  'from-gold-deep/55 to-charcoal',
+  'from-ink-soft to-charcoal',
+  'from-leather-deep to-charcoal',
+  'from-crimson-deep/40 to-charcoal',
+  'from-charcoal-raised to-charcoal',
+  'from-gold-deep/30 to-charcoal',
+  'from-charcoal-light to-charcoal',
 ];
 
 /**

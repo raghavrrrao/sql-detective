@@ -4,7 +4,7 @@ import { DifficultyBadge } from './DifficultyBadge';
 
 /** Rail colour follows the tier's rank, matching DifficultyBadge. */
 const rails = {
-  1: 'bg-sky-400',
+  1: 'bg-verdict-info',
   2: 'bg-verdict-clear',
   3: 'bg-gold',
   4: 'bg-orange-400',
@@ -19,9 +19,10 @@ export function DifficultyCard({ difficulty, rank = 2, time, concepts, story, in
       whileHover={{ y: -7 }}
       viewport={{ once: true, amount: 0.25 }}
       transition={{ duration: 0.45, delay: index * 0.1 }}
-      className="clip-corner relative panel-surface p-5 shadow-panel sm:p-7"
+      className="clip-corner relative panel-surface p-5 shadow-panel transition-shadow duration-300 hover:shadow-panel-raised sm:p-7"
     >
       <span aria-hidden="true" className={`absolute left-0 top-0 h-full w-[3px] ${rails[rank] ?? rails[2]}`} />
+      <span aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-bone/18 to-transparent" />
 
       <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
         <h3 className="typo-heading text-2xl text-bone sm:text-3xl">{difficulty}</h3>

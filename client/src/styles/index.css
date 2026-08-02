@@ -87,17 +87,22 @@
     color-scheme: dark;
     font-family: Rajdhani, Inter, ui-sans-serif, system-ui, sans-serif;
     font-size: 16px;
-    background: #08070a;
-    /* Investigation board texture, shared by every screen. */
-    --board-grid: rgba(255, 255, 255, 0.035);
-    --board-line: rgba(196, 19, 46, 0.5);
+    background: #1b1b21;
+    /* Investigation board texture, shared by every screen. Warmed towards
+       brass so the grid reads as a desk blotter rather than a wireframe. */
+    --board-grid: rgba(233, 216, 184, 0.035);
+    --board-line: rgba(169, 29, 43, 0.55);
+    --lamp: rgba(217, 180, 95, 0.10);
   }
 
   body {
     margin: 0;
     min-width: 320px;
     min-height: 100vh;
-    background: #08070a;
+    /* Charcoal with a warm floor, not a black hole. */
+    background:
+      radial-gradient(120% 80% at 50% 0%, #23232b 0%, #1b1b21 55%, #17171c 100%);
+    background-attachment: fixed;
     color: #f3f0e8;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
@@ -125,15 +130,25 @@
   input[type='submit'] {
     font-weight: 500;
     letter-spacing: 0.14em;
+    /* Tactile by default: every control eases rather than snapping. The
+       press itself is a Tailwind `active:` utility on the buttons that carry
+       weight, because a variant is the only thing that reliably beats a
+       `hover:` utility in the cascade. */
+    transition:
+      transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 180ms cubic-bezier(0.22, 1, 0.36, 1),
+      background-color 180ms ease,
+      border-color 180ms ease,
+      color 180ms ease;
   }
 
   ::selection {
-    background: rgba(196, 19, 46, 0.4);
+    background: rgba(169, 29, 43, 0.45);
     color: #f3f0e8;
   }
 
   *:focus-visible {
-    outline: 2px solid #e8c766;
+    outline: 2px solid #d9b45f;
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -143,15 +158,15 @@
     height: 10px;
   }
   ::-webkit-scrollbar-track {
-    background: #0c0c10;
+    background: #1e1e25;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2c2c36;
-    border: 2px solid #0c0c10;
+    background: #41414d;
+    border: 2px solid #1e1e25;
     border-radius: 999px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #46464f;
+    background: #5a5a68;
   }
 }
 
@@ -249,7 +264,7 @@
   }
 
   .vignette {
-    background: radial-gradient(120% 90% at 50% 40%, transparent 30%, rgba(0, 0, 0, 0.55) 78%, rgba(0, 0, 0, 0.9) 100%);
+    background: radial-gradient(115% 85% at 50% 38%, transparent 34%, rgba(10, 9, 12, 0.38) 76%, rgba(10, 9, 12, 0.7) 100%);
   }
 
   .scanlines {
@@ -279,24 +294,85 @@
     clip-path: polygon(0 0, 100% 0, calc(100% - 9px) 100%, 0 100%);
   }
 
-  /* ---- Surfaces ---- */
+  /* ---- Surfaces ----------------------------------------------------------
+   *
+   * Every panel is meant to read as an object on a desk rather than a filled
+   * rectangle. Three things do that work, and none of them is an outer
+   * shadow — `clip-path` clips those away, and nearly every panel here is
+   * clipped:
+   *
+   *   1. a light edge along the top, where a desk lamp would catch it,
+   *   2. shade pooling along the bottom inside edge,
+   *   3. a diagonal body gradient so the face is never one flat value.
+   *
+   * The elevation ladder is panel → raised → dossier, each a step lighter and
+   * a step warmer than the last.
+   */
   .panel-surface {
-    background: linear-gradient(160deg, rgba(27, 27, 33, 0.92) 0%, rgba(12, 12, 16, 0.94) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background:
+      linear-gradient(180deg, rgba(255, 250, 236, 0.05) 0%, rgba(255, 250, 236, 0) 34%),
+      linear-gradient(158deg, rgba(42, 42, 51, 0.96) 0%, rgba(33, 33, 41, 0.97) 100%);
+    border: 1px solid rgba(233, 216, 184, 0.09);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 250, 236, 0.07),
+      inset 0 -22px 34px -26px rgba(0, 0, 0, 0.9);
   }
 
   .panel-surface-raised {
-    background: linear-gradient(160deg, rgba(34, 34, 41, 0.95) 0%, rgba(16, 16, 21, 0.96) 100%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background:
+      linear-gradient(180deg, rgba(255, 250, 236, 0.07) 0%, rgba(255, 250, 236, 0) 40%),
+      linear-gradient(158deg, rgba(54, 54, 65, 0.97) 0%, rgba(42, 42, 52, 0.98) 100%);
+    border: 1px solid rgba(233, 216, 184, 0.13);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 250, 236, 0.10),
+      inset 0 -24px 38px -28px rgba(0, 0, 0, 0.85);
   }
 
+  /* Paper in a folder: warmer, with a brass edge and a soft page sheen. */
   .dossier-surface {
-    background: linear-gradient(150deg, rgba(30, 27, 24, 0.94) 0%, rgba(14, 13, 12, 0.96) 100%);
-    border: 1px solid rgba(201, 162, 39, 0.16);
+    background:
+      linear-gradient(180deg, rgba(255, 238, 205, 0.06) 0%, rgba(255, 238, 205, 0) 42%),
+      linear-gradient(150deg, rgba(48, 43, 36, 0.97) 0%, rgba(36, 31, 26, 0.98) 100%);
+    border: 1px solid rgba(184, 146, 66, 0.24);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 238, 205, 0.09),
+      inset 0 -22px 36px -26px rgba(0, 0, 0, 0.85);
+  }
+
+  /* The notebook page itself — the one surface allowed to read as paper. */
+  .paper-surface {
+    background:
+      linear-gradient(180deg, rgba(255, 240, 210, 0.07) 0%, rgba(255, 240, 210, 0.02) 30%, rgba(255, 240, 210, 0) 70%),
+      linear-gradient(152deg, rgba(52, 46, 38, 0.97) 0%, rgba(39, 34, 28, 0.98) 100%);
+    border: 1px solid rgba(184, 146, 66, 0.20);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 240, 210, 0.10),
+      inset 0 -20px 34px -26px rgba(0, 0, 0, 0.8);
+  }
+
+  /* Desk leather, for the board backdrop. */
+  .desk-surface {
+    background:
+      radial-gradient(90% 70% at 50% 0%, rgba(217, 180, 95, 0.07) 0%, rgba(217, 180, 95, 0) 60%),
+      linear-gradient(170deg, rgba(43, 33, 25, 0.55) 0%, rgba(30, 23, 18, 0.55) 100%);
+  }
+
+  /* The cone of a desk lamp, thrown from just above the top edge. */
+  .lamp-light {
+    background: radial-gradient(85% 55% at 50% -8%, var(--lamp) 0%, rgba(217, 180, 95, 0.03) 42%, transparent 72%);
   }
 
   .hairline-top {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-shadow: inset 0 1px 0 rgba(255, 250, 236, 0.07);
+  }
+
+  /* Press response for the controls that carry weight. */
+  .tactile:hover:not(:disabled) {
+    transform: translateY(-1px);
+  }
+  .tactile:active:not(:disabled) {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.45);
   }
 
   /* Red string that connects pins on a detective board. */

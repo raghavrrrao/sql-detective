@@ -64,7 +64,16 @@ export function CaseIntroPage() {
                 style={{ filter: 'brightness(1.1) contrast(1.1) saturate(1.1)' }}
               />
             )}
-            <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.04] mix-blend-overlay" />
+            {/*
+              The art is the hero, so nothing dims it as a whole. The scrim is
+              anchored to the bottom third only — enough to guarantee the
+              caption reads on a bright plate, while the top of the plate is
+              left completely alone.
+            */}
+            <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink-deep/92 via-ink-deep/55 to-transparent" />
+            <div aria-hidden="true" className="absolute inset-0 film-grain opacity-[0.035] mix-blend-overlay" />
+            {/* A brass mount, the way a photograph sits in a case file. */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 shadow-[inset_0_0_0_1px_rgba(184,146,66,0.22),inset_0_0_60px_-18px_rgba(0,0,0,0.9)]" />
             <div className="relative">
               <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.24em] text-crimson-glow">
                 {wording.isTheft ? <FileSearch size={15} strokeWidth={2.4} /> : <UserX size={15} strokeWidth={2.4} />} {wording.subject}

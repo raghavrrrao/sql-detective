@@ -48,7 +48,7 @@ export function CaseDebrief({ isOpen, onClose, report }) {
   if (!report) return null;
 
   return (
-    <ReusableModal isOpen={isOpen} onClose={onClose} title="Investigation report" icon={FileText} size="full">
+    <ReusableModal isOpen={isOpen} onClose={onClose} title="Investigation report" icon={FileText} size="full" surface="paper">
       <div className="mb-5 flex justify-end print:hidden">
         <button
           type="button"

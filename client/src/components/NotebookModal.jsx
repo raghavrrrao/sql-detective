@@ -110,7 +110,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
   }, [selectSection]);
 
   return (
-    <ReusableModal isOpen={isOpen} onClose={handleClose} title="Detective notebook" icon={BookOpen} size="lg" bodyRef={bodyRef}>
+    <ReusableModal isOpen={isOpen} onClose={handleClose} title="Detective notebook" icon={BookOpen} size="lg" surface="paper" bodyRef={bodyRef}>
       <div
         role="tablist"
         aria-label="Notebook sections"

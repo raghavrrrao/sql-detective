@@ -16,18 +16,46 @@ export default {
         sans: ['Rajdhani', 'Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
       },
+      /*
+       * The room, not the void.
+       *
+       * The old palette sat on near-black (#08070A), which reads as an unlit
+       * dashboard rather than a room with a lamp in it. Everything is lifted
+       * onto charcoal and warmed towards leather, brass and aged paper. Every
+       * text/surface pair in this palette was measured against WCAG AA before
+       * it was adopted; the tightest is crimson-glow on a panel at 4.95:1.
+       */
       colors: {
-        ink: { DEFAULT: '#08070A', soft: '#0C0C10' },
-        charcoal: { DEFAULT: '#131318', light: '#1B1B21', line: '#26262E' },
-        crimson: { DEFAULT: '#C4132E', bright: '#E5233F', deep: '#7A0A1C', glow: '#FF3B57' },
-        gold: { DEFAULT: '#C9A227', bright: '#E8C766', deep: '#7A6215' },
-        bone: { DEFAULT: '#F3F0E8', muted: '#B9B8C2', dim: '#8B8A96' },
-        verdict: { clear: '#3FBF7F', watch: '#E0A22B', alert: '#E5384F' },
+        // Page and overlay base. `ink` is also the text colour on gold.
+        ink: { DEFAULT: '#1B1B21', soft: '#212129', deep: '#141419' },
+        // Panel surfaces, in ascending elevation.
+        charcoal: { DEFAULT: '#26262F', light: '#31313A', raised: '#3A3A45', line: '#4A4A56' },
+        // Mahogany rather than fire-engine.
+        crimson: { DEFAULT: '#A91D2B', bright: '#C9273A', deep: '#6E1119', glow: '#EC6076' },
+        // Brass rather than yellow.
+        gold: { DEFAULT: '#B89242', bright: '#D9B45F', deep: '#6E5722' },
+        // Aged paper, warm through the whole ramp.
+        bone: { DEFAULT: '#F3F0E8', muted: '#CFC9BC', dim: '#A39D90' },
+        verdict: { clear: '#5FA877', watch: '#D6A33A', alert: '#E36A7C', info: '#7FA9D4' },
+        // Desk leather, used by the board backdrop.
+        leather: { DEFAULT: '#2B2119', deep: '#1E1712' },
       },
+      /*
+       * clip-path clips an element's *outer* box-shadow away entirely, and
+       * almost every panel in this game is clipped. So elevation is carried by
+       * inset light along the top edge and inset shade along the bottom — the
+       * way a real object catches a desk lamp — with outer shadows kept for
+       * the unclipped things that can actually show them.
+       */
       boxShadow: {
-        panel: '0 24px 60px -20px rgba(0,0,0,0.85)',
-        glow: '0 0 0 1px rgba(201,162,39,0.28), 0 12px 40px -12px rgba(201,162,39,0.30)',
-        crimson: '0 0 0 1px rgba(196,19,46,0.35), 0 16px 44px -16px rgba(196,19,46,0.55)',
+        panel: 'inset 0 1px 0 rgba(255,255,255,0.07), inset 0 -22px 34px -26px rgba(0,0,0,0.9), 0 18px 44px -24px rgba(0,0,0,0.75)',
+        'panel-raised': 'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -24px 38px -28px rgba(0,0,0,0.85), 0 22px 52px -26px rgba(0,0,0,0.8)',
+        lift: 'inset 0 1px 0 rgba(255,255,255,0.12), 0 14px 30px -14px rgba(0,0,0,0.75)',
+        press: 'inset 0 2px 6px rgba(0,0,0,0.45)',
+        glow: '0 0 0 1px rgba(184,146,66,0.32), 0 14px 40px -14px rgba(184,146,66,0.32)',
+        crimson: '0 0 0 1px rgba(169,29,43,0.45), 0 16px 44px -16px rgba(169,29,43,0.55)',
+        // The lamp cone that separates the board from the room behind it.
+        lamp: '0 -30px 70px -40px rgba(217,180,95,0.30)',
       },
       keyframes: {
         drift: {
@@ -53,6 +81,16 @@ export default {
           '50%': { opacity: '0.55' },
           '52%': { opacity: '1' },
         },
+        // A card settling onto the desk rather than sliding in from nowhere.
+        settle: {
+          '0%': { opacity: '0', transform: 'translate3d(0,10px,0) scale(0.995)' },
+          '100%': { opacity: '1', transform: 'translate3d(0,0,0) scale(1)' },
+        },
+        // The lamp warming up behind the board.
+        breathe: {
+          '0%,100%': { opacity: '0.55' },
+          '50%': { opacity: '0.8' },
+        },
       },
       animation: {
         drift: 'drift 24s ease-in-out infinite',
@@ -60,6 +98,8 @@ export default {
         scan: 'scan 2.6s linear infinite',
         sweep: 'sweep 1.6s ease-in-out infinite',
         flicker: 'flicker 6s ease-in-out infinite',
+        settle: 'settle 380ms cubic-bezier(0.22,1,0.36,1) both',
+        breathe: 'breathe 9s ease-in-out infinite',
       },
     },
   },

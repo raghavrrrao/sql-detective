@@ -4,7 +4,7 @@ import { relatedDiscoveries } from '../../utils/evidenceLinks';
 import { useInvestigationSession } from '../../state/investigationSession';
 
 const confidenceStyles = {
-  Recorded: 'border-sky-400/35 bg-sky-500/10 text-sky-300',
+  Recorded: 'border-verdict-info/35 bg-verdict-info/10 text-verdict-info',
   Forensic: 'border-verdict-clear/35 bg-verdict-clear/10 text-verdict-clear',
   Reported: 'border-verdict-watch/40 bg-verdict-watch/10 text-verdict-watch',
   Documented: 'border-white/15 bg-white/[0.05] text-bone-muted',
