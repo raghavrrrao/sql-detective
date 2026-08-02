@@ -93,9 +93,11 @@ const GLOBAL_KEYS = ['settings', 'leaderboard'];
  * participant without touching settings, the leaderboard, or anything saved by
  * someone playing in personal mode.
  *
+ * @param {string} scope
+ * @param {{keep?: string[]}} [options] unscoped key names to leave alone
  * @returns {number} how many keys were removed
  */
-export function clearScope(scope = '') {
+export function clearScope(scope = '', { keep = [] } = {}) {
   const store = getStore();
   if (!store) return 0;
   // The personal scope is the empty prefix, so every other scope's keys would
@@ -111,6 +113,9 @@ export function clearScope(scope = '') {
       const rest = key.slice(NAMESPACE.length + 1);
       if (GLOBAL_KEYS.includes(rest)) continue;
       if (!rest.startsWith(scope)) continue;
+      // Named survivors: clearing an investigation should not also make the
+      // game forget that this player has already been trained.
+      if (keep.includes(rest.slice(scope.length))) continue;
       if (foreignPrefixes.some((prefix) => rest.startsWith(prefix))) continue;
 
       doomed.push(key);

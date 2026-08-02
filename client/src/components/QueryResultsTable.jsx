@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, DatabaseZap, FileSearch, Lightbulb, Search } from 'lucide-react';
+import { AlertTriangle, Check, DatabaseZap, FileSearch, Lightbulb, Search, Sparkles } from 'lucide-react';
 import { caseTables } from '../utils/sqlInsights';
 
 /** Only the first rows animate in; a large result set must not stagger 500 elements. */
@@ -58,7 +58,7 @@ const Row = memo(function Row({ row, columns, index }) {
   );
 });
 
-function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false, error = null, rowCount = 0, hasRun = false, summary = null }) {
+function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false, error = null, rowCount = 0, hasRun = false, summary = null, lastDiscovery = null }) {
   const isEmpty = !isLoading && !error && rows.length === 0;
   const hint = error ? hintFor(error) : null;
 
@@ -83,6 +83,45 @@ function QueryResultsTableComponent({ columns = [], rows = [], isLoading = false
           </span>
         )}
       </header>
+
+      {/*
+        What the last query actually changed. Everything named here is measured
+        from the player's own file, so it can be shown the moment it lands
+        without giving anything away. Deliberately one quiet line rather than a
+        stack of toasts.
+      */}
+      {!isLoading && !error && lastDiscovery && (lastDiscovery.added > 0 || lastDiscovery.completedObjectives.length > 0) && (
+        <motion.div
+          key={lastDiscovery.at}
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.25 }}
+          role="status"
+          aria-live="polite"
+          className="flex flex-wrap items-center gap-x-3 gap-y-1.5 border-b border-gold/25 bg-gold/[0.06] px-5 py-2.5"
+        >
+          {lastDiscovery.added > 0 && (
+            <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-[0.12em] text-gold-bright">
+              <Sparkles size={13} strokeWidth={2.4} aria-hidden="true" />
+              {lastDiscovery.added} new {lastDiscovery.added === 1 ? 'record' : 'records'} filed
+            </span>
+          )}
+          {lastDiscovery.openedCategories.map((label) => (
+            <span key={label} className="text-xs text-bone-muted">{label} unlocked</span>
+          ))}
+          {lastDiscovery.completedObjectives.map((label) => (
+            <span key={label} className="flex items-center gap-1.5 text-xs font-medium text-verdict-clear">
+              <Check size={13} strokeWidth={2.6} aria-hidden="true" /> {label}
+            </span>
+          ))}
+          {lastDiscovery.investigationDelta > 0 && (
+            <span className="ml-auto typo-numeric text-xs text-gold-bright">
+              Investigation {lastDiscovery.investigation}%
+              <span className="text-verdict-clear"> +{lastDiscovery.investigationDelta}</span>
+            </span>
+          )}
+        </motion.div>
+      )}
 
       {/*
         No AnimatePresence here on purpose. A local SQLite query returns in a

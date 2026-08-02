@@ -3,19 +3,29 @@ import { executeCaseQuery } from '../services/caseService';
 import { assessReadiness, evaluateAccusation } from '../utils/accusation';
 import { getSolution } from '../utils/caseSolution';
 import { markCaseSolved, recordQueryRun } from '../utils/caseProgress';
-import { computeScore } from '../utils/scoring';
+import { computeScore, starsFor } from '../utils/scoring';
 import { getCase, getCaseThresholds, getCaseWording } from '../catalog/caseCatalog';
 import { extractDiscoveries, mergeDiscoveries } from '../utils/discovery';
 import { buildInsights } from '../utils/insights';
 import { buildProgressLedger } from '../utils/investigationProgress';
 import { buildTimeline } from '../utils/investigationTimeline';
+import { buildCategoryProgress, computeInvestigationPercent, countByTable } from '../utils/investigationCategories';
+import { hintBudget, nextHint } from '../utils/hints';
 import { evaluateObjectives, objectiveTally } from '../utils/objectives';
 import { describeResult, nounFor } from '../utils/queryFeedback';
 import { applyDiscoveriesToFiles, buildSuspectIntel } from '../utils/suspectIntel';
 import { inspectStatement } from '../utils/sqlInsights';
 import { readJson, writeJson } from '../utils/storage';
 
-const SESSION_VERSION = 4;
+/*
+ * 5 — discoveries now carry the columns they were recovered with, the notebook
+ * renders from them rather than from a pre-filled briefing, and hints are
+ * chosen contextually and stored as text rather than counted against a fixed
+ * ladder. A v4 session has none of that, so it is discarded on load. Solved
+ * cases, reports, best scores and the leaderboard live in a different store
+ * and are untouched by this.
+ */
+const SESSION_VERSION = 5;
 const HISTORY_LIMIT = 50;
 const JOURNAL_LIMIT = 200;
 const PERSIST_DELAY = 350;
@@ -80,6 +90,21 @@ function fullScanTotal(insights, rowCount) {
   return { table: insights.tables[0], total: rowCount };
 }
 
+/**
+ * The state an objective is measured against. Objectives count real recovered
+ * records now, so they need the category ledger rather than just which tables
+ * were touched.
+ */
+function objectiveStateOf({ discoveries, tableTotals, reach, isSolved }) {
+  return {
+    ...reach,
+    isSolved,
+    tableTotals,
+    categories: buildCategoryProgress({ discoveries, tableTotals }),
+    recoveredByTable: countByTable(discoveries),
+  };
+}
+
 function reducer(state, action) {
   switch (action.type) {
     case 'setSql':
@@ -137,13 +162,26 @@ function reducer(state, action) {
 
       // Objectives tick off gameplay, so the log has to be written where they change.
       const isSolved = state.verdict?.proven === true;
-      const before = evaluateObjectives(state.caseId, { ...state.reach, isSolved });
-      const after = evaluateObjectives(state.caseId, { ...reach, isSolved });
-      after.forEach((objective, index) => {
-        if (objective.isDone && !before[index].isDone) {
-          entries.push(journalEntry(startedAt, 'objective', `Objective complete — ${objective.label}`));
-        }
+      const beforeState = objectiveStateOf({ discoveries: state.discoveries, tableTotals: state.tableTotals, reach: state.reach, isSolved });
+      const afterState = objectiveStateOf({ discoveries, tableTotals, reach, isSolved });
+      const before = evaluateObjectives(state.caseId, beforeState);
+      const after = evaluateObjectives(state.caseId, afterState);
+
+      const wasDone = new Set(before.filter((objective) => objective.isDone).map((objective) => objective.id));
+      const completedNow = after.filter((objective) => objective.isDone && !wasDone.has(objective.id));
+      completedNow.forEach((objective) => {
+        entries.push(journalEntry(startedAt, 'objective', `Objective complete — ${objective.label}`));
       });
+
+      // What this one query changed, for the notice under the results panel.
+      // Everything in here is derived from the player's own file, so it can be
+      // shown immediately without giving anything away.
+      const openedCategories = afterState.categories.filter((category) => {
+        const previous = beforeState.categories.find((entry) => entry.id === category.id);
+        return category.isUnlocked && !previous?.isUnlocked;
+      });
+      const investigationBefore = computeInvestigationPercent(beforeState.categories);
+      const investigationAfter = computeInvestigationPercent(afterState.categories);
 
       // Someone crossing into a substantial file is a milestone for the player.
       added.forEach((record) => {
@@ -169,6 +207,14 @@ function reducer(state, action) {
         suspectFiles,
         reach,
         tableTotals,
+        lastDiscovery: {
+          at: startedAt,
+          added: added.length,
+          openedCategories: openedCategories.map((category) => category.label),
+          completedObjectives: completedNow.map((objective) => objective.label),
+          investigationDelta: investigationAfter - investigationBefore,
+          investigation: investigationAfter,
+        },
         journal: pushJournal(state.journal, entries),
         history: [
           { id: `${startedAt}-${state.reach.successes + state.reach.failures}`, sql: statement, at: startedAt, ok: true, rowCount, executionTime: result.executionTime ?? null, error: null },
@@ -182,6 +228,9 @@ function reducer(state, action) {
       return {
         ...state,
         result: { ...state.result, isLoading: false, error: message, hasRun: true, summary: null },
+        // A rejected query discovered nothing; the previous notice must not
+        // linger under an error as though it had.
+        lastDiscovery: null,
         reach: { ...state.reach, failures: state.reach.failures + 1 },
         history: [
           { id: `${startedAt}-${state.reach.successes + state.reach.failures}`, sql: statement, at: startedAt, ok: false, rowCount: 0, executionTime: null, error: message },
@@ -264,16 +313,32 @@ function reducer(state, action) {
       };
     }
 
-    case 'revealHint':
-      return state.hintsRevealed >= action.total
-        ? state
-        : {
-          ...state,
-          hintsRevealed: state.hintsRevealed + 1,
-          journal: pushJournal(state.journal, [
-            journalEntry(action.at, 'hint', `Took hint ${state.hintsRevealed + 1}`),
-          ]),
-        };
+    /*
+     * The hint is chosen here, at the moment it is taken, against the file as
+     * it stands right now — which is what stops a hint pointing somewhere the
+     * player has already been. Once chosen it is stored as text, so a hint
+     * that has been paid for never changes afterwards.
+     */
+    case 'revealHint': {
+      const authored = getCase(state.caseId)?.hints ?? [];
+      if (state.hintsTaken.length >= hintBudget(authored)) return state;
+
+      const hint = nextHint({
+        authored,
+        categories: buildCategoryProgress({ discoveries: state.discoveries, tableTotals: state.tableTotals }),
+        features: state.reach.features,
+        taken: state.hintsTaken,
+      });
+      if (!hint) return state;
+
+      return {
+        ...state,
+        hintsTaken: [...state.hintsTaken, hint],
+        journal: pushJournal(state.journal, [
+          journalEntry(action.at, 'hint', `Took hint ${state.hintsTaken.length + 1}`),
+        ]),
+      };
+    }
 
     case 'setReasoning':
       return state.reasoning === action.reasoning ? state : { ...state, reasoning: action.reasoning };
@@ -311,7 +376,7 @@ function reducer(state, action) {
 }
 
 /** Rehydrates a saved session, discarding anything that no longer matches the shape. */
-function initialise({ difficulty, starterSql, defaultFolder }) {
+function initialise({ difficulty, starterSql, defaultFolder, tableTotals }) {
   const fresh = {
     version: SESSION_VERSION,
     // Kept in state so the reducer can resolve catalog-driven objectives
@@ -326,13 +391,18 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     elapsedMs: 0,
     runningSince: null,
     completionMs: null,
-    hintsRevealed: 0,
+    // Hint *text*, in the order it was taken. See the revealHint reducer case.
+    hintsTaken: [],
     sql: starterSql,
     history: [],
     journal: [],
     discoveries: [],
     suspectFiles: {},
-    tableTotals: {},
+    // Seeded from the row counts the briefing sent, so every category can show
+    // a denominator ("3 / 8 recovered") from the first moment rather than only
+    // after a table has happened to be read in full.
+    tableTotals: { ...tableTotals },
+    lastDiscovery: null,
     cleared: [],
     primeSuspect: null,
     notes: '',
@@ -365,9 +435,11 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     sql: asString(stored.sql, starterSql),
     history: asArray(stored.history).filter((entry) => entry && typeof entry.sql === 'string').slice(0, HISTORY_LIMIT),
     journal: asArray(stored.journal).filter((entry) => entry && typeof entry.title === 'string').slice(0, JOURNAL_LIMIT),
-    discoveries: discoveries.map((record) => ({ ...record, suspects: asArray(record.suspects) })),
+    discoveries: discoveries.map((record) => ({ ...record, suspects: asArray(record.suspects), fields: asObject(record.fields) })),
     suspectFiles: asObject(stored.suspectFiles),
-    tableTotals: asObject(stored.tableTotals),
+    // Briefing counts are the floor; a stored full-table scan can only confirm
+    // the same number, never contradict it.
+    tableTotals: { ...tableTotals, ...asObject(stored.tableTotals) },
     cleared: asArray(stored.cleared).filter((value) => typeof value === 'string'),
     primeSuspect: typeof stored.primeSuspect === 'string' ? stored.primeSuspect : null,
     notes: asString(stored.notes),
@@ -387,7 +459,7 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
     startedAt: Number.isFinite(stored.startedAt) ? stored.startedAt : fresh.startedAt,
     elapsedMs: Number.isFinite(stored.elapsedMs) ? stored.elapsedMs : 0,
     completionMs: Number.isFinite(stored.completionMs) ? stored.completionMs : null,
-    hintsRevealed: Number.isFinite(stored.hintsRevealed) ? stored.hintsRevealed : 0,
+    hintsTaken: asArray(stored.hintsTaken).filter((entry) => typeof entry === 'string'),
     accusations: asArray(stored.accusations).filter((entry) => entry && typeof entry.suspect === 'string'),
     verdict: stored.verdict && typeof stored.verdict.suspect === 'string' ? stored.verdict : null,
     reveal: stored.reveal && typeof stored.reveal === 'object' ? stored.reveal : null,
@@ -400,7 +472,18 @@ function initialise({ difficulty, starterSql, defaultFolder }) {
 
 export function InvestigationSessionProvider({ difficulty, briefing, starterSql, children }) {
   const defaultFolder = briefing.notebook[0]?.id ?? 'evidence';
-  const [state, dispatch] = useReducer(reducer, { difficulty, starterSql, defaultFolder }, initialise);
+  // The briefing's row counts are the denominators for every "3 / 8 recovered"
+  // in the game. They say how big each table is and nothing whatever about
+  // what is in it.
+  const briefingTotals = useMemo(
+    () => Object.fromEntries((briefing.tables ?? []).map((table) => [table.name, table.rowCount])),
+    [briefing.tables],
+  );
+  const [state, dispatch] = useReducer(
+    reducer,
+    { difficulty, starterSql, defaultFolder, tableTotals: briefingTotals },
+    initialise,
+  );
 
   // The query runner reads live state without being rebuilt on every keystroke.
   const stateRef = useRef(state);
@@ -435,7 +518,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       startedAt: state.startedAt,
       elapsedMs: state.elapsedMs,
       completionMs: state.completionMs,
-      hintsRevealed: state.hintsRevealed,
+      hintsTaken: state.hintsTaken,
       accusations: state.accusations,
       verdict: state.verdict,
       reveal: state.reveal,
@@ -447,7 +530,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       state.tableTotals, state.cleared, state.primeSuspect, state.notes, state.evidenceNotes,
       state.bookmarks, state.leadsDone, state.notebookSection, state.boardFolder,
       state.expanded, state.scrollPositions, state.reach, state.startedAt,
-      state.elapsedMs, state.completionMs, state.hintsRevealed, state.accusations, state.verdict, state.reveal, state.reasoning, state.lastAccusationDiscoveryCount,
+      state.elapsedMs, state.completionMs, state.hintsTaken, state.accusations, state.verdict, state.reveal, state.reasoning, state.lastAccusationDiscoveryCount,
     ],
   );
 
@@ -462,14 +545,21 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
   }, [snapshot, storageKey]);
 
   // A tab closed or navigated away mid-debounce must still keep the last edit.
+  //
+  // Both exits carry the same guard: if the stored session has gone while this
+  // board was mounted, something deliberately cleared it — a replay, a mode
+  // switch, a reset — and writing the in-memory copy back would silently undo
+  // that. The first debounced write lands 350ms after mount, so the only thing
+  // this can cost is a session too new to contain anything.
   useEffect(() => {
-    const flush = () => writeJson(storageKey, snapshotRef.current);
+    const flush = () => {
+      if (readJson(storageKey, null) === null) return;
+      writeJson(storageKey, snapshotRef.current);
+    };
     window.addEventListener('pagehide', flush);
     return () => {
       window.removeEventListener('pagehide', flush);
-      // If the stored session has gone while this board was mounted, a replay
-      // cleared it — writing the in-memory copy back would silently undo that.
-      if (readJson(storageKey, null) !== null) flush();
+      flush();
     };
   }, [storageKey]);
 
@@ -536,9 +626,22 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
   /* -------------------------------------------------------------- selectors */
 
   const isSolved = state.verdict?.proven === true;
+
+  // The category ledger is the spine of the investigation loop: the notebook
+  // renders from it, objectives count against it, the accusation gate reads it
+  // and the debrief reports it back.
+  const categories = useMemo(
+    () => buildCategoryProgress({ discoveries: state.discoveries, tableTotals: state.tableTotals }),
+    [state.discoveries, state.tableTotals],
+  );
+  const investigation = useMemo(() => computeInvestigationPercent(categories), [categories]);
+  const recoveredByTable = useMemo(() => countByTable(state.discoveries), [state.discoveries]);
+
   const objectives = useMemo(
-    () => evaluateObjectives(difficulty, { ...state.reach, isSolved }),
-    [difficulty, state.reach, isSolved],
+    () => evaluateObjectives(difficulty, {
+      ...state.reach, isSolved, categories, recoveredByTable, tableTotals: state.tableTotals,
+    }),
+    [difficulty, state.reach, isSolved, categories, recoveredByTable, state.tableTotals],
   );
   const tally = useMemo(() => objectiveTally(objectives), [objectives]);
   const timeline = useMemo(() => buildTimeline(state.discoveries), [state.discoveries]);
@@ -575,15 +678,18 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       discoveries: state.discoveries,
       reach: state.reach,
       intel,
+      categories,
+      investigation,
+      tally,
       lastAccusationDiscoveryCount: state.lastAccusationDiscoveryCount,
     }),
-    [difficulty, state.discoveries, state.reach, intel, state.lastAccusationDiscoveryCount],
+    [difficulty, state.discoveries, state.reach, intel, categories, investigation, tally, state.lastAccusationDiscoveryCount],
   );
 
   /* ------------------------------------------------------------- accusation */
 
-  const selectorsRef = useRef({ timeline, intel, ledger, tally });
-  selectorsRef.current = { timeline, intel, ledger, tally };
+  const selectorsRef = useRef({ timeline, intel, ledger, tally, categories, investigation });
+  selectorsRef.current = { timeline, intel, ledger, tally, categories, investigation };
 
   /**
    * Grades an accusation and, only when it is proven, pulls the reveal out of
@@ -591,7 +697,10 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
    */
   const submitAccusation = useCallback(async ({ suspect, evidenceKeys, reasoning }) => {
     const current = stateRef.current;
-    const { timeline: currentTimeline, intel: currentIntel, ledger: currentLedger, tally: currentTally } = selectorsRef.current;
+    const {
+      timeline: currentTimeline, intel: currentIntel, ledger: currentLedger,
+      tally: currentTally, categories: currentCategories, investigation: currentInvestigation,
+    } = selectorsRef.current;
     const at = Date.now();
 
     const { proven, coverage } = evaluateAccusation({
@@ -631,12 +740,13 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     const { score, breakdown } = computeScore({
       baseScore: briefing.case.score ?? 1000,
       attempts: current.accusations.length + 1,
-      hintsUsed: current.hintsRevealed,
+      hintsUsed: current.hintsTaken.length,
       elapsedMs,
       estimate: getCase(difficulty)?.estimatedTime,
       coverage: { ...coverage, queries: current.reach.successes + current.reach.failures },
       thresholds: getCaseThresholds(difficulty).verdict,
       objectives: currentTally,
+      investigation: currentInvestigation,
     });
 
     const cited = current.discoveries.filter((record) => evidenceKeys.includes(record.key));
@@ -653,10 +763,20 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
       reasoning,
       coverage,
       elapsedMs,
-      hintsUsed: current.hintsRevealed,
+      hintsUsed: current.hintsTaken.length,
       score,
       scoreBreakdown: breakdown,
+      stars: starsFor({
+        investigation: currentInvestigation,
+        objectives: currentTally,
+        hintsUsed: current.hintsTaken.length,
+        wrongAccusations: current.accusations.length,
+      }),
       objectives: currentTally,
+      // What was recovered against what was there, so the debrief can show the
+      // player exactly what they left behind — which is the whole replay hook.
+      investigation: currentInvestigation,
+      categories: currentCategories.map(({ id, label, recovered, total, target, isComplete }) => ({ id, label, recovered, total, target, isComplete })),
       ledger: currentLedger,
       citedEvidence: cited.map(({ key, title, table, occurredAt, location, confidence, sql }) => ({ key, title, table, occurredAt, location, confidence, sql })),
       discoveries: current.discoveries.map(({ key, title, table, occurredAt, location, confidence }) => ({ key, title, table, occurredAt, location, confidence })),
@@ -680,7 +800,7 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     setReasoning: (reasoning) => dispatch({ type: 'setReasoning', reasoning }),
     startTimer: () => dispatch({ type: 'startTimer', at: Date.now() }),
     pauseTimer: () => dispatch({ type: 'pauseTimer', at: Date.now() }),
-    revealHint: (total) => dispatch({ type: 'revealHint', total, at: Date.now() }),
+    revealHint: () => dispatch({ type: 'revealHint', at: Date.now() }),
     deleteHistoryEntry: (id) => dispatch({ type: 'deleteHistoryEntry', id }),
     clearHistory: () => dispatch({ type: 'clearHistory' }),
     setPrimeSuspect: (name) => dispatch({ type: 'setPrimeSuspect', name, at: Date.now() }),
@@ -716,7 +836,8 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     elapsedMs: state.elapsedMs,
     runningSince: state.runningSince,
     completionMs: state.completionMs,
-    hintsRevealed: state.hintsRevealed,
+    hintsTaken: state.hintsTaken,
+    hintsRevealed: state.hintsTaken.length,
     accusations: state.accusations,
     verdict: state.verdict,
     reveal: state.reveal,
@@ -729,15 +850,19 @@ export function InvestigationSessionProvider({ difficulty, briefing, starterSql,
     ledger,
     insights,
     readiness,
+    categories,
+    investigation,
+    lastDiscovery: state.lastDiscovery,
     starterSql,
   }), [
     state.result, state.history, state.journal, state.discoveries, state.tableTotals,
     state.primeSuspect, state.cleared, state.notes, state.evidenceNotes, state.bookmarks,
     state.leadsDone, state.notebookSection, state.boardFolder, state.expanded,
     state.scrollPositions, state.reach, state.startedAt,
-    state.elapsedMs, state.runningSince, state.completionMs, state.hintsRevealed,
+    state.elapsedMs, state.runningSince, state.completionMs, state.hintsTaken,
     state.accusations, state.verdict, state.reveal, state.reasoning,
-    objectives, tally, timeline, intel, ledger, insights, readiness, starterSql,
+    objectives, tally, timeline, intel, ledger, insights, readiness,
+    categories, investigation, state.lastDiscovery, starterSql,
   ]);
 
   const sqlDraft = useMemo(() => ({ sql: state.sql, isDirty: state.sql !== starterSql }), [state.sql, starterSql]);

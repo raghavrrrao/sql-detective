@@ -168,6 +168,11 @@ export function extractDiscoveries({ sql, tables, rows, rosterNames = [], at }) 
         location: place || null,
         occurredAt: buildTimestamp(table, row),
         confidence: provenance[table] ?? 'Documented',
+        // The columns this query actually returned. The notebook renders from
+        // these, so a narrow projection files a thin record and a later
+        // `SELECT *` fills the same record out — the player only ever holds
+        // what they asked the database for.
+        fields: { ...row },
       });
     }
   }
@@ -196,18 +201,26 @@ export function mergeDiscoveries(existing, incoming) {
       continue;
     }
     // Seen before — keep the original discovery time, take any new detail.
+    // Columns accumulate: a wider projection of a row already on file enriches
+    // the record the player holds rather than replacing or duplicating it.
+    const currentFields = current.fields ?? {};
+    const fields = { ...currentFields, ...record.fields };
+    const gainedColumns = Object.keys(fields).length > Object.keys(currentFields).length;
+
     const merged = {
       ...current,
       title: record.title.length > current.title.length ? record.title : current.title,
       location: current.location ?? record.location,
       occurredAt: current.occurredAt ?? record.occurredAt,
       suspects: current.suspects.length >= record.suspects.length ? current.suspects : record.suspects,
+      fields,
     };
     if (
       merged.title !== current.title
       || merged.location !== current.location
       || merged.occurredAt !== current.occurredAt
       || merged.suspects !== current.suspects
+      || gainedColumns
     ) {
       byKey.set(record.key, merged);
       changed = true;

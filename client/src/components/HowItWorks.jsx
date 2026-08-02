@@ -25,7 +25,7 @@ export function HowItWorks() {
               Four steps, repeated until the board is clear. Every case teaches the SQL you need for the next one.
             </p>
             <div className="mt-5">
-              <ActionButton as="link" to="/how-to-play" variant="ghost" iconRight={ArrowRight}>
+              <ActionButton as="link" to="/training" variant="ghost" iconRight={ArrowRight}>
                 Never written SQL? Start here
               </ActionButton>
             </div>

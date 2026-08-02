@@ -153,7 +153,7 @@ export function NotebookModal({ isOpen, onClose, caseData, caseFacts, briefing, 
         {active.id === 'timeline' && <NotebookTimeline />}
         {active.id === 'suspects' && <NotebookSuspects />}
         {active.id === 'hints' && <NotebookHints difficulty={difficulty} />}
-        {active.id === 'evidence' && <NotebookEvidenceNotes evidence={briefing.evidence} />}
+        {active.id === 'evidence' && <NotebookEvidenceNotes />}
         {active.id === 'history' && <NotebookQueryHistory onClose={handleClose} />}
         {active.id === 'notes' && <NotebookPersonalNotes />}
       </div>

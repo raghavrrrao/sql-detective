@@ -16,7 +16,7 @@ export function NotebookObjectives({ leads }) {
           <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Investigation objectives</h3>
           <p className="font-mono text-sm text-gold-bright">{tally.done} of {tally.total} complete</p>
         </div>
-        <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">These complete on their own as you work the database.</p>
+        <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">These count what you have actually recovered, and tick over on their own as you query. The mark on each bar is what counts as enough — you never have to empty a table.</p>
 
         <ul className="mt-4 space-y-2.5">
           {objectives.map((objective) => (
@@ -40,10 +40,35 @@ export function NotebookObjectives({ leads }) {
               </span>
 
               <div className="min-w-0 flex-1">
-                <p className={`text-base font-medium leading-6 ${objective.isDone ? 'text-verdict-clear' : 'text-bone'}`}>
-                  {objective.label}
-                  <span className="sr-only">{objective.locked ? ' — locked' : objective.isDone ? ' — complete' : ' — outstanding'}</span>
-                </p>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <p className={`text-base font-medium leading-6 ${objective.isDone ? 'text-verdict-clear' : 'text-bone'}`}>
+                    {objective.label}
+                    <span className="sr-only">{objective.locked ? ' — locked' : objective.isDone ? ' — complete' : ' — outstanding'}</span>
+                  </p>
+                  {objective.isCounted && (
+                    <p className={`font-mono text-sm ${objective.isDone ? 'text-verdict-clear' : 'text-gold-bright'}`}>
+                      {objective.recovered} / {objective.total}
+                      <span className="sr-only"> recovered</span>
+                    </p>
+                  )}
+                </div>
+
+                {/* The bar fills to the whole table; the notch is what counts
+                    as enough, so a player can see they have sufficient without
+                    being told they must empty the table. */}
+                {objective.isCounted && (
+                  <div aria-hidden="true" className="relative mt-2 h-1 w-full overflow-hidden bg-white/10">
+                    <span
+                      className={`block h-full transition-[width] duration-500 ${objective.isDone ? 'bg-verdict-clear' : 'bg-gold'}`}
+                      style={{ width: `${Math.round((objective.recovered / Math.max(1, objective.total)) * 100)}%` }}
+                    />
+                    <span
+                      className="absolute inset-y-0 w-px bg-bone/45"
+                      style={{ left: `${Math.round((objective.target / Math.max(1, objective.total)) * 100)}%` }}
+                    />
+                  </div>
+                )}
+
                 {!objective.isDone && <p className="mt-1.5 typo-body-secondary text-sm text-bone-muted">{objective.hint}</p>}
               </div>
             </li>

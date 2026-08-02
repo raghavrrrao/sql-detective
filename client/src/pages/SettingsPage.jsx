@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, GraduationCap, House, Music, ShieldAlert, Volume2 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { AnimatedBackground } from '../components/AnimatedBackground';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { LeaderboardPanel } from '../components/LeaderboardPanel';
 import { SectionHeading } from '../components/SectionHeading';
 import { GAME_MODES } from '../utils/gameSettings';
 import { useGameMode } from '../state/gameMode';
+import { resetTraining } from '../utils/tutorialProgress';
 
 function Row({ title, description, children }) {
   return (
@@ -47,6 +48,7 @@ export function SettingsPage() {
     mode, isFestival, detectiveName, music, soundEffects, appVersion,
     chooseMode, clearCurrentSession, resetPersonalProgress, clearLeaderboard, setMusic, setSoundEffects,
   } = useGameMode();
+  const navigate = useNavigate();
 
   // Every destructive action goes through the same confirmation.
   const [pending, setPending] = useState(null);
@@ -151,6 +153,23 @@ export function SettingsPage() {
           <div className="mt-5 flex flex-wrap gap-2.5">
             <Toggle label="Music" icon={Music} isOn={music} onChange={setMusic} />
             <Toggle label="Sound effects" icon={Volume2} isOn={soundEffects} onChange={setSoundEffects} />
+          </div>
+        </section>
+
+        <section className="clip-corner mt-6 panel-surface p-7 shadow-panel">
+          <h2 className="flex items-center gap-2 font-display text-lg font-medium uppercase tracking-[0.16em] text-bone">
+            <GraduationCap size={18} className="text-gold-bright" strokeWidth={2.2} aria-hidden="true" /> Training
+          </h2>
+          <div className="mt-4">
+            <Row title="Replay Detective Training" description="Runs the training file again from the first briefing. Nothing you have solved is affected.">
+              <button
+                type="button"
+                onClick={() => { resetTraining(); navigate('/training'); }}
+                className={neutral}
+              >
+                Start training
+              </button>
+            </Row>
           </div>
         </section>
 

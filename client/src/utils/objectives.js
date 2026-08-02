@@ -1,16 +1,23 @@
-import { getCaseWording, getObjectiveIds } from '../catalog/caseCatalog';
+import { getObjectiveIds } from '../catalog/caseCatalog';
 
 /**
  * The objective board.
  *
- * Every objective completes off a real investigation signal — which tables the
- * player has successfully queried, which SQL features they used, and whether
- * the case has been closed. Nothing here watches button clicks, so an objective
- * can only tick by doing the detective work.
+ * Objectives are measured goals, not passive prompts. Most of them count real
+ * records the player has pulled out of the database — "Recover physical
+ * evidence 5 / 8" — and tick over automatically as discoveries land. A few
+ * stay boolean because what they teach is a *technique* rather than a volume
+ * of records, and those still complete off a real investigation signal:
+ * which tables came back with rows and which SQL features were used. Nothing
+ * here watches a button, so an objective can only be completed by doing the
+ * detective work.
  *
- * The library below defines how each objective is *measured*; the catalog
- * decides which of them a given case *uses*. A short tutorial case can list
- * four, an expert case all eight, and neither needs new logic.
+ * The ids below are the same ids the case catalog has always listed, so
+ * changing how an objective is measured needs no change to any case.
+ *
+ * Counted objectives complete at the category's `target`, not its total (see
+ * investigationCategories). Recovering everything is rewarded by score and
+ * shown in the debrief, but it is never required.
  */
 
 /** Log tables that can independently place a person somewhere at a time. */
@@ -19,44 +26,64 @@ const recordTables = ['access_logs', 'cctv_logs', 'phone_logs', 'security_logs']
 const has = (list, value) => list.includes(value);
 const countOf = (list, values) => values.filter((value) => list.includes(value)).length;
 
+const categoryOf = (state, id) => state.categories?.find((category) => category.id === id) ?? null;
+
 export const objectiveLibrary = {
   victim: {
     label: 'Identify the victim',
     hint: 'Pull the victim record: SELECT * FROM victims;',
     isComplete: ({ tables }) => has(tables, 'victims'),
   },
+
   suspects: {
-    label: 'Open the suspect roster',
+    label: 'Open the suspect files',
     hint: 'Every case starts here: SELECT * FROM suspects;',
-    isComplete: ({ tables }) => has(tables, 'suspects'),
+    measure: (state) => categoryOf(state, 'suspects'),
   },
+
   witnesses: {
-    label: 'Review witness statements',
+    label: 'Collect witness statements',
     hint: 'People lie, but they lie on the record: SELECT * FROM witnesses;',
-    isComplete: ({ tables }) => has(tables, 'witnesses'),
+    measure: (state) => categoryOf(state, 'witnesses'),
   },
+
   evidence: {
-    label: 'Examine the physical evidence',
+    label: 'Recover physical evidence',
     hint: 'Try evidence, weapons or fingerprints.',
-    isComplete: ({ tables }) => countOf(tables, ['evidence', 'weapons', 'fingerprints']) > 0,
+    measure: (state) => categoryOf(state, 'evidence'),
   },
+
   access: {
-    label: 'Review the badge and access logs',
+    label: 'Recover the badge and access logs',
     hint: 'Doors remember who opened them: SELECT * FROM access_logs;',
-    isComplete: ({ tables }) => has(tables, 'access_logs'),
+    // Scoped to one table rather than the whole timeline category: this is the
+    // objective that teaches a player to go and read a door log specifically.
+    measure: (state) => {
+      const total = state.tableTotals?.access_logs ?? 0;
+      if (total === 0) return null;
+      const recovered = Math.min(total, state.recoveredByTable?.access_logs ?? 0);
+      return { recovered, total, target: Math.max(1, Math.ceil(total * 0.6)) };
+    },
   },
+
   timeline: {
-    label: 'Put the movements in order',
-    hint: 'Query cctv_logs or security_logs with an ORDER BY.',
-    isComplete: ({ tables, features }) =>
-      countOf(tables, ['cctv_logs', 'security_logs']) > 0 && has(features, 'order_by'),
+    label: 'Reconstruct the timeline',
+    hint: 'Query the log tables, then read them in order with ORDER BY.',
+    measure: (state) => categoryOf(state, 'timeline'),
+    // Recovering the events is most of the work, but the chronology only
+    // really exists once they have been put in sequence — so this one keeps
+    // its ORDER BY requirement on top of the count.
+    alsoRequires: ({ features }) => has(features, 'order_by'),
+    blockedHint: 'You have the events. Sort them with ORDER BY to read the night in sequence.',
   },
+
   contradiction: {
     label: 'Cross-reference a claim against the records',
     hint: 'Narrow two different log tables with WHERE — or JOIN them — and compare.',
     isComplete: ({ tables, features }) =>
       countOf(tables, recordTables) >= 2 && (has(features, 'where') || has(features, 'join')),
   },
+
   accusation: {
     label: 'Name the person responsible',
     hint: 'File a formal accusation once your file stands up.',
@@ -66,19 +93,46 @@ export const objectiveLibrary = {
 
 /**
  * @param {string} caseId
- * @param {{tables:string[], features:string[], isSolved?:boolean}} state
- * @returns {Array<{id:string,label:string,hint:string,isDone:boolean}>}
+ * @param {object} state  { tables, features, isSolved, categories, recoveredByTable, tableTotals }
+ * @returns {Array<{id,label,hint,isDone,recovered,total,target,isCounted}>}
  */
 export function evaluateObjectives(caseId, state) {
   return getObjectiveIds(caseId)
     .map((id) => {
       const definition = objectiveLibrary[id];
       if (!definition) return null;
+
+      // --- boolean objectives -------------------------------------------
+      if (!definition.measure) {
+        return {
+          id,
+          label: definition.label,
+          hint: definition.hint,
+          isDone: definition.isComplete(state),
+          isCounted: false,
+          recovered: 0,
+          total: 0,
+          target: 0,
+        };
+      }
+
+      // --- counted objectives -------------------------------------------
+      const measured = definition.measure(state);
+      // A category with no rows in this case cannot be an objective for it.
+      if (!measured || measured.total === 0) return null;
+
+      const reachedTarget = measured.recovered >= measured.target;
+      const gateOpen = definition.alsoRequires ? definition.alsoRequires(state) : true;
+
       return {
         id,
         label: definition.label,
-        hint: definition.hint,
-        isDone: definition.isComplete(state),
+        hint: reachedTarget && !gateOpen ? definition.blockedHint ?? definition.hint : definition.hint,
+        isDone: reachedTarget && gateOpen,
+        isCounted: true,
+        recovered: measured.recovered,
+        total: measured.total,
+        target: measured.target,
       };
     })
     .filter(Boolean);

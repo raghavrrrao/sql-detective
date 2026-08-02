@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { clearLeaderboard as wipeLeaderboard } from '../utils/leaderboard';
 import { SCOPES, clearScope } from '../utils/storage';
+import { TRAINING_KEY } from '../utils/tutorialProgress';
 import {
   APP_VERSION,
   GAME_MODES,
@@ -61,9 +62,16 @@ export function GameModeProvider({ children }) {
     return apply({ detectiveName: '' }, { remount: true });
   }, [apply]);
 
-  /** Clears the current investigation but keeps the detective at the keyboard. */
+  /**
+   * Clears the current investigation but keeps the detective at the keyboard —
+   * and keeps their training record, because wiping a session is not a reason
+   * to put somebody back through the tutorial.
+   */
   const clearCurrentSession = useCallback(() => {
-    clearScope(settings.mode === GAME_MODES.festival ? SCOPES.festival : SCOPES.personal);
+    clearScope(
+      settings.mode === GAME_MODES.festival ? SCOPES.festival : SCOPES.personal,
+      { keep: [TRAINING_KEY] },
+    );
     setSessionNonce((value) => value + 1);
   }, [settings.mode]);
 

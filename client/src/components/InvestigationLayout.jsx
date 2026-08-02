@@ -50,8 +50,8 @@ function TerminalPanel({ onEditorReady }) {
 }
 
 function ResultsPanel() {
-  const { result } = useInvestigationSession();
-  return <QueryResultsTable {...result} />;
+  const { result, lastDiscovery } = useInvestigationSession();
+  return <QueryResultsTable {...result} lastDiscovery={lastDiscovery} />;
 }
 
 function InvestigationBoard({ caseData, briefing, difficulty }) {
@@ -187,7 +187,6 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         <div className="relative flex min-h-0 flex-1">
           <Sidebar
             sections={briefing.notebook}
-            evidence={briefing.evidence}
             activeFolder={boardFolder}
             onSelectFolder={setBoardFolder}
             isDrawerOpen={isSidebarOpen}
@@ -236,12 +235,19 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
       </button>
 
       {isSolved ? (
+        /*
+         * Reopens the verdict screen rather than jumping straight to the
+         * report, because that screen is the only route to the score summary —
+         * and in Festival Mode the score summary is what files the leaderboard
+         * entry. Going directly to the report would strand a player who had
+         * dismissed the verdict screen before taking their score.
+         */
         <button
           type="button"
-          onClick={() => setIsReportOpen(true)}
+          onClick={() => setIsCaseClosedOpen(true)}
           className="clip-corner-sm fixed bottom-4 right-4 z-20 inline-flex items-center gap-2.5 border border-verdict-clear/60 bg-verdict-clear/15 px-4 py-3 font-display text-sm font-medium uppercase tracking-[0.16em] text-verdict-clear transition-transform hover:-translate-y-0.5 sm:bottom-6 sm:right-6 sm:px-5 sm:py-3.5"
         >
-          Case closed · Report
+          Case closed
         </button>
       ) : (
         <AccuseButton onOpen={openAccuse} />
@@ -259,6 +265,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
         onOpenReport={openReport}
         onContinue={isFestival ? openScore : null}
         onLeave={() => { setIsCaseClosedOpen(false); navigate(isFestival ? '/' : '/difficulty'); }}
+        onClose={() => setIsCaseClosedOpen(false)}
       />
 
       {isFestival && (
@@ -268,6 +275,7 @@ function InvestigationBoard({ caseData, briefing, difficulty }) {
           difficulty={difficulty}
           onOpenReport={() => setIsReportOpen(true)}
           onNextDetective={() => { setIsScoreOpen(false); navigate('/'); }}
+          onClose={() => setIsScoreOpen(false)}
         />
       )}
 

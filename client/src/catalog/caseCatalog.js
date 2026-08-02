@@ -70,7 +70,11 @@ const defaults = {
   starterQuery: 'SELECT name, occupation FROM suspects;',
   thresholds: {
     // What the file has to look like before an accusation may be filed.
-    readiness: { discoveries: 15, sources: 4, suspects: 3, requireVictim: true, allowRepeatAccusation: false },
+    // `investigation` is the weighted percentage across every line of enquiry
+    // (see utils/investigationCategories) and `objectives` is how many of this
+    // case's own goals must be met. Together they are what stops a case being
+    // closed off the back of a single query.
+    readiness: { discoveries: 15, sources: 4, suspects: 3, investigation: 55, objectives: 4, requireVictim: true, allowRepeatAccusation: false },
     // What a proven case needs on top of naming the right person.
     verdict: { citations: 3, discoveries: 20, sources: 5, timeline: 6 },
   },
@@ -134,7 +138,7 @@ export const caseCatalog = [
     starterQuery: '-- Case 01 · Three people were in the North Wing. Start with the roster.\nSELECT * FROM suspects;',
     theme: { accent: 'gold', icon: 'GraduationCap' },
     thresholds: {
-      readiness: { discoveries: 8, sources: 3, suspects: 2, requireVictim: false, allowRepeatAccusation: true },
+      readiness: { discoveries: 8, sources: 3, suspects: 2, investigation: 45, objectives: 3, requireVictim: false, allowRepeatAccusation: true },
       verdict: { citations: 1, discoveries: 8, sources: 3, timeline: 2 },
     },
   }),
@@ -178,7 +182,7 @@ export const caseCatalog = [
     starterQuery: '-- Case 02 · Five people were in North Hall. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'gold', icon: 'GraduationCap' },
     thresholds: {
-      readiness: { discoveries: 15, sources: 4, suspects: 3 },
+      readiness: { discoveries: 15, sources: 4, suspects: 3, investigation: 55, objectives: 4 },
       verdict: { citations: 2, discoveries: 15, sources: 4, timeline: 4 },
     },
   }),
@@ -225,7 +229,7 @@ export const caseCatalog = [
     starterQuery: '-- Case 03 · Six people had a card that works after hours.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'gold', icon: 'Frame' },
     thresholds: {
-      readiness: { discoveries: 20, sources: 4, suspects: 4, requireVictim: false },
+      readiness: { discoveries: 20, sources: 4, suspects: 4, investigation: 55, objectives: 4, requireVictim: false },
       verdict: { citations: 3, discoveries: 24, sources: 5, timeline: 6 },
     },
   }),
@@ -268,7 +272,7 @@ export const caseCatalog = [
     starterQuery: '-- Case 04 · Seven suspects, one fob-controlled study. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'crimson', icon: 'Landmark' },
     thresholds: {
-      readiness: { discoveries: 20, sources: 5, suspects: 4 },
+      readiness: { discoveries: 20, sources: 5, suspects: 4, investigation: 60, objectives: 5 },
       verdict: { citations: 3, discoveries: 28, sources: 6, timeline: 8 },
     },
   }),
@@ -311,7 +315,7 @@ export const caseCatalog = [
     starterQuery: '-- Case 05 · Nine suspects, one ship, nobody went ashore. Start with the roster.\nSELECT name, occupation FROM suspects;',
     theme: { accent: 'crimson', icon: 'Ship' },
     thresholds: {
-      readiness: { discoveries: 25, sources: 6, suspects: 5 },
+      readiness: { discoveries: 25, sources: 6, suspects: 5, investigation: 60, objectives: 5 },
       verdict: { citations: 4, discoveries: 35, sources: 7, timeline: 10 },
     },
   }),

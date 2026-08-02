@@ -1,5 +1,6 @@
+import { useEffect, useRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { FileText, Gavel, KeyRound, Scale, ScrollText, Skull, Target, Trophy } from 'lucide-react';
+import { FileText, Gavel, KeyRound, Scale, ScrollText, Skull, Target, Trophy, X } from 'lucide-react';
 import { caseTables } from '../utils/sqlInsights';
 import { useInvestigationSession } from '../state/investigationSession';
 
@@ -25,8 +26,16 @@ function Panel({ icon: Icon, label, children, delay }) {
  * say who did it. Everything shown here comes from the case database, fetched
  * after the verdict was proven.
  */
-export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = null, onLeave }) {
+export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = null, onLeave, onClose }) {
   const { reveal: revealed, verdict, discoveries, timeline, reach, accusations } = useInvestigationSession();
+  const overlayRef = useRef(null);
+
+  // A keydown only reaches the overlay's handler if focus is inside it.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const frame = window.requestAnimationFrame(() => overlayRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -37,16 +46,30 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
   return (
     <AnimatePresence>
       <motion.div
+        ref={overlayRef}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         role="dialog"
         aria-modal="true"
         aria-label="Case closed"
-        className="fixed inset-0 z-[60] overflow-y-auto bg-ink/97 backdrop-blur-xl"
+        onKeyDown={(event) => { if (event.key === 'Escape') onClose?.(); }}
+        tabIndex={-1}
+        className="fixed inset-0 z-[60] overflow-y-auto bg-ink/97 outline-none backdrop-blur-xl"
       >
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 board-grid-fine opacity-30" />
         <div aria-hidden="true" className="pointer-events-none fixed inset-0 vignette" />
+
+        {/* Every other route out of here either navigates away or opens
+            another dialog. This one just puts the solved board back. */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close and return to the case board"
+          className="clip-corner-sm absolute right-4 top-4 z-10 border border-white/12 bg-white/[0.04] p-2.5 text-bone-dim transition-colors hover:border-gold/45 hover:text-gold-bright sm:right-6 sm:top-6"
+        >
+          <X size={19} strokeWidth={2} aria-hidden="true" />
+        </button>
 
         <div className="relative mx-auto max-w-4xl px-6 py-16 sm:px-10">
           <motion.p {...reveal(0.05)} className="text-center font-mono text-sm uppercase tracking-[0.3em] text-crimson-glow">
@@ -149,7 +172,7 @@ export function CaseClosedScreen({ isOpen, caseData, onOpenReport, onContinue = 
               onClick={onLeave}
               className="clip-corner-sm border border-white/12 bg-white/[0.04] px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:border-gold/45 hover:text-gold-bright"
             >
-              Back to the case board
+              Leave the investigation
             </button>
             <button
               type="button"

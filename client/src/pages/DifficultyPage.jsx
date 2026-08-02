@@ -33,10 +33,10 @@ export function DifficultyPage() {
         </Link>
 
         <Link
-          to="/how-to-play"
+          to="/training"
           className="ml-6 inline-flex items-center gap-2.5 font-display text-sm font-medium uppercase tracking-[0.18em] text-bone-dim transition-colors hover:text-gold-bright"
         >
-          <GraduationCap size={16} strokeWidth={2.2} aria-hidden="true" /> New to SQL? How to play
+          <GraduationCap size={16} strokeWidth={2.2} aria-hidden="true" /> New to SQL? Run Detective Training
         </Link>
 
         <div className="pt-16">

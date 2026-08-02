@@ -19,13 +19,29 @@ import { isAccused } from './caseSolution';
  * without one of them becoming unwinnable.
  */
 
-/** What the file has to look like before a formal accusation is allowed. */
+/**
+ * What the file has to look like before a formal accusation is allowed.
+ *
+ * `investigation` is the important one: it is a weighted reading of how far
+ * each line of enquiry has been recovered, so it cannot be satisfied by
+ * hammering a single table. Note what is deliberately *not* here — no check
+ * requires a specific category, so the player keeps genuine freedom over which
+ * threads they pull. The gate asks whether an investigation happened, not
+ * whether a checklist was completed.
+ */
 function readinessChecks(limits) {
   return [
     { id: 'victim', test: ({ reach }) => !limits.requireVictim || reach.tables.includes('victims') },
     { id: 'suspects', test: ({ intel }) => intel.filter((profile) => profile.status !== 'unknown').length >= limits.suspects },
     { id: 'volume', test: ({ discoveries }) => discoveries.length >= limits.discoveries },
     { id: 'breadth', test: ({ reach }) => reach.tables.length >= limits.sources },
+    { id: 'investigation', test: ({ investigation }) => (investigation ?? 0) >= limits.investigation },
+    {
+      id: 'objectives',
+      // The accusation objective only completes by accusing, so it can never
+      // be part of its own gate.
+      test: ({ tally }) => (tally?.done ?? 0) >= Math.min(limits.objectives, Math.max(0, (tally?.total ?? 0) - 1)),
+    },
   ];
 }
 
@@ -39,10 +55,17 @@ function corroborationChecks(limits) {
   ];
 }
 
+/**
+ * Progress is reported as how the *file* reads, never as a list of conditions.
+ * A player who could see the conditions would work the conditions instead of
+ * the case.
+ */
 const readinessMessages = [
   'There is almost nothing on file yet.',
   'The file is thin. Keep pulling records.',
   'The file is taking shape.',
+  'Several lines of enquiry are still open.',
+  'You are close to having a case.',
   'You are close to having a case.',
 ];
 

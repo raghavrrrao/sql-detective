@@ -20,6 +20,8 @@ export function GlobalSearchModal({ isOpen, onClose, briefing, onOpenSection }) 
     return () => window.cancelAnimationFrame(frame);
   }, [isOpen]);
 
+  // Only the leads folder still carries briefing text; every other folder is
+  // built from discoveries now, and those are searched through `discoveries`.
   const briefingEntries = useMemo(
     () => briefing.notebook.flatMap((section) => section.entries),
     [briefing.notebook],
@@ -28,9 +30,9 @@ export function GlobalSearchModal({ isOpen, onClose, briefing, onOpenSection }) 
   const results = useMemo(
     () => searchInvestigation(term, {
       discoveries, journal, timeline, intel, objectives, history,
-      evidence: briefing.evidence, notebook: briefingEntries, notes,
+      notebook: briefingEntries, notes,
     }),
-    [term, discoveries, journal, timeline, intel, objectives, history, briefing.evidence, briefingEntries, notes],
+    [term, discoveries, journal, timeline, intel, objectives, history, briefingEntries, notes],
   );
 
   return (

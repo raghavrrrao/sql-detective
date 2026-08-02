@@ -48,8 +48,8 @@ export function Hero() {
             <ActionButton as="link" to="/difficulty" variant="primary" size="lg" iconRight={ArrowRight}>
               Start Investigation
             </ActionButton>
-            <ActionButton as="link" to="/how-to-play" variant="ghost" size="lg" icon={PlayCircle}>
-              How to Play
+            <ActionButton as="link" to="/training" variant="ghost" size="lg" icon={PlayCircle}>
+              Detective Training
             </ActionButton>
             <ActionButton as="link" to="/settings" variant="ghost" size="lg" icon={SlidersHorizontal}>
               Settings

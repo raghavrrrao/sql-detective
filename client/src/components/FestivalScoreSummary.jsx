@@ -1,6 +1,6 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { BadgeCheck, FileText, Trophy, UserRoundPlus } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, FileText, Trophy, UserRoundPlus, X } from 'lucide-react';
 import { LeaderboardPanel } from './LeaderboardPanel';
 import { getCase, getCaseThresholds } from '../catalog/caseCatalog';
 import { computeScore } from '../utils/scoring';
@@ -23,10 +23,18 @@ function Stat({ label, value, tone = 'bone' }) {
  * landed on the board, and the button that hands the machine to the next
  * person. Filing the result happens exactly once, on mount.
  */
-export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenReport, onNextDetective }) {
+export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenReport, onNextDetective, onClose }) {
   const { detectiveName, startNextDetective } = useGameMode();
-  const { verdict, accusations, discoveries, reach, timeline, completionMs, hintsRevealed, tally } = useInvestigationSession();
+  const { verdict, accusations, discoveries, reach, timeline, completionMs, hintsRevealed, tally, investigation } = useInvestigationSession();
   const filedRef = useRef(null);
+  const overlayRef = useRef(null);
+
+  // A keydown only reaches the overlay's handler if focus is inside it.
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    const frame = window.requestAnimationFrame(() => overlayRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [isOpen]);
 
   const entry = useMemo(() => {
     if (!isOpen || !verdict?.proven) return null;
@@ -48,6 +56,10 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
       coverage: { ...coverage, queries: reach.successes + reach.failures },
       thresholds: getCaseThresholds(difficulty).verdict,
       objectives: tally,
+      // One engine grades both modes, so a leaderboard entry means exactly what
+      // a solved case means. Omitting this would score festival play on a
+      // different scale from personal play.
+      investigation,
     });
 
     const filed = recordResult({
@@ -64,7 +76,7 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
 
     filedRef.current = { ...filed, breakdown, elapsedMs, coverage };
     return filedRef.current;
-  }, [isOpen, verdict, accusations.length, discoveries.length, reach, timeline.length, completionMs, hintsRevealed, tally, caseData, difficulty, detectiveName]);
+  }, [isOpen, verdict, accusations.length, discoveries.length, reach, timeline.length, completionMs, hintsRevealed, tally, investigation, caseData, difficulty, detectiveName]);
 
   const board = useMemo(() => (entry ? getTopEntries() : []), [entry]);
 
@@ -77,15 +89,32 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
 
   return (
     <motion.div
+      ref={overlayRef}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       role="dialog"
       aria-modal="true"
       aria-label="Final score"
-      className="fixed inset-0 z-[65] overflow-y-auto bg-ink/97 backdrop-blur-xl"
+      onKeyDown={(event) => { if (event.key === 'Escape') onClose?.(); }}
+      tabIndex={-1}
+      className="fixed inset-0 z-[65] overflow-y-auto bg-ink/97 outline-none backdrop-blur-xl"
     >
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 board-grid-fine opacity-30" />
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 vignette" />
+
+      {/*
+        Both actions below are one-way: the report stacks another dialog on top
+        of this one, and Next detective wipes the session. Somebody who just
+        wants to look at the board again needs a way out that destroys nothing.
+      */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close the score summary"
+        className="clip-corner-sm absolute right-4 top-4 z-10 border border-white/12 bg-white/[0.04] p-2.5 text-bone-dim transition-colors hover:border-gold/45 hover:text-gold-bright sm:right-6 sm:top-6"
+      >
+        <X size={19} strokeWidth={2} aria-hidden="true" />
+      </button>
 
       <div className="relative mx-auto max-w-4xl px-6 py-14 sm:px-10">
         <p className="text-center font-mono text-sm uppercase tracking-[0.3em] text-crimson-glow">Case closed</p>
@@ -140,6 +169,16 @@ export function FestivalScoreSummary({ isOpen, caseData, difficulty, onOpenRepor
             className="clip-corner-sm inline-flex items-center gap-2.5 border border-crimson-bright/60 bg-crimson px-6 py-3.5 font-display text-sm font-medium uppercase tracking-[0.16em] text-bone shadow-crimson transition-transform hover:-translate-y-0.5"
           >
             <UserRoundPlus size={17} strokeWidth={2.2} aria-hidden="true" /> Next detective
+          </button>
+        </div>
+
+        <div className="mt-5 text-center">
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex items-center gap-2 border-b border-white/20 pb-0.5 text-sm text-bone-dim transition-colors hover:border-gold/50 hover:text-gold-bright"
+          >
+            <ArrowLeft size={15} strokeWidth={2.2} aria-hidden="true" /> Back to the case board
           </button>
         </div>
 

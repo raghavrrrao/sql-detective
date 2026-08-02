@@ -12,11 +12,26 @@
 
 const clamp = (value, low, high) => Math.min(high, Math.max(low, value));
 
-/** Weightings. They add to 1 so the bonus band is easy to reason about. */
-const WEIGHTS = { coverage: 0.34, objectives: 0.26, efficiency: 0.2, speed: 0.2 };
+/**
+ * Weightings. They add to 1 so the bonus band is easy to reason about.
+ *
+ * Investigation is the heaviest by a wide margin, and speed is now the
+ * lightest: a thorough investigation has to beat a rushed one, so the clock
+ * can influence a score but must never decide it. Between two players who both
+ * name the right person, the one who built the better file wins.
+ */
+const WEIGHTS = { investigation: 0.4, objectives: 0.25, coverage: 0.15, efficiency: 0.1, speed: 0.1 };
 
 /** The most a perfect run can add on top of the base value. */
 const MAX_BONUS = 0.5;
+
+/**
+ * Closing a case on a barely-worked file is still a win, but it is not worth
+ * full marks. Below this the score is scaled down in proportion to how far
+ * short the investigation fell.
+ */
+const THIN_INVESTIGATION = 60;
+const MAX_THIN_PENALTY = 0.25;
 
 /** A wrong accusation costs a fifth, down to a floor. */
 const WRONG_ACCUSATION_COST = 0.2;
@@ -53,6 +68,7 @@ export function computeScore({
   coverage = {},
   thresholds = {},
   objectives = { done: 0, total: 0 },
+  investigation = 0,
 }) {
   const required = {
     discoveries: thresholds.discoveries ?? 20,
@@ -82,9 +98,15 @@ export function computeScore({
   const target = parseEstimate(estimate);
   const speedShare = target && elapsedMs > 0 ? clamp(1 - elapsedMs / target, 0, 1) : 0;
 
+  // --- investigation: how much of the case was actually worked -------------
+  // The heaviest single component, and the one thing a player cannot fake by
+  // running the same query repeatedly.
+  const investigationShare = clamp(investigation / 100, 0, 1);
+
   const bonus = MAX_BONUS * (
-    coverageShare * WEIGHTS.coverage
+    investigationShare * WEIGHTS.investigation
     + objectiveShare * WEIGHTS.objectives
+    + coverageShare * WEIGHTS.coverage
     + efficiencyShare * WEIGHTS.efficiency
     + speedShare * WEIGHTS.speed
   );
@@ -93,22 +115,44 @@ export function computeScore({
   const accuracy = clamp(1 - wrongAccusations * WRONG_ACCUSATION_COST, ACCURACY_FLOOR, 1);
   const hintCost = clamp(hintsUsed * HINT_COST, 0, MAX_HINT_COST);
 
-  const multiplier = Math.max(0, accuracy * (1 + bonus) - hintCost);
+  // Guessing well off a thin file should not pay like an investigation.
+  const shortfall = clamp((THIN_INVESTIGATION - investigation) / THIN_INVESTIGATION, 0, 1);
+  const thinPenalty = shortfall * MAX_THIN_PENALTY;
+
+  const multiplier = Math.max(0, accuracy * (1 + bonus) - hintCost - thinPenalty);
   const score = Math.max(0, Math.round((baseScore * multiplier) / 10) * 10);
 
   return {
     score,
     breakdown: {
       baseScore,
+      investigation,
       accuracy: Math.round(accuracy * 100),
       wrongAccusations,
       hintsUsed,
       hintPenalty: Math.round(hintCost * 100),
-      coverageBonus: Math.round(coverageShare * WEIGHTS.coverage * MAX_BONUS * 100),
+      thinPenalty: Math.round(thinPenalty * 100),
+      investigationBonus: Math.round(investigationShare * WEIGHTS.investigation * MAX_BONUS * 100),
       objectiveBonus: Math.round(objectiveShare * WEIGHTS.objectives * MAX_BONUS * 100),
+      coverageBonus: Math.round(coverageShare * WEIGHTS.coverage * MAX_BONUS * 100),
       efficiencyBonus: Math.round(efficiencyShare * WEIGHTS.efficiency * MAX_BONUS * 100),
       speedBonus: Math.round(speedShare * WEIGHTS.speed * MAX_BONUS * 100),
       totalBonus: Math.round(bonus * 100),
     },
   };
+}
+
+/**
+ * Star rating for the debrief. Built from how the case was *worked*, not from
+ * the raw score, so a high-value expert case cannot buy stars a tutorial run
+ * could never reach.
+ *
+ * @returns {number} 1–5
+ */
+export function starsFor({ investigation = 0, objectives = { done: 0, total: 0 }, hintsUsed = 0, wrongAccusations = 0 }) {
+  const objectiveShare = objectives.total > 0 ? objectives.done / objectives.total : 0;
+  const worked = (clamp(investigation / 100, 0, 1) * 0.6) + (clamp(objectiveShare, 0, 1) * 0.4);
+  const penalties = Math.min(0.3, hintsUsed * 0.05 + wrongAccusations * 0.1);
+  const rating = clamp(worked - penalties, 0, 1);
+  return Math.max(1, Math.min(5, Math.round(rating * 5)));
 }

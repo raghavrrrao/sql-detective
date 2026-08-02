@@ -65,6 +65,28 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           <h2 className="mt-2 font-display text-2xl font-medium uppercase leading-tight text-bone sm:text-4xl">{report.title}</h2>
         </header>
 
+        {/*
+          The headline the player earned. Stars are built from how the case was
+          worked rather than from the raw score, so a tutorial run and an expert
+          run are rated on the same scale.
+        */}
+        {typeof report.investigation === 'number' && (
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border border-gold/25 bg-gold/[0.06] p-5">
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Investigation</p>
+              <p className="mt-1 typo-numeric text-4xl font-semibold leading-none text-gold-bright">{report.investigation}%</p>
+            </div>
+            {typeof report.stars === 'number' && (
+              <div className="text-right">
+                <p className="text-xs font-medium uppercase tracking-[0.16em] text-bone-dim">Rating</p>
+                <p className="mt-1 text-2xl leading-none text-gold-bright" aria-label={`${report.stars} out of 5 stars`}>
+                  <span aria-hidden="true">{'★'.repeat(report.stars)}{'☆'.repeat(5 - report.stars)}</span>
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+
         <dl className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           <Field label="Difficulty" value={report.difficulty} />
           <Field label="Date solved" value={formatDate(report.solvedAt)} />
@@ -92,9 +114,22 @@ export function CaseDebrief({ isOpen, onClose, report }) {
           </Section>
         )}
 
-        <Section title="Investigation coverage">
+        {/*
+          What was recovered against what was actually there. This is the replay
+          hook: "6 / 8 evidence" is the line that sends somebody back in.
+        */}
+        <Section title="What you recovered">
           <ul className="grid gap-2.5 sm:grid-cols-2">
-            {(report.ledger ?? []).map((row) => (
+            {(report.categories ?? []).map((row) => (
+              <li key={row.id} className="flex items-center justify-between gap-3 border-b border-white/10 pb-2 typo-body text-base text-bone-muted">
+                <span>{row.label}</span>
+                <span className={`font-mono text-sm ${row.recovered >= row.total ? 'text-verdict-clear' : 'text-bone'}`}>
+                  {row.recovered} / {row.total}
+                  {row.recovered < row.total && <span className="text-bone-dim"> · {row.total - row.recovered} missed</span>}
+                </span>
+              </li>
+            ))}
+            {(report.ledger ?? []).filter((row) => row.id === 'victim' || row.id === 'suspects').map((row) => (
               <li key={row.id} className="flex items-center justify-between gap-3 border-b border-white/10 pb-2 typo-body text-base text-bone-muted">
                 <span>{row.label}</span>
                 <span className="font-mono text-sm text-bone">{row.value}</span>

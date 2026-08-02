@@ -20,7 +20,7 @@ const factsFor = (timeLabel) => [
  * and which are missing. Neither reads the contents of a record.
  */
 export function NotebookOverview({ caseData, caseFacts }) {
-  const { ledger, insights, discoveries, reach } = useInvestigationSession();
+  const { ledger, insights, discoveries, reach, categories, investigation } = useInvestigationSession();
   const isTheft = caseFacts?.crimeType === 'theft';
   const facts = factsFor(caseFacts?.timeLabel ?? 'Time of death');
 
@@ -50,14 +50,63 @@ export function NotebookOverview({ caseData, caseFacts }) {
         )}
       </section>
 
+      {/*
+        Investigation, not completion. This measures the file the player has
+        built out of the database — every figure is a count of records they
+        recovered themselves, against a denominator that says how large the
+        table is and nothing about what is in it.
+      */}
       <section>
-        <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Investigation ledger</h3>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="font-display text-sm font-medium uppercase tracking-[0.16em] text-bone">Investigation</h3>
+          <p className="typo-numeric text-2xl font-semibold leading-none text-gold-bright">
+            {investigation}%<span className="sr-only"> investigated</span>
+          </p>
+        </div>
         <p className="mt-1.5 typo-body-secondary text-sm text-bone-dim">
-          Counts what you have recovered. A total only appears once you have read that table in full.
+          How far each line of enquiry has been worked. The mark on a bar is what counts as enough — you never have to empty a table.
         </p>
 
+        <div aria-hidden="true" className="mt-3 h-1.5 w-full overflow-hidden bg-white/10">
+          <span
+            className="block h-full bg-gradient-to-r from-crimson via-gold to-gold-bright transition-[width] duration-700"
+            style={{ width: `${investigation}%` }}
+          />
+        </div>
+
         <ul className="mt-4 space-y-2.5">
-          {ledger.map((entry) => {
+          {categories.map((category) => {
+            const style = category.isComplete ? stateStyles.done : category.isUnlocked ? stateStyles.partial : stateStyles.todo;
+            const Icon = style.icon;
+            return (
+              <li key={category.id} className="clip-corner-sm border border-white/10 bg-white/[0.035] px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <Icon size={17} className={style.tone} strokeWidth={2.2} aria-hidden="true" />
+                  <span className="min-w-0 flex-1 text-base font-medium text-bone">{category.label}</span>
+                  <span className={`clip-corner-sm border px-2.5 py-1 font-mono text-xs font-medium ${style.chip}`}>
+                    {category.recovered} / {category.total}
+                  </span>
+                </div>
+                <div aria-hidden="true" className="relative mt-2.5 h-1 w-full overflow-hidden bg-white/10">
+                  <span
+                    className={`block h-full transition-[width] duration-500 ${category.isComplete ? 'bg-verdict-clear' : 'bg-gold'}`}
+                    style={{ width: `${Math.round((category.recovered / Math.max(1, category.total)) * 100)}%` }}
+                  />
+                  <span
+                    className="absolute inset-y-0 w-px bg-bone/45"
+                    style={{ left: `${Math.round((category.target / Math.max(1, category.total)) * 100)}%` }}
+                  />
+                </div>
+                {!category.isUnlocked && (
+                  <p className="mt-2 typo-body-secondary text-xs text-bone-dim">{category.empty}</p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        <ul className="mt-4 space-y-2.5">
+          {ledger.filter((entry) => entry.id === 'victim' || entry.id === 'suspects').map((entry) => {
             const style = stateStyles[entry.state] ?? stateStyles.todo;
             const Icon = style.icon;
             return (

@@ -1,9 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ClipboardList, FolderOpen, MapPinned, MessagesSquare, Search, StickyNote, X } from 'lucide-react';
-import { EvidenceCard } from './EvidenceCard';
-import { TimelineBoard } from './TimelineBoard';
-import { WitnessReport } from './WitnessReport';
+import { ClipboardList, FileText, FolderOpen, MapPinned, MessagesSquare, Search, StickyNote, X } from 'lucide-react';
+import { DiscoveredRecord } from './DiscoveredRecord';
+import { boardFolderForTable } from '../utils/investigationCategories';
 import { useInvestigationSession } from '../state/investigationSession';
 
 const folderMeta = {
@@ -11,6 +10,7 @@ const folderMeta = {
   witnesses: { label: 'Statements', icon: MessagesSquare },
   'crime-scene': { label: 'Scene', icon: MapPinned },
   timeline: { label: 'Timeline', icon: ClipboardList },
+  documents: { label: 'Documents', icon: FileText },
   notes: { label: 'Leads', icon: StickyNote },
 };
 
@@ -18,13 +18,23 @@ function matches(value, term) {
   return term === '' || value.toLowerCase().includes(term);
 }
 
+/** Everything a discovery holds is searchable, including the columns it carries. */
+const searchText = (record) =>
+  `${record.title} ${record.table} ${record.location ?? ''} ${record.occurredAt ?? ''} ${record.suspects.join(' ')} ${Object.values(record.fields ?? {}).join(' ')}`;
+
 /**
- * The case board. Notebook sections become classified folders; the structured
- * evidence array renders as investigation cards inside the Evidence folder.
- * The open folder and any expanded exhibit survive a refresh.
+ * The case board.
+ *
+ * Every folder except Leads fills from the player's own discoveries. Nothing
+ * is here because the briefing handed it over — the folders start empty and a
+ * record appears the moment a query returns it, which is what makes SQL the
+ * way the case is read rather than a lock on the accuse button.
+ *
+ * Leads is the one exception, and deliberately so: it holds the official
+ * briefing the detective was given before the investigation started.
  */
-export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDrawerOpen, onClose }) {
-  const { expanded, toggleExpanded } = useInvestigationSession();
+export function Sidebar({ sections, activeFolder, onSelectFolder, isDrawerOpen, onClose }) {
+  const { expanded, toggleExpanded, discoveries, categories } = useInvestigationSession();
   const [search, setSearch] = useState('');
 
   const section = sections.find((entry) => entry.id === activeFolder) ?? sections[0];
@@ -35,9 +45,19 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
 
   const term = search.trim().toLowerCase();
 
-  const filteredEvidence = useMemo(
-    () => evidence.filter((item) => matches(`${item.title} ${item.category} ${item.description}`, term)),
-    [evidence, term],
+  // Discoveries filed under each folder, newest first.
+  const byFolder = useMemo(() => {
+    const grouped = {};
+    for (const record of discoveries) {
+      const folder = boardFolderForTable(record.table);
+      (grouped[folder] ??= []).push(record);
+    }
+    return grouped;
+  }, [discoveries]);
+
+  const folderRecords = useMemo(
+    () => (byFolder[sectionId] ?? []).filter((record) => matches(searchText(record), term)),
+    [byFolder, sectionId, term],
   );
 
   const filteredEntries = useMemo(
@@ -45,7 +65,13 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
     [section, term],
   );
 
-  const toggleExhibit = useCallback((id) => toggleExpanded(`board:evidence:${id}`), [toggleExpanded]);
+  // The category behind this folder, for the recovered/total line.
+  const progress = useMemo(
+    () => categories.find((category) => category.board === sectionId) ?? null,
+    [categories, sectionId],
+  );
+
+  const toggleRecord = useCallback((key) => toggleExpanded(`board:${key}`), [toggleExpanded]);
 
   // Arrow keys walk the folder tabs.
   const handleTabKeys = useCallback((event) => {
@@ -57,6 +83,8 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
     onSelectFolder(next.id);
     event.currentTarget.querySelector(`#board-tab-${next.id}`)?.focus();
   }, [sections, sectionId, onSelectFolder]);
+
+  const isLeads = sectionId === 'notes';
 
   return (
     <aside
@@ -82,6 +110,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
             const meta = folderMeta[entry.id] ?? { label: entry.title, icon: FolderOpen };
             const Icon = meta.icon;
             const isActive = entry.id === sectionId;
+            const count = entry.id === 'notes' ? 0 : (byFolder[entry.id]?.length ?? 0);
             return (
               <button
                 key={entry.id}
@@ -99,10 +128,29 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
                 }`}
               >
                 <Icon size={13} strokeWidth={2.2} aria-hidden="true" /> {meta.label}
+                {count > 0 && <span className="font-mono text-xs text-bone-muted">{count}</span>}
               </button>
             );
           })}
         </div>
+
+        {/* Recovered / total for the open folder */}
+        {progress && (
+          <div className="border-b border-white/10 px-3 py-2.5">
+            <div className="flex items-baseline justify-between gap-2">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-bone-dim">Recovered</p>
+              <p className="font-mono text-xs text-gold-bright">
+                {progress.recovered} / {progress.total}
+              </p>
+            </div>
+            <div aria-hidden="true" className="mt-2 h-1 w-full overflow-hidden bg-white/10">
+              <span
+                className={`block h-full transition-[width] duration-500 ${progress.isComplete ? 'bg-verdict-clear' : 'bg-gold'}`}
+                style={{ width: `${Math.round((progress.recovered / Math.max(1, progress.total)) * 100)}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Search */}
         <div className="border-b border-white/10 p-3">
@@ -128,25 +176,7 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.2 }}
             >
-              {sectionId === 'evidence' && (
-                <div className="space-y-3">
-                  {filteredEvidence.map((item, index) => (
-                    <EvidenceCard
-                      key={item.id}
-                      item={item}
-                      index={index}
-                      isOpen={Boolean(expanded[`board:evidence:${item.id}`])}
-                      onToggle={toggleExhibit}
-                    />
-                  ))}
-                  {filteredEvidence.length === 0 && <p className="px-1 py-6 text-sm text-bone-dim">No evidence matches that search.</p>}
-                </div>
-              )}
-
-              {sectionId === 'witnesses' && <WitnessReport entries={filteredEntries} />}
-              {sectionId === 'timeline' && <TimelineBoard entries={filteredEntries} />}
-
-              {(sectionId === 'crime-scene' || sectionId === 'notes') && (
+              {isLeads ? (
                 <ul className="space-y-3">
                   {filteredEntries.map((entry) => (
                     <li key={entry} className="clip-corner-sm panel-surface-raised p-4 typo-document text-[0.9rem] text-bone-muted">
@@ -154,6 +184,30 @@ export function Sidebar({ sections, evidence, activeFolder, onSelectFolder, isDr
                     </li>
                   ))}
                   {filteredEntries.length === 0 && <li className="px-1 py-6 text-sm text-bone-dim">Nothing matches that search.</li>}
+                </ul>
+              ) : (
+                <ul className="space-y-2.5">
+                  {folderRecords.map((record) => (
+                    <DiscoveredRecord
+                      key={record.key}
+                      record={record}
+                      isOpen={Boolean(expanded[`board:${record.key}`])}
+                      onToggle={toggleRecord}
+                    />
+                  ))}
+
+                  {folderRecords.length === 0 && (
+                    <li className="px-1 py-8 text-center">
+                      <p className="typo-body text-sm text-bone-muted">
+                        {term === '' ? (progress?.empty ?? 'Nothing recovered yet.') : 'Nothing in this folder matches that search.'}
+                      </p>
+                      {term === '' && progress && (
+                        <p className="mt-2 typo-body-secondary text-xs text-bone-dim">
+                          {progress.total} {progress.total === 1 ? 'record is' : 'records are'} on file in the database. Query for them.
+                        </p>
+                      )}
+                    </li>
+                  )}
                 </ul>
               )}
             </motion.div>
